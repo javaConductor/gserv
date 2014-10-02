@@ -1,0 +1,65 @@
+<!--
+  ~ The MIT License (MIT)
+  ~
+  ~ Copyright (c) 2014 Lee Collins
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<div ng-controller="ProgressDemoCtrl">
+
+    <h3>Static</h3>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <progressbar value="55"></progressbar>
+        </div>
+        <div class="col-sm-4">
+            <progressbar class="progress-striped" value="22" type="warning">22%</progressbar>
+        </div>
+        <div class="col-sm-4">
+            <progressbar class="progress-striped active" max="200" value="166" type="danger"><i>166 / 200</i>
+            </progressbar>
+        </div>
+    </div>
+
+    <hr/>
+    <h3>Dynamic
+        <button class="btn btn-sm btn-primary" type="button" ng-click="random()">Randomize</button>
+    </h3>
+    <progressbar max="max" value="dynamic"><span style="color:black; white-space:nowrap;">{{dynamic}} / {{max}}</span>
+    </progressbar>
+
+    <small><em>No animation</em></small>
+    <progressbar animate="false" value="dynamic" type="success"><b>{{dynamic}}%</b></progressbar>
+
+    <small><em>Object (changes type based on value)</em></small>
+    <progressbar class="progress-striped active" value="dynamic" type="{{type}}">{{type}} <i ng-show="showWarning">!!!
+        Watch out !!!</i></progressbar>
+
+    <hr/>
+    <h3>Stacked
+        <button class="btn btn-sm btn-primary" type="button" ng-click="randomStacked()">Randomize</button>
+    </h3>
+    <progress>
+        <bar ng-repeat="bar in stacked" value="bar.value" type="{{bar.type}}"><span ng-hide="bar.value < 5">{{bar.value}}%</span>
+        </bar>
+    </progress>
+
+</div>

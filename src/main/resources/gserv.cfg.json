@@ -1,0 +1,31 @@
+{
+    "https":{
+        "keyManagerAlgorithm": "SunX509",
+        "trustManagerAlgorithm": "SunX509",
+        "keystoreFilePath": "/Users/lcollins/gserv.keystore",
+        "keyStoreImplementation": "JKS",
+        "password": "remoteip",
+        "sslProtocol" : "TLS"
+    },
+    "plugins": {
+        "cors":             "com.soulsys.g_serv.plugins.cors.CorsPlugin",
+        "compression":"com.soulsys.g_serv.plugins.compression.CompressionPlugin.class",
+        "caching":        "com.soulsys.g_serv.plugins.caching.CachingPlugin.class"
+        },
+    "apps" : [{
+            "https": false,
+            "name" : "singlePageMath",
+            "resourceScripts" : ["resources/Resource1.groovy","resources/Resource2.groovy"],
+            "port" : 11111,
+            "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
+        },{
+              "https": true,
+              "name" : "singlePageMath2",
+              "resourceScripts" : ["resources/Resource2.groovy"],
+              "port" : 11112,
+              "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
+          }],
+
+    "classpath" : ["/apps/lib/*"]
+
+}
