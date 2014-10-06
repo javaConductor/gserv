@@ -24,6 +24,7 @@
 
 package com.soulsys.gserv.configuration
 
+import com.soulsys.gserv.GServ
 import com.soulsys.gserv.GServFactory
 import com.soulsys.gserv.exceptions.ConfigException
 import com.soulsys.gserv.resourceloader.ResourceLoader
@@ -69,6 +70,13 @@ class GServConfigFile {
             System.err.println("Error in gserv config(${configFile.absolutePath}) - No apps specified.  At least one is required.")
             return [];
         }
+        ClassLoader classLoader = GServ.classLoader
+        ///// Get the classpath and add those jars to the Classpath
+        if(cfg.classpath){
+            classLoader = addClasspath(classLoader, cfg.classpath)
+        }
+
+
         GServConfig newCfg;
         def configs = cfg.apps.collect { app ->
             newCfg = appToConfig(app)
@@ -79,6 +87,13 @@ class GServConfigFile {
         }
         configs
     }//parse
+
+    ClassLoader addClasspath(ClassLoader classLoader, List classpath){
+        def urls = classpath.collect { jar ->
+            new File(jar).toURI().toURL()
+        }
+        URLClassLoader.newInstance(urls, classLoader)
+    }
 
     def addResources(resourceScripts, config) {
         def resources = []

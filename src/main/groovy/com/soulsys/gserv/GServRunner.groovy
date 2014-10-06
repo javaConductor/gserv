@@ -52,6 +52,7 @@ class GServRunner {
         cli.s(longOpt: 'serverRoot', 'Server Static Root (used only when configFilePath is not present)', args: 1, required: false)
         cli.p(longOpt: 'port', 'Port (used only when configFilePath is not present)', args: 1, required: false)
         cli.d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', required: false)
+        cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         //d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.usage()
@@ -81,15 +82,21 @@ class GServRunner {
      * @param resourceScripts
      * @return list of configs (containing one config)
      */
-    def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts) {
+    def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts, classpath) {
         GServConfig cfg
+        ClassLoader classLoader = GServ.classLoader
+
+        if (classpath){
+            classLoader = this.addClasspath(classLoader, classpath)
+        }
+
         if (instanceScript) {
-            cfg = resourceLoader.loadInstance(new File(instanceScript))
+            cfg = resourceLoader.loadInstance(new File(instanceScript), classLoader)
         }
 
         cfg = cfg ?: factory.createGServConfig()
         if (resourceScripts) {
-            def resources = scriptLoader.loadResources(resourceScripts)
+            def resources = scriptLoader.loadResources(resourceScripts, classLoader)
             cfg.addResources(resources)
         }
         if (staticRoot) {
@@ -134,7 +141,7 @@ class GServRunner {
         def configFile
         def configFilename = options.c;
         if (!configFilename) {
-            def staticRoot, port, defaultResource, resourceScripts, instanceScript;
+            def staticRoot, port, classpath, defaultResource, resourceScripts, instanceScript;
             if (!options.p)
                 throw new ConfigException("Port is required for gserv cli.")
 
@@ -143,12 +150,14 @@ class GServRunner {
             defaultResource = options.d;
             resourceScripts = options.rs;
             instanceScript = options.i;
+            classpath = options.js;
             configs = createConfigs(
                     staticRoot,
                     port,
                     defaultResource,
                     instanceScript,
-                    resourceScripts);
+                    resourceScripts,
+            classpath);
         } else {   // use ONLY the config file and ignore everything else on the cmdLine
             configFile = new File(configFilename);
             if (!configFile.exists()) {
@@ -156,12 +165,25 @@ class GServRunner {
             }
             configs = createConfigs(configFile)
         }
-        /// should never return from this call
-        withPool(configs.size()) {
-            configs.eachParallel { cfg ->
+
+        def stopFns = configs.collect { cfg ->
                 def instance = factory.createHttpInstance(cfg);
                 instance.start(cfg.port())
             }
-        }
+
+        Thread.sleep(300)
+
+        return ({ ->
+            stopFns.each { stopFn -> stopFn() }
+        });
+
     }//start
+
+    ClassLoader addClasspath(ClassLoader classLoader, List classpath){
+        def urls = classpath.collect { jar ->
+            new File(jar).toURI().toURL()
+        }
+        URLClassLoader.newInstance(urls, classLoader)
+    }
+
 }//class

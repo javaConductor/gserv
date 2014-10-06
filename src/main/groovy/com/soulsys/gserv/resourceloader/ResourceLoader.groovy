@@ -32,7 +32,6 @@ import com.soulsys.gserv.configuration.GServConfig
  * Created by lcollins on 8/14/2014.
  */
 class ResourceLoader {
-    static GroovyShell _groovyShell = new GroovyShell(GServ.classLoader)
     static def resourceCache = [:]
 
     /**
@@ -41,10 +40,11 @@ class ResourceLoader {
      * @param instanceScriptFile
      * @return List<gServResource>
      */
-    def loadResources(File resourceScriptFile) {
+    def loadResources(File resourceScriptFile, ClassLoader classLoader) {
         if (!(resourceScriptFile?.exists()))
             return [];
-        def resources = resourceCache[resourceScriptFile.absolutePath] ?: _groovyShell.evaluate(resourceScriptFile)
+        GroovyShell groovyShell = new GroovyShell(classLoader)
+        def resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
         resourceCache[resourceScriptFile.absolutePath] = resources
         resources
     }
@@ -54,10 +54,11 @@ class ResourceLoader {
      * @param instanceScriptFile
      * @return GServConfig
      */
-    GServConfig loadInstance(File instanceScriptFile) {
+    GServConfig loadInstance(File instanceScriptFile, ClassLoader classLoader) {
         if (!(instanceScriptFile?.exists()))
             return null;
-        GServInstance instance = _groovyShell.evaluate(instanceScriptFile)
+        GroovyShell groovyShell = new GroovyShell(classLoader)
+        GServInstance instance = groovyShell.evaluate(instanceScriptFile)
         instance ? instance.config() : null
     }
 }

@@ -165,7 +165,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 actr << [exchange: httpExchange, pattern: pattern]
             } catch (IllegalStateException e) {
                 if (e.message.startsWith("The actor cannot accept messages at this point.")) {
-                    //TODO needs new handle
+                    //TODO needs new handler
                     println "Actor in bad state: replacing."
                     _actorPool.replaceActor(actr)
                     println "Actor in bad state: replaced and reprocessed!"

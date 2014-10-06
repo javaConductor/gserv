@@ -45,8 +45,10 @@ public class Stress2Test {
                 writeJson([word: word, upperCase: word.toUpperCase(), lowerCase: word.toLowerCase()])
             }
         }
-        Thread.start { http.start(10000) }
+        def stopFn
+        Thread.start { stopFn  = http.start(10000) }
         Thread.sleep(200)
+        if (stopFn) stopFn()
     }
 
 //    @Test

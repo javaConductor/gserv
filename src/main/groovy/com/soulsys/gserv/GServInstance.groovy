@@ -29,6 +29,7 @@ import com.soulsys.gserv.events.Events
 import com.soulsys.gserv.wrapper.ExchangeWrapper
 import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpsServer
 import groovy.util.logging.Log4j
 import javax.net.ssl.*
 import java.security.KeyStore
@@ -100,8 +101,13 @@ class GServInstance {
         def appName = _cfg.name() ?: "gserv"
         println "$appName starting HTTP on port ${server.address.port}"
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
-        server.start();
-    }
+        Thread.start {
+            server.start();
+        }
+        return ({ ->
+            server.stop(0);
+        });
+    };
 
     def config() {
         return _cfg;
@@ -228,7 +234,12 @@ class gServHttpsInstance extends GServInstance {
         println "$appName starting HTTPS on port ${server.address.port}"
 
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
-        server.start();
+        Thread.start {
+            server.start();
+        }
+        return ({ ->
+            server.stop(0);
+        });
     }
 
 }

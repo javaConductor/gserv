@@ -51,14 +51,17 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'log4j:log4j:1.2.17'
-    compile('org.codehaus.groovy:groovy-all:2.3.0')
+//    compile('org.codehaus.groovy:groovy-all:2.3.0')
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
     compile('org.codehaus.gpars:gpars:1.1.0')
     compile('commons-io:commons-io:2.4')
     compile 'org.pegdown:pegdown:1.2.1'
     compile 'commons-cli:commons-cli:1.2'
 
     /// needed for Grab/Grape
-    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
+    compile 'org.apache.ivy:ivy:2.2.0'
+
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     testCompile "junit:junit:4.11"

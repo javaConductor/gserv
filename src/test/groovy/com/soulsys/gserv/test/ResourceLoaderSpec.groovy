@@ -24,11 +24,13 @@
 
 package com.soulsys.gserv.test
 
+import com.soulsys.gserv.GServ
 import com.soulsys.gserv.resourceloader.ResourceLoader
 import spock.lang.Specification
 
 public class ResourceLoaderSpec extends Specification {
-ResourceLoader resourceLoader
+    ResourceLoader resourceLoader
+    ClassLoader classLoader = GServ.classLoader
 	def "Should load gserv resource list"() {
 
         URI uri = ClassLoader.getSystemResource("test/Resource1.groovy").toURI()
@@ -36,7 +38,7 @@ ResourceLoader resourceLoader
 
         when:
             resourceLoader = new ResourceLoader()
-            resources = resourceLoader.loadResources( new File(uri) )
+            resources = resourceLoader.loadResources( new File(uri), classLoader )
 
         then:
             resources.size() == 1

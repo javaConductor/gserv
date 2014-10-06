@@ -255,7 +255,7 @@ class gServHandler implements HttpHandler {
 
         def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
         // def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
-        //TODO Use the CPUs + 1 strategy
+        //TODO Use the CORES + 1 strategy
         _nuDispatcher = {
             _factory.createDispatcher(actors, _routes, _staticRoots,
                     _templateEngineName,
