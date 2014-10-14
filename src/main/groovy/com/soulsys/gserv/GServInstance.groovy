@@ -26,12 +26,26 @@ package com.soulsys.gserv
 
 import com.soulsys.gserv.events.EventManager
 import com.soulsys.gserv.events.Events
+import com.soulsys.gserv.jmx.GServJMX
+import com.soulsys.gserv.jmx.GServJMXMXBean
 import com.soulsys.gserv.wrapper.ExchangeWrapper
-import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpsServer
+import groovy.jmx.builder.JmxBuilder
 import groovy.util.logging.Log4j
+
+import javax.management.Attribute
+import javax.management.AttributeList
+import javax.management.MBeanServer
+import javax.management.MBeanServerConnection
+import javax.management.ObjectInstance
+import javax.management.ObjectName
+import javax.management.StandardMBean
+import javax.management.remote.JMXConnectorFactory
+import javax.management.remote.JMXServiceURL
 import javax.net.ssl.*
+import java.lang.management.ManagementFactory
+import java.rmi.registry.LocateRegistry
 import java.security.KeyStore
 
 /**
@@ -59,13 +73,45 @@ class GServInstance {
         _templateEngineName = cfg.templateEngineName();
     }
 
+    def mbean
+
+    def exportMBean(actualPort, jmxBean) {
+
+        System.properties.put('com.sun.management.jmxremote.ssl', true);
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
+        JmxBuilder jmx = new JmxBuilder(mbs)
+        def connection = jmx.server(port: 8090)
+
+//        def beans = jmx.export {
+//            bean(jmxBean){
+//                attributes: "*"
+//            }
+//        }
+        def beans = jmx.export(policy: "replace") {
+            bean(
+                    target: jmxBean,
+                    name: name
+            )
+        }
+
+        this.mbean = (GroovyMBean) beans[0]
+//        println "JMX MBean: ${this.mbean}"
+        this.mbean
+    }
+
     /**
      * This method will start the server on 'port'.
      *
      * @param port
      */
     def start(port = null) {
-        def actualPort = (port ?: _cfg.port());
+        def actualPort = (port ?: _cfg.port())
+
+        exportMBean(actualPort,
+                new GServJMX()
+        );
+
         def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(actualPort as Integer), 0);
         def context = server.createContext("/", _handler);
         def requestId = 1L;
@@ -150,6 +196,12 @@ class gServHttpsInstance extends GServInstance {
      */
     def start(port = null) {
         def actualPort = (port ?: _cfg.port())
+
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
+        GServJMX mbean = new GServJMX();
+        mbs.registerMBean(mbean, name);
+
         def httpsConfig = this._cfg.httpsConfig()
         assert (httpsConfig.password)
         def keyManagerAlgorithm = httpsConfig.keyManagerAlgorithm ?: "SunX509"

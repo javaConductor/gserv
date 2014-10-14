@@ -79,7 +79,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     /**
      * Search Application resources when resolving request paths
      *
-      * @param bUseResourceDocs
+     * @param bUseResourceDocs
      * @return
      *
      */
@@ -132,7 +132,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
 
 /**
  *
-  * @param staticRoots
+ * @param staticRoots
  * @return
  */
     def staticRoots(staticRoots) {
@@ -164,12 +164,25 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 actr = (_actorPool.next())
                 actr << [exchange: httpExchange, pattern: pattern]
             } catch (IllegalStateException e) {
+                evtMgr.publish(Events.RequestProcessingError, [
+                        requestId   : httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
+                        routePath   : pattern.toString(),
+                        errorMessage: e.message,
+                        method      : httpExchange.getRequestMethod()])
+
                 if (e.message.startsWith("The actor cannot accept messages at this point.")) {
                     //TODO needs new handler
                     println "Actor in bad state: replacing."
                     _actorPool.replaceActor(actr)
                     println "Actor in bad state: replaced and reprocessed!"
                     process(httpExchange)
+                } else {
+                    evtMgr.publish(Events.RequestProcessingError, [
+                            requestId   : httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
+                            routePath   : pattern.toString(),
+                            errorMessage: e.message,
+                            method      : httpExchange.getRequestMethod()])
+
                 }
             }
             //println "AsyncDispatcher.process(): route $pattern sent to processor."

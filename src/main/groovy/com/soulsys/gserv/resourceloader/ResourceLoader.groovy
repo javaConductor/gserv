@@ -27,10 +27,13 @@ package com.soulsys.gserv.resourceloader
 import com.soulsys.gserv.GServ
 import com.soulsys.gserv.GServInstance
 import com.soulsys.gserv.configuration.GServConfig
+import groovy.util.logging.Log4j
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 /**
  * Created by lcollins on 8/14/2014.
  */
+@Log4j
 class ResourceLoader {
     static def resourceCache = [:]
 
@@ -44,8 +47,17 @@ class ResourceLoader {
         if (!(resourceScriptFile?.exists()))
             return [];
         GroovyShell groovyShell = new GroovyShell(classLoader)
-        def resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
-        resourceCache[resourceScriptFile.absolutePath] = resources
+        def resources
+        try {
+            resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
+            resourceCache[resourceScriptFile.absolutePath] = resources
+        } catch (MultipleCompilationErrorsException ex) {
+            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
+        } catch (Throwable ex) {
+            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
+        }
         resources
     }
 

@@ -26,7 +26,9 @@ package com.soulsys.gserv.configuration.scriptloader
 
 import com.soulsys.gserv.GServInstance
 import com.soulsys.gserv.configuration.GServConfig
+import com.soulsys.gserv.resourceloader.InstanceScriptException
 import com.soulsys.gserv.resourceloader.ResourceLoader
+import com.soulsys.gserv.resourceloader.ResourceScriptException
 
 /**
  * Created by lcollins on 8/26/2014.
@@ -53,14 +55,16 @@ class ScriptLoader {
                         System.err.println("No resourceScript: ${f.absolutePath}")
                         return []
                     }
-                    return (resourceLoader.loadResources(f, classLoader) ?: [])
+                    def instances = []
+                    try {
+                        instances = resourceLoader.loadResources(f, classLoader)
+                    } catch (ResourceScriptException ex) {
+                        throw new InstanceScriptException(ex.message)
+                    } catch (Throwable ex) {
+                        throw ex
+                    }
+                    return instances ?: []
                 }.flatten()
     };////
-//
-//    GServConfig addResources(resourceScripts, config) {
-//        def resources = loadResources(resourceScripts)
-//        config.addResources(resources)
-//        config;
-//    };////
 
 }

@@ -52,6 +52,12 @@ class GServ {
             "matchedRoute"   : 'g$$matchedRoute',
             "postProcessList": 'g$$postProcessList'
     ]
+    static def returnCodes = [
+            Normal                  : 0,
+            InstanceCompilationError: -1,
+            ResourceCompilationError: -2,
+            GeneralError            : -3
+    ]
 
     def serverPlugins = new gServPlugins()// has no plugins
 

@@ -28,7 +28,10 @@ import com.soulsys.gserv.configuration.GServConfig
 import com.soulsys.gserv.configuration.GServConfigFile
 import com.soulsys.gserv.configuration.scriptloader.ScriptLoader
 import com.soulsys.gserv.exceptions.ConfigException
+import com.soulsys.gserv.resourceloader.InstanceScriptException
 import com.soulsys.gserv.resourceloader.ResourceLoader
+import com.soulsys.gserv.resourceloader.ResourceScriptException
+import groovy.util.logging.Log4j
 import org.apache.commons.cli.Option
 
 import static groovyx.gpars.GParsPool.withPool
@@ -36,6 +39,7 @@ import static groovyx.gpars.GParsPool.withPool
 /**
  * Runs instances of gserv  as specified by the command-line args.
  */
+@Log4j
 class GServRunner {
     def factory = new GServFactory();
     def scriptLoader = new ScriptLoader();
@@ -55,7 +59,7 @@ class GServRunner {
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         //d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
-        cli.usage()
+//        cli.usage()
     }
 
     /**
@@ -68,8 +72,12 @@ class GServRunner {
         //TODO must add the [get('\', file(defaultPage) )] to the server config.
         /// read the config to get the 'https' and 'apps' info
         GServConfigFile configFile = new GServConfigFile()
-        List<GServConfig> configs = configFile.parse(cfgFile);
-        configs
+        try {
+            return configFile.parse(cfgFile);
+        } catch (Exception ex) {
+            log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
+            throw ex;
+        }
     }//createConfig
 
     /**
@@ -96,8 +104,18 @@ class GServRunner {
 
         cfg = cfg ?: factory.createGServConfig()
         if (resourceScripts) {
-            def resources = scriptLoader.loadResources(resourceScripts, classLoader)
-            cfg.addResources(resources)
+
+            try {
+                def resources = scriptLoader.loadResources(resourceScripts, classLoader)
+                cfg.addResources(resources)
+            } catch (Throwable ex) {
+                log.error("Could not load resource script: ${ex.message}")
+                println ex.message
+                throw ex
+//                System.exit(GServ.returnCodes.ResourceCompilationError);
+            }
+
+
         }
         if (staticRoot) {
             cfg.addStaticRoots([staticRoot])
@@ -140,30 +158,44 @@ class GServRunner {
         def configs
         def configFile
         def configFilename = options.c;
-        if (!configFilename) {
-            def staticRoot, port, classpath, defaultResource, resourceScripts, instanceScript;
-            if (!options.p)
-                throw new ConfigException("Port is required for gserv cli.")
+        try {
+            if (!configFilename) {
+                def staticRoot, port, classpath, defaultResource, resourceScripts, instanceScript;
+                if (!options.p)
+                    throw new ConfigException("Port is required for gserv cli.")
 
-            staticRoot = options.s;
-            port = options.p as int;
-            defaultResource = options.d;
-            resourceScripts = options.rs;
-            instanceScript = options.i;
-            classpath = options.js;
-            configs = createConfigs(
-                    staticRoot,
-                    port,
-                    defaultResource,
-                    instanceScript,
-                    resourceScripts,
-            classpath);
-        } else {   // use ONLY the config file and ignore everything else on the cmdLine
-            configFile = new File(configFilename);
-            if (!configFile.exists()) {
-                throw new IllegalArgumentException("ConfigFile $configFilename not found!");
+                staticRoot = options.s;
+                port = options.p as int;
+                defaultResource = options.d;
+                resourceScripts = options.rs;
+                instanceScript = options.i;
+                classpath = options.js;
+                configs = createConfigs(
+                        staticRoot,
+                        port,
+                        defaultResource,
+                        instanceScript,
+                        resourceScripts,
+                        classpath);
+            } else {   // use ONLY the config file and ignore everything else on the cmdLine
+                configFile = new File(configFilename);
+                if (!configFile.exists()) {
+                    throw new IllegalArgumentException("ConfigFile $configFilename not found!");
+                }
+                configs = createConfigs(configFile)
             }
-            configs = createConfigs(configFile)
+        } catch (ResourceScriptException ex) {
+            log.error("Could not start app.", ex)
+            //System.exit(GServ.returnCodes.ResourceCompilationError)
+            throw ex;
+        } catch (InstanceScriptException ex) {
+            log.error("Could not start app.", ex)
+            //System.exit(GServ.returnCodes.InstanceCompilationError)
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("Could not start app.", ex)
+            //System.exit(GServ.returnCodes.GeneralError)
+            throw ex;
         }
 
         def stopFns = configs.collect { cfg ->
@@ -183,7 +215,8 @@ class GServRunner {
         def urls = classpath.collect { jar ->
             new File(jar).toURI().toURL()
         }
-        URLClassLoader.newInstance(urls, classLoader)
+        new URLClassLoader(urls as URL[], classLoader)
+//        URLClassLoader.newInstance(urls, classLoader)
     }
 
 }//class

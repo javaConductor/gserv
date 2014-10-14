@@ -30,10 +30,12 @@ import com.soulsys.gserv.exceptions.ConfigException
 import com.soulsys.gserv.resourceloader.ResourceLoader
 import groovy.json.JsonSlurper
 import com.soulsys.gserv.plugins.PluginMgr
+import groovy.util.logging.Log4j
 
 /**
  * Created by lcollins on 8/14/2014.
  */
+@Log4j
 class GServConfigFile {
     ResourceLoader resourceLoader = new ResourceLoader()
     GServFactory factory = new GServFactory()
@@ -79,7 +81,13 @@ class GServConfigFile {
 
         GServConfig newCfg;
         def configs = cfg.apps.collect { app ->
-            newCfg = appToConfig(app)
+
+            try {
+                newCfg = appToConfig(app)
+            } catch (Exception ex) {
+                log.error("Unable to instantiate configuration", ex)
+                throw ex;
+            }
             if (httpsCfg && app.https) {
                 newCfg.httpsConfig(httpsCfg);
             }
@@ -115,7 +123,14 @@ class GServConfigFile {
     def appToConfig(app) {
         def config = factory.createGServConfig()
         app.with {
-            config = addResources(resourceScripts, config);
+
+            try {
+                config = addResources(resourceScripts, config);
+            } catch (Exception ex) {
+                log.debug("Could not load resource scripts.", ex)
+                throw ex
+            }
+
             registerPlugins(plugins)
             if (port) {
                 config.port(port)
