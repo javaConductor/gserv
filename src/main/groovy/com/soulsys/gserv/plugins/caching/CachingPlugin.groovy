@@ -29,7 +29,7 @@ import com.soulsys.gserv.filters.FilterOptions
 import com.soulsys.gserv.plugins.AbstractPlugin
 
 /**
- * Created by lcollins on 4/23/2014.
+ * Created by javaConductor on 4/23/2014.
  */
 class CachingPlugin extends AbstractPlugin {
     def options

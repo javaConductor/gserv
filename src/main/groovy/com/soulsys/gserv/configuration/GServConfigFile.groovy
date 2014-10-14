@@ -33,7 +33,7 @@ import com.soulsys.gserv.plugins.PluginMgr
 import groovy.util.logging.Log4j
 
 /**
- * Created by lcollins on 8/14/2014.
+ * Created by javaConductor on 8/14/2014.
  */
 @Log4j
 class GServConfigFile {

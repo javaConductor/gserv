@@ -27,7 +27,7 @@ package com.soulsys.gserv.plugins
 import com.soulsys.gserv.Route
 
 /**
- * Created by lcollins on 3/22/14.
+ * Created by javaConductor on 3/22/14.
  */
 abstract class AbstractPlugin implements IPlugin {
     @Override

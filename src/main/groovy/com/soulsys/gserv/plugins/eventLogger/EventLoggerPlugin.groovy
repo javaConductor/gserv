@@ -40,7 +40,7 @@ import groovy.util.logging.Log
  * Provides filter where path = Config.url || '/log'
  *
  *
- * Created by lcollins on 2/5/14.
+ * Created by javaConductor on 2/5/14.
  */
 @Log
 class EventLoggerPlugin extends AbstractPlugin {
@@ -89,7 +89,8 @@ class EventLoggerPlugin extends AbstractPlugin {
 
     @Override
     List<Route> filters() {
-        def f = RouteFactory.createBeforeFilterURLPattern("EventLogFilter", '*', "/", [(FilterOptions.PassRouteParams): false]) { ->
+        def f = RouteFactory.createBeforeFilterURLPattern("EventLogFilter", '*', "/", [(FilterOptions.PassRouteParams): false]) {
+            ->
 /*
             if (exchange.requestURI.path.startsWith(logSincePrefix)) {
                 Date d = formatUTC(exchange.requestURI.path.substring(11))

@@ -28,7 +28,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 /**
- * Created by lcollins on 3/30/14.
+ * Created by javaConductor on 3/30/14.
  */
 class DateUtils {
 

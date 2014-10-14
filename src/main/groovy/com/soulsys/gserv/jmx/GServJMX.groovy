@@ -3,7 +3,7 @@ package com.soulsys.gserv.jmx
 import groovy.time.Duration
 
 /**
- * Created by lcollins on 10/7/2014.
+ * Created by javaConductor on 10/7/2014.
  */
 class GServJMX implements GServJMXMXBean {
     def GServJMX() {

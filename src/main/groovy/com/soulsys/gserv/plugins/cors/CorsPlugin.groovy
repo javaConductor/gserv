@@ -38,7 +38,7 @@ class CORSMode {
 
 /**
  *
- * Created by lcollins on 1/13/14.
+ * Created by javaConductor on 1/13/14.
  *
  */
 @Log4j

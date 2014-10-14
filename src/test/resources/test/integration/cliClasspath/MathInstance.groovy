@@ -1,3 +1,4 @@
+package test.integration.cliClasspath
 /*
  * The MIT License (MIT)
  *
@@ -22,38 +23,15 @@
  * THE SOFTWARE.
  */
 
-package com.soulsys.gserv.plugins
+import com.soulsys.gserv.*
+import com.soulsys.gserv.test.cli.math.CliMathService
 
-import com.soulsys.gserv.events.EventManager
-import com.soulsys.gserv.events.Events
+def service = new CliMathService()
 
-/**
- * Created by javaConductor on 1/24/14.
- */
-class PluginMgr {
-
-    private static final INSTANCE = new PluginMgr()
-
-    static def instance() { INSTANCE }
-
-    private def PluginMgr() {
-    }
-
-    def plugins = [:]
-
-    def register(name, Class pluginClass) {
-        plugins[name] = pluginClass
-        EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
-    }
-
-    IPlugin plugin(name, options) {
-        def clazz = plugins[name]
-        def ret
-        if (clazz) {
-            ret = clazz.newInstance()
-            ret.init(options)
+    new GServ().http {
+        get("/math/add/:num1/:num2") { num1, num2 ->
+            def ans = service.calc("add", num1, num2)
+            def msg = "Adding $num1 to $num2 == $ans"
+            write(msg.bytes)
         }
-        EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
-        ret
     }
-}

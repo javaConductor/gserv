@@ -37,17 +37,17 @@ import org.apache.commons.io.IOUtils
 import org.pegdown.PegDownProcessor
 
 /**
- * Created by lcollins on 5/13/2014.
+ * Created by javaConductor on 5/13/2014.
  */
 @Log4j
 class MarkdownPlugin extends AbstractPlugin {
-    def contentTypes = ["text/x-markdown","application/markdown"]
-    def fileExtensions = ["md","markdown"]
+    def contentTypes = ["text/x-markdown", "application/markdown"]
+    def fileExtensions = ["md", "markdown"]
     PegDownProcessor pegDownProcessor = new PegDownProcessor()
     boolean filterContentType = true
 
     @Override
-    def init( options) {
+    def init(options) {
 //        filterContentType = options?.filterContentType
         return null
     }
@@ -59,8 +59,8 @@ class MarkdownPlugin extends AbstractPlugin {
      */
     @Override
     List<Route> filters() {
-        [RouteFactory.createAfterFilterURLPattern("MarkdownPluginFilter", "GET", "/*",[ (FilterOptions.PassRouteParams) : false, (FilterOptions.MatchedRoutesOnly ): true]){e, data ->
-                handleAfter(e, data)
+        [RouteFactory.createAfterFilterURLPattern("MarkdownPluginFilter", "GET", "/*", [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedRoutesOnly): true]) { e, data ->
+            handleAfter(e, data)
         }]
     }
 
@@ -73,7 +73,7 @@ class MarkdownPlugin extends AbstractPlugin {
      */
     @Override
     MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
-        if ( delegateType == DelegateTypes.HttpMethod){
+        if (delegateType == DelegateTypes.HttpMethod) {
             delegateMetaClass.writeMarkdown << writeMarkdown
         }
         return super.decorateDelegate(delegateType, delegateMetaClass)
@@ -88,24 +88,24 @@ class MarkdownPlugin extends AbstractPlugin {
         def writer = new StringWriter();
         IOUtils.copy(inStream, writer)
         def bytes = pegDownProcessor.markdownToHtml(writer.buffer.toString()).bytes
-        write( bytes )
+        write(bytes)
     }
 
     private def handleAfter(ExchangeWrapper exchange, data) {
         /// if the name is known MD extension
         def convertMarkdown = isMarkdownFilePath(fileExtensions, exchange.requestURI.path)
-        log.debug ( "Found MD file: $convertMarkdown")
-         def bytes = ( !convertMarkdown ) ? data : pegDownProcessor.markdownToHtml(new String(data)).bytes
-        if(convertMarkdown){
+        log.debug("Found MD file: $convertMarkdown")
+        def bytes = (!convertMarkdown) ? data : pegDownProcessor.markdownToHtml(new String(data)).bytes
+        if (convertMarkdown) {
             exchange.responseHeaders.set('Content-type', "text/html")
-            exchange.responseHeaders.set('Content-length', ""+bytes.size())
+            exchange.responseHeaders.set('Content-length', "" + bytes.size())
         }
         bytes
     }
 
-    def isMarkdownFilePath(fileExtensions, path){
-       !( ! fileExtensions.find {
-            path.endsWith('.'+it)
+    def isMarkdownFilePath(fileExtensions, path) {
+        !(!fileExtensions.find {
+            path.endsWith('.' + it)
         });
     }
 

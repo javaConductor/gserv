@@ -27,7 +27,7 @@ package com.soulsys.gserv.plugins.cors
 import groovy.util.logging.Log4j
 
 /**
- * Created by lcollins on 1/13/14.
+ * Created by javaConductor on 1/13/14.
  */
 @Log4j
 class CORSConfig {
@@ -45,7 +45,7 @@ class CORSConfig {
                             customRequestHeaders: []
                     ],
                     "129.25.192.33": [
-                            methods: ["GET"],
+                            methods             : ["GET"],
                             maxAge              : 7200,
                             customRequestHeaders: []
                     ]

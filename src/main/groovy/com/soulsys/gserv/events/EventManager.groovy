@@ -28,7 +28,7 @@ import groovyx.gpars.GParsPool
 import groovyx.gpars.actor.Actors
 
 /**
- * Created by lcollins on 1/17/14.
+ * Created by javaConductor on 1/17/14.
  */
 
 class _subscription {
@@ -76,7 +76,7 @@ class EventManager {
     def publish(topic, data) {
         data.'when' = new Date()
         try {
-           _act << new _broadcast([topic: topic, data: data])
+            _act << new _broadcast([topic: topic, data: data])
         }
         catch (Throwable ex) {
             System.err.println("EventManager.publish. Exception: ${ex.message}")

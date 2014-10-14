@@ -31,7 +31,7 @@ import com.soulsys.gserv.resourceloader.ResourceLoader
 import com.soulsys.gserv.resourceloader.ResourceScriptException
 
 /**
- * Created by lcollins on 8/26/2014.
+ * Created by javaConductor on 8/26/2014.
  */
 class ScriptLoader {
 

@@ -25,7 +25,7 @@
 package com.soulsys.gserv
 
 /**
- * Created by lcollins on 3/5/14.
+ * Created by javaConductor on 3/5/14.
  */
 class Main {
 

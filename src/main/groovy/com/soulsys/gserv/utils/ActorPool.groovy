@@ -25,7 +25,7 @@
 package com.soulsys.gserv.utils
 
 /**
- * Created by lcollins on 5/4/2014.
+ * Created by javaConductor on 5/4/2014.
  */
 class ActorPool {
     def actorList = []

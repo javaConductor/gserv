@@ -22,38 +22,12 @@
  * THE SOFTWARE.
  */
 
-package com.soulsys.gserv.plugins
-
-import com.soulsys.gserv.events.EventManager
-import com.soulsys.gserv.events.Events
-
-/**
- * Created by javaConductor on 1/24/14.
- */
-class PluginMgr {
-
-    private static final INSTANCE = new PluginMgr()
-
-    static def instance() { INSTANCE }
-
-    private def PluginMgr() {
-    }
-
-    def plugins = [:]
-
-    def register(name, Class pluginClass) {
-        plugins[name] = pluginClass
-        EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
-    }
-
-    IPlugin plugin(name, options) {
-        def clazz = plugins[name]
-        def ret
-        if (clazz) {
-            ret = clazz.newInstance()
-            ret.init(options)
+import com.soulsys.gserv.*
+[
+        GServ.Resource("/upper") {
+            get("/:word") { word ->
+                write(word.toUpperCase().bytes)
+            }
         }
-        EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
-        ret
-    }
-}
+]
+
