@@ -22,7 +22,8 @@
  * THE SOFTWARE.
  */
 
-import com.soulsys.gserv.*
+import org.groovyrest.gserv.*
+
 [
         GServ.Resource("/upper") {
             get("/:word") { word ->

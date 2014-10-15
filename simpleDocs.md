@@ -57,7 +57,7 @@ Creating services in g-serv is extremely simple.
 The following code creates an HTTP server and starts it listening to port 8080:
 
 ```
-import com.soulsys.gserv.GServ
+import org.groovyrest.gserv.GServ
 class WelcomeService {
 
     public static void main(String[] args) {

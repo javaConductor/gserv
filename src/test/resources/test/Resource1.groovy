@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import com.soulsys.gserv.*
+import org.groovyrest.gserv.*
 
 [
         GServ.Resource("/hello") {

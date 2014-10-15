@@ -2,7 +2,7 @@ package test.integration.basicauth
 /**
  * Created by javaConductor on 9/28/2014.
  */
-import com.soulsys.gserv.GServ
+import org.groovyrest.gserv.GServ
 
 def gserv = new GServ();
 

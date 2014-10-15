@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import com.soulsys.gserv.*
+import org.groovyrest.gserv.*
 import com.soulsys.gserv.test.cli.math.CliMathService
 
 def service = new CliMathService()
