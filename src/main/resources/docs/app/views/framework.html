@@ -1,0 +1,160 @@
+<div>
+    <h1>GServ Framework</h1>
+    GServ framework provides a container-free way to expose new or existing functionality as a REST based service.
+    <hr/>
+    <h2>Requirements</h2>
+    <hr/>
+    <p>Add GServ to your dependencies:<br/>
+        Gradle: "org.groovyrest:gserv:0.0.1"<br/>
+        Maven: group: "org.groovyrest", name::"gserv", version:"0.0.1"
+    </p>
+
+    <h2>Creating REST Resources:</h2>
+    <hr/>
+    <p>Creating REST resources is easy to do. Simply use the static function:
+    <pre>GServ.Resource<(name, config)</pre>
+    <br/>
+    Here, we will create a Books REST resource.
+    </p>
+<pre>
+def gserv = new GServ()
+
+/// Create a Books REST resource
+
+/* the root path is passed to the GServ.resource() method
+along with a closure defining the endpoints of the resource
+*/
+
+def bkResource = gserv.resource("/books") {
+      ////
+      // responds  to /books/faq
+      get("/faq", file("BooksFaq.html"))
+      // responds  to /books/xyz
+      get(":id"), { id ->
+          def book = bookService.get( id )
+          writeJson(book)
+      }
+      // responds  to /books/all
+      get("/all", {  ->
+        def books = bookService.allBooks ()
+        header("content-type", "application/json")
+        writeJSON(books)
+    })
+}
+</pre>
+
+<span>
+    After this call, bkResource represents a resource with root '/books' and 3 routes:<br/>
+    <li>GET path='/books/faq'</li>
+    <li>GET path='/books/all'</li>
+   <li>GET path='/books/:id' (where 'id' is a valid book ID.)</li>
+    This resource can now be added to a ServerInstance
+</span>
+    <hr/>
+    <h2>Composing resources into Services</h2>
+    <hr/>
+   <span>Services are made of Resources, additional Routes and Config Settings
+   Creating services in gServ is extremely simple.<br/>
+   The following code creates an HTTP server and starts it listening to port 8080:
+    </span>
+   <pre>
+
+    // The http() method creates a GServInstance
+    gserv.http {
+        // setup a directory for static files
+        static_root ("webapp")
+        /// add Book REST resources to our GServ instance
+        resource(bkResource)
+    }.start(8080);
+
+   </pre>
+
+    <span>In addition to serving the Books Resource, we also serve static docs from the folder 'webapp'.  This folder can be on the file-system or on the classpath.</span>
+    <hr/>
+    <h2>Complete Example</h2>
+    <hr/>
+    <p>
+        Create a folder: WelcomeTest
+        In the new directory, add file 'build.gradle' with contents below:
+
+    </p>
+<pre>
+
+apply plugin: 'groovy'
+apply plugin: 'application'
+apply plugin: 'maven'
+
+mainClassName = 'WelcomeService'
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'log4j:log4j:1.2.17'
+    compile('org.codehaus.groovy:groovy-all:2.3.0')
+    compile("org.groovyrest:g-serv:0.0.1")
+
+    /// needed for Grab/Grape
+    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile "junit:junit:4.11"
+}
+</pre>
+
+    You may add a single resource / method handler to the service but its usually more useful to group the operations in
+    a resource together. So, a more realistic example would be:
+    </p>
+
+<pre>
+import org.groovyrest.gserv.GServ
+class WelcomeService {
+
+    public static void main(String[] args) {
+        new WelcomeService();
+    }
+
+    def WelcomeService() {
+        def gserv = new GServ()
+        def bkResource = gserv.resource("/books") {
+              ////
+              // responds  to /books/faq
+              get("/faq", file("BooksFaq.html"))
+              // responds  to /books/xyz
+              get(":id"), { id ->
+                  def book = bookService.get( id )
+                  writeJson(book)
+              }
+              // responds  to /books/all
+              get("/all", {  ->
+                def books = bookService.allBooks ()
+                header("content-type", "application/json")
+                writeJSON(books)
+            })
+        }
+
+        gserv.http {
+            get("/welcome", {->
+                write("Welcome to g-serv, The embeddable REST server for Groovy!")
+            });
+        resource( bkResource )
+        }.start(8080)
+    }
+}
+</pre>
+
+    <p>
+        Tell Gradle to build and run your program.
+    <pre>
+    gradlew clean run
+    </pre>
+    Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your
+    browser.
+    </p>
+</div>

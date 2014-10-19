@@ -1,0 +1,69 @@
+<script src="/inline/response.html" type="text/ng-template">
+    <accordion-heading>
+        {{response.searchText}} : {{response.searchType}}
+    </accordion-heading>
+</script>
+
+<div class="main">
+    <ng-form name="nate" class="form-horizontal">
+        <table width="90%">
+            <tr>
+                <td>
+                    <table width="100%">
+                        <tr>
+                            <td><input type="text" ng-model="current.subjectVerseSpec" placeholder="Subject Verses">
+                            </td>
+                            <td>
+                                <select ng-model="current.relationshipType"
+                                        ng-options="rtype.name for rtype in relationshipTypes">
+                                    <!--<option ng-repeat="rtype in relationshipTypes" value="{{ rtype.name }}" >{{ rtype.name  }}</option>-->
+                                </select>
+                            </td>
+                            <td><input type="text" ng-model="current.relatedVerseSpec" placeholder="Related Verses">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="buttonRow">
+                                <button ng-click="saveCurrent()">SAVE</button>
+                                <button ng-click="clearCurrent()"> CANCEL</button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <table width="90%">
+                    <thead>
+                    <tr>
+                        <th> Subject Verse</th>
+                        <th> Relationships</th>
+                        <th> Related Verse</th>
+                        <th> Comments</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="vr in verseRelationships">
+                        <td>{{ vr.subjectVerseSpec }}</td>
+                        <td>{{ vr.relationshipType }}</td>
+                        <td>{{ vr.relatedVerseSpec }}</td>
+                        <td>{{ vr.comments }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </tr>
+        </table>
+    </ng-form>
+
+    <accordion>
+        <accordion-group ng-repeat="response in searchResponses">
+            <accordion-heading>
+                <button type="button" class="close" ng-click="removeResult($index)">x</button>
+                {{response.searchText}} : {{response.searchType}} : {{ response.verses.length }} verse(s) found.
+            </accordion-heading>
+            <li ng-repeat="v in response.verses">
+                <a ng-click="showChapter(v.book, v.chapter)"> {{v.verseSpec}}&nbsp;{{v.verseText}} </a>
+            </li>
+        </accordion-group>
+    </accordion>
+
+</div>

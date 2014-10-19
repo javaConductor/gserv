@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<h1>Usage</h1>
+<style ng-click="">
+    pre {
+    white-space: pre-wrap;
+    font-family: "Consolas", "Menlo", "Courier", monospace;border: groove;border-color: navy;
+    padding: 1em;min-width: 20%;max-width: 90%;
+    }
+    body{
+    padding: 2em;
+    }
+</style>
+
+<h2>Creating REST Resources:</h2>
+
+<p>Creating REST resources is easy to do. Simply use the static function:
+<pre>GServ.Resource<(name, config)</pre>
+<br/>
+Here, we will reate a Books REST resource with 2 method GET
+</p>
+<pre>
+def gserv = new GServ()
+
+/// Create a Books REST resource
+
+/* the root path is passed to the GServ.resource() method
+along with a closure defining the endpoints or the resource
+*/
+
+def bkResource = gserv.resource("/books") {
+      ////
+      // responds  to /books/faq
+      get("/faq", file("BooksFaq.html"))
+      // responds  to /books/xyz
+      get(":id"), { id ->
+          def book = bookService.get( id )
+          writeJson(book)
+      }
+      // responds  to /books/all
+      get("/all", {  ->
+        def books = bookService.allBooks ()
+        header("content-type", "application/json")
+        writeJSON(books)
+    })
+}
+
+// The http() method creates a GServInstance that can later listen on a port and handle REST requests
+
+gserv.http {
+    // setup a directory for static files
+    static_root ("webapp")
+    /// add Book REST resources to our GServ instance
+    resource(bkResource)
+}.start(8080);
+</pre>
+<h2>Services</h2>
+Services are composed of resources, staticRoots and filters.
+The service definition closure has access to the following functions:
+<pre>
+static_root()
+resource()
+get()
+put()
+post()
+delete()
+filter()
+cors()
+getFile()
+</pre>
+<h2>Creating Services</h2>
+Services are made of Resources, additional Routes and Config Settings
+Creating services in gServ is extremely simple.
+
+The following code creates an HTTP server and starts it listening to port 8080:
+
+<h2>Example</h2>
+
+<p>
+    Create a folder: WelcomeTest
+    In the new directory, add file 'build.gradle' with contents below:
+
+</p>
+<pre>
+
+apply plugin: 'groovy'
+apply plugin: 'application'
+apply plugin: 'maven'
+
+mainClassName = 'WelcomeService'
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'log4j:log4j:1.2.17'
+    compile('org.codehaus.groovy:groovy-all:2.3.0')
+    compile("org.groovyrest:g-serv:0.0.1")
+
+    /// needed for Grab/Grape
+    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile "junit:junit:4.11"
+}
+</pre>
+
+<p>
+    Copy this code to WelcomeService.groovyin your WelcomeService folder.
+    Tell Gradle to build and run your program.
+    <pre>
+    gradlew clean run
+    </pre>
+Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your browser.
+
+You may add a single resource / method handler to the service but its usually more useful to group the operations in a
+resource together. So, a more realistic example would be:
+</p>
+
+<pre>
+import org.groovyrest.gserv.GServ
+class WelcomeService {
+
+    public static void main(String[] args) {
+        new WelcomeService();
+    }
+
+    def WelcomeService() {
+        def gserv = new GServ()
+
+        gserv.http {
+            get("/welcome", {->
+                write("Welcome to g-serv, The embeddable REST server for Groovy!")
+            });
+
+        }.start(8080)
+    }
+}
+</pre>
+
+<p>
+    Tell Gradle to build and run your program.
+    <pre>
+    gradlew clean run
+    </pre>
+Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your browser.
+</p>
+
+You may add a single resource / method handler to the service but its usually
+more useful to group the operations in a resource together.
+
+<h2>Defining Resources</h2>
+
+Here we use GServ.resource to define a REST resource. The resource definition closure has methods for each of the HTTP
+commands GET, PUT, POST, DELETE.
+Methods include:
+Resource
+<pre>
+get(String name, String path, Closure requestHandler)
+put(String name, String path, Closure requestHandler)
+post(String name, String path, Closure requestHandler)
+delete(String name, String path, Closure requestHandler)
+filter()
+writeText(String contentType, String text )
+writeJSON(  Map  )
+writeJSON(  List  )
+forward()
+call()
+template()
+to.[json|xml](istream)
+</pre>
+
+<pre>
+writeText(String contentType, String text )
+writeJSON(  Map  )
+writeJSON(  List  )
+forward()
+call()
+template()
+to.[json|xml](istream)
+</pre>
+
+<h2>Defining Filters</h2>
+
+<p>Server Config may include a Filter definitions.
+    The builtin function "filter( )" is used to define a filter.
+    As expected, filters get called before the Route code is called.
+    The filter may choose to: call a different Route, return a response or error, pre/post process the output of the
+    Route processing.
+    A filter may be passive and record activity rather than effect the processing.
+</p>
+
+</body>
+</html>
+
+
+"def gserv = new GServ();
+
+gserv.http {
+
+// Add a REST endpoint '/letter/
+<name>'
+    get(""letter"", ""/letter/:name"", { name ->
+    template(""letter.html"", [name: name, dateString: ""December 25, 2000""])
+    })
+    // Add a filter to intercept and reject letters to 'Lee'
+    after(""/letter/:name"", ""GET"") { name ->
+    if (name == ""Lee"") {
+    error(400, ""Cannot send letter to Lee"")
+    } else
+    nextFilter()
+    }
+    }.start( 8080 );"

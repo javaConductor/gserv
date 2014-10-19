@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<style ng-click="">
+    pre {
+    font-family: "Consolas", "Menlo", "Courier", monospace;border: groove;border-color: navy;
+    padding: 1em;min-width: 20%;max-width: 90%;
+    }
+    body{
+    padding: 2em;
+    }
+</style>
+<h2>Single Page Applications (SPA)</h2>
+
+<p>One of the main uses of GServ is to create an SPA. What are Single Page Apps?
+    Single-page Apps are applications that primarily run in the browser. They use
+    AJAX HTTP requests from the page to get data from services. These services
+    are usually REST-based and produce JSON or XML formatted data. The main
+    page of the application is never fully reloaded but rather it uses partial templates when necessary and adds them
+    when necessary.
+    Some JavaScript code is needed to populate the templates with the data from the services.
+</p>
+
+<p> GServ provides a few capabilities on the server-side to facilitate this:
+<li>Serve the main HTML page (Static Content)</li>
+<li>Serve the partial templates</li>
+<li>Serve the REST resources</li>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<style ng-click="">
+    pre {
+    font-family: "Consolas", "Menlo", "Courier", monospace;border: groove;border-color: navy;
+    padding: 1em;min-width: 20%;max-width: 90%;
+    }
+    body{
+    padding: 2em;
+    }
+</style>
+<h1>Filter API</h1>
+
+<p>In the GServ Config you can define filters. GServ defines 2 kinds of filters: After and Before<br/>
+    As you can probably guess, before-filters are called <b>before</b> the Route code is called.<br/>
+    Similarly, after-filters are called <b>after</b> the Route code is called and has a chance to modify the output
+    produced by the Route.
+</p>
+
+<h2>before( name, url, method, options, order, filterBehaviorClosure )</h2>
+<table border="1">
+    <tr>
+        <th>Argument</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>Optional name of the filter.</td>
+    </tr>
+    <tr>
+        <td>url</td>
+        <td>String</td>
+        <td>The path for which this filter is defined.</td>
+    </tr>
+    <tr>
+        <td>method</td>
+        <td>List&lt;String&gt;</td>
+        <td>"GET" | "PUT" | "POST" | "DELETE"</td>
+    </tr>
+    <tr>
+        <td>options</td>
+        <td>Map</td>
+        <td>
+            <table width="100%">
+                <tr>
+                    <th>PassRouteParams</th>
+                    <td>Boolean</td>
+                    <td>If true, the Route variables will be passed to the filterBehaviorClosure. Default is false.</td>
+                </tr>
+                <tr>
+                    <th>MatchedRoutesOnly</th>
+                    <td>Boolean</td>
+                    <td>If true, the filterBehaviorClosure will ONLY be called when the request path actually matches a
+                        resource route or static path. Default is false.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>order</td>
+        <td>Integer</td>
+        <td>An integer which specifies the relative order of filter execution. Low numbers are run first. The default is
+            5.
+        </td>
+    </tr>
+    <tr>
+        <td>filterBehaviorClosure</td>
+        <td>Closure</td>
+        <td>The closure that is called whenever this filter is invoked.
+            The arguments passed to the closure vary depending on the filter's options. If the 'PassRouteParams'is set
+            to 'true', then the route variables will be passed to the closure, in order, as arguments..
+            <br/>This closure must return: the current HttpExchange, a modified or wrapped HttpExchange implementation,
+            or null.
+        </td>
+    </tr>
+
+</table>
+
+<p>The before-filter may choose to:
+<ul>
+    <li>call a different Route</li>
+    <li>return a response or error</li>
+    <li>pre-process the data sent in the request</li>
+    <li>be passive and do nothing more than record activity rather than effect input</li>
+</ul>
+</p>
+
+<h2>after(name, uri, method, options, order, filterBehaviorClosure)</h2>
+<table border="1">
+    <tr>
+        <th>Argument</th>
+        <th>Type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>Optional name of the filter.</td>
+    </tr>
+    <tr>
+        <td>url</td>
+        <td>String</td>
+        <td>The path for which this filter is defined.</td>
+    </tr>
+    <tr>
+        <td>method</td>
+        <td>List</td>
+        <td>"GET" | "PUT" | "POST" | "DELETE"</td>
+    </tr>
+    <tr>
+        <td>options</td>
+        <td>Map</td>
+        <td>
+            <table width="100%">
+                <tr>
+                    <th>PassRouteParams</th>
+                    <td>Boolean</td>
+                    <td>If true, the Route variables will be passed to the filterBehaviorClosure. Default is false.</td>
+                </tr>
+                <tr>
+                    <th>MatchedRoutesOnly</th>
+                    <td>Boolean</td>
+                    <td>If true, the filterBehaviorClosure will ONLY be called when the request path actually matches a
+                        resource route or static path. Default is false.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>order</td>
+        <td>Integer</td>
+        <td>An integer which specifies the relative order of filter execution. Lowest numbers are run first. The default
+            is 5.
+        </td>
+    </tr>
+    <tr>
+        <td>filterBehaviorClosure</td>
+        <td>Closure</td>
+        <td>The closure that is called whenever this filter is invoked. Returns null if no change to the data is needed
+            else returns the modified data
+        </td>
+    </tr>
+</table>
+
+<p>The after-filter may choose to:
+<ul>
+    <li>transform the data produced by routes and up-stream filters</li>
+    <li>pre-process the data sent in the request</li>
+    <li>be passive and do nothing more than record activity rather than effect output</li>
+</ul>
+</p>
+
+<h2>Filter Behavior Closure Signatures</h2>
+
+<h3>Before </h3>
+<pre>HttpExchange beforeFn ( )</pre>
+
+<h3>After </h3>
+<pre>byte[] afterFn ( HttpExchange exchange, byte[] data )</pre>
+
+<p>Server Config may include Filter definitions.
+    There are 3 builtin functions:
+
+</p>
+
+<h2>Filter Examples</h2>
+
+<h3>Before Filter</h3>
+<pre>
+    // Add a filter to intercept and reject letters to 'Lee'
+    before("rejectLee", "/letter/:name", "GET", [(FilterOptions.PassRouteParams): true] ) { name ->
+        if ( name == "Lee")
+            error(403, "Lee not allowed");
+        else
+            nextFilter();
+        return exchange;
+    }
+</pre>
+
+<h3>After Filter</h3>
+<pre>
+    // Add a filter to capture the response and change its text to uppercase
+    after("upperCaseFilter", "/letter/:name", "GET", [:] ) { exchange, data ->
+        def newData = new String(data).toUpperCase().bytes;
+        return newData;
+    } </pre>
+</body>
+</html>

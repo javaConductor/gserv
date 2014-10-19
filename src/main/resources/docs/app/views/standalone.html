@@ -1,0 +1,112 @@
+<div ng-controller="GServStandaloneDocsCtrl">
+
+    <h1>GServ Standalone</h1>
+
+    <p>GServ may be used as an HTTP sever to serve static content as well as REST resouirces</p>
+
+    <h2> Getting Started</h2>
+
+    <h3>Prerequisites</h3>
+    <li>Install Java 1.6+ and Set JAVA_HOME to point to the installation.</li>
+    <h3>Download install script</h3>
+
+    <h3>Run install script</h3>
+
+    <h3>Verify installation</h3>
+    <pre>
+        prompt> gserv
+    </pre>
+    This should print the gserv version info to the console.
+    <h2>Serving Static Content</h2>
+    Here we serve static content from the <i>/public</i> folder on port 12000.
+        <pre>
+        prompt> gserv -s /public -p 12000
+        </pre>
+
+    <h2>Serving REST Resources</h2>
+
+    <p>GServ may be used to serve static content along with dynamic REST resources</p>
+        <pre>
+        prompt> gserv -s /public -r Math.groovy -p 12000
+        </pre>
+    The content of Math.groovy:
+    <pre>
+        import org.groovyrest.gserv.GServ
+
+        GServ.Resource("/math"){
+            get("/") {
+                writeText("text/plain", "Welcome to our GServ Math example");
+            }
+
+            get("/:num1/:num2/:operation") { num1, num2, operation ->
+                def ans = 0;
+                def msg = "";
+                switch ( operation ){
+                    case "add" : ans = (num1 as int) + (num2 as int);
+                    case "subtract" : ans = (num1 as int) - (num2 as int);
+                    case "multiply" : ans = (num1 as int) * (num2 as int);
+                    case "divide" : ans = (num1 as double) / (num2 as double);
+                        msg = "$operation($num1, $num2) = $ans"
+                    default:
+                        msg = "Operation: $operation is not supported";
+                }
+                writeText("text/plain",  msg);
+            }
+        }
+    </pre>
+    <h2>GServ Commandline Options</h2>
+
+    <div>
+        <table>
+            <tr>
+                <th>Option</th>
+                <th>Meaning</th>
+                <th>Example</th>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-s</td>
+                <td class="optionDescription">Static Content Folder</td>
+                <td class="optionExample"></td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-p</td>
+                <td class="optionDescription">The port on which to listen.</td>
+                <td class="optionExample">
+                    <pre>gserv -s /public -p 12000</pre>
+                </td>
+                </td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-i</td>
+                <td class="optionDescription">GServ Instance Script</td>
+                <td class="optionExample"></td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-d</td>
+                <td class="optionDescription">Default Resource</td>
+                <td class="optionExample"></td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-r</td>
+                <td class="optionDescription">GServ Resource Scripts< (separated by commas)</td>
+                <td class="optionExample"></td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-j</td>
+                <td class="optionDescription">Classpath (list of Jars separated by commas)</td>
+                <td class="optionExample">
+                    <pre>gserv -s /public -r This.groovy,That.groovy -j This.jar,That.jar</pre>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">OR</td>
+            </tr>
+            <tr>
+                <td class="cmdLineOption">-c</td>
+                <td class="optionDescription">GServ Config file name</td>
+                <td class="optionExample"></td>
+            </tr>
+        </table>
+
+    </div>
+</div>

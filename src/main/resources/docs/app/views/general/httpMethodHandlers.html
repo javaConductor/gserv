@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<style ng-click="">
+    pre {
+    font-family: "Consolas", "Menlo", "Courier", monospace;border: groove;border-color: navy;
+    padding: 1em;min-width: 20%;max-width: 90%;
+    }
+    body{
+    padding: 2em;
+    }
+</style>
+<h2>HTTP Method Handlers</h2>
+
+<p>The following functions are available in any Resource or Instance Configuration</p>
+    <pre>
+    get(String name, String path, Closure requestHandler)
+    put(String name, String path, Closure requestHandler)
+    post(String name, String path, Closure requestHandler)
+    delete(String name, String path, Closure requestHandler)
+    handle( List&lt;String&gt; httpMethods, String path, Closure requestHandler)
+    </pre>
+
+
+<h2>Route Matching</h2>
+The <i>path</i> argument may be static or it may contain variables. Any path element
+starting with a colon is considered a variable. All path elements not starting with
+a colon will be matched verbatim.
+
+<h3>Example</h3>
+
+<p>A route declared as "/user" will match request http://host:port/user
+    There are no variables therefore no values will be passed to the RequestHandler closure.
+
+<p>A route declared as "/user/:id" will match request http://host:port/user/&lt;AnyValue&gt;<br/>
+    Here, the value of :id will be the one argument passed to the RequestHandler closure.
+
+<p>A route declared as "/user/:id/grades" will match request http://host:port/user/xyz/grades<br/>
+    Here, its the same as above - the value of :id will be the one argument passed to the RequestHandler closure.
+
+<p>A route declared as "/user/:id/history/:when" will match request http://host:port/user/xyz/history/20141128<br/>
+    Here, the values of :id and :when will be passed to the RequestHandler closure in order [eg. closure( id, when) {}
+    ].
+
+<p>
+    As you can probably tell by now, each variable value will be passed to RequestHandler closure in order.
+
+<h2>API Documentation</h2>
+
+<h3>
+    <pre>get(String name, String path, Closure requestHandler)<p></p>get(String path, Closure requestHandler)</pre>
+    <h3>Example:</h3>
+</h3>
+<pre>
+        GServ.Resource("/counter"){
+            get("/") {
+                writeText("text/plain", "Welcome to our GServ GET example");
+            }
+
+            get("/:num1/:num2/:operation") { num1, num2, operation ->
+                def ans = 0;
+                def msg = "";
+                switch ( operation ){
+                    case "add" : ans = (num1 as int) + (num2 as int);
+                    case "subtract" : ans = (num1 as int) - (num2 as int);
+                    case "multiply" : ans = (num1 as int) * (num2 as int);
+                    case "divide" : ans = (num1 as double) / (num2 as double);
+                        msg = "$operation($num1, $num2) = $ans"
+                    default:
+                        msg = "Operation: $operation is not supported";
+                }
+                writeText("text/plain", msg);
+            }
+
+        }
+</pre>
+</body>
+</html>

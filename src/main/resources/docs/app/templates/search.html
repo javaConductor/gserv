@@ -1,0 +1,41 @@
+<script src="/inline/response.html" type="text/ng-template">
+    <accordion-heading>
+        {{response.searchText}} : {{response.searchType}}
+    </accordion-heading>
+</script>
+
+<div ng-controller="SearchController" class="main">
+    <ng-form name="nate" class="form-horizontal">
+        <table width="90%">
+            <tr>
+                <td><input type="text" class="form-control" ng-model="searchInfo.searchText">
+                    <button ng-click="searchIt()" class="btn-lg btn-primary">SEARCH!</button>
+                </td>
+            </tr>
+            <tr>
+                <td class="btn-group-sm">
+                    <input name="searchType" class="btn" type="radio" ng-value="searchTypes.ALL"
+                           ng-model="searchInfo.searchType"> All<br/>
+                    <input name="searchType" class="btn" type="radio" ng-value="searchTypes.ANY"
+                           ng-model="searchInfo.searchType"> Any<br/>
+                    <input name="searchType" class="btn" type="radio" ng-value="searchTypes.PHRASE"
+                           ng-model="searchInfo.searchType">Phrase
+                </td>
+            </tr>
+
+        </table>
+    </ng-form>
+
+    <accordion>
+        <accordion-group ng-repeat="response in searchResponses">
+            <accordion-heading>
+                <button type="button" class="close" ng-click="removeResult($index)">x</button>
+                {{response.searchText}} : {{response.searchType}} : {{ response.verses.length }} verse(s) found.
+            </accordion-heading>
+            <li ng-repeat="v in response.verses">
+                <a ng-click="showChapter(v.book, v.chapter)"> {{v.verseSpec}}&nbsp;{{v.verseText}} </a>
+            </li>
+        </accordion-group>
+    </accordion>
+
+</div>

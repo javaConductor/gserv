@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<div>
+
+    <h1>GServ</h1>
+
+    <h2>Creating Secure REST Service</h2>
+
+    <h3>Create GServ Config</h3>
+
+    <p> A GServ Config file is a regular JSON formatted file.
+        Below is an example of a minimal config file:
+    <pre>
+{
+    "apps" : [{
+            "https": false,
+            "name" : "Secured App Example",
+            "resourceScripts" : ["resources/Resource1.groovy","resources/Resource2.groovy"],
+            "port" : 11111,
+            "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
+        }]
+}
+    </pre>
+    The GServ config is required to have at least one application defined.
+    The 'apps' element is a List of Application Definitions. Each entry in this list
+    is separate App instance that will run on its own port. Port must be unique across app instances.
+    Application Definitions can contain the following:
+    <li><i>https</i>: boolean
+    <li>name: String
+    <li>resourceScripts(optional) : List&lt;String&gt; containing REST resource script file names
+    <li>port: Integer port on which to listen for requests.</li>
+
+    </p>
+    <h3>Creating REST Resources</h3>
+
+    <p>
+        REST Resources Scripts define one or more Resources:
+        <pre>
+
+import org.groovyrest.gserv.*
+
+[
+        GServ.Resource("/hello") {
+            get("/") {
+                write("Hello World".bytes)
+            }
+
+            get("/:name") { name ->
+                //println l
+                write("Hello $name".toString().bytes)
+            }
+
+        }
+]
+
+        </pre>
+
+    </p>
+    <h3>Using REST Resources to Build a REST Service</h3>
+
+    <p></p>
+
+    <h3>Using Basic Authentication with your Service</h3>
+
+    <p></p>
+
+    <h3>Use HTTPS to Encrypt/Decrypt traffic to your REST Service</h3>
+
+    <p> To use HTTPS, you will need to add an HTTPS section to your GServ config file.
+
+
+    </p>
+
+</div>

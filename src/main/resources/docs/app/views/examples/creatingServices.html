@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CServices</title>
+</head>
+<body>
+<h2>Services</h2>
+Services are composed of resources, staticRoots and filters.
+The service definition closure has access to the following functions:
+<pre>
+static_root()
+resource()
+get()
+put()
+post()
+delete()
+filter()
+cors()
+getFile()
+</pre>
+<hr/>
+<h2>Creating Services</h2>
+Services are made of Resources, additional Routes and Config Settings
+Creating services in gServ is extremely simple.
+
+The following code creates an HTTP server and starts it listening to port 8080:
+
+<hr/>
+<h2>Complete Example</h2>
+
+<p>
+    Create a folder: WelcomeTest
+    In the new directory, add file 'build.gradle' with contents below:
+
+</p>
+<pre>
+
+apply plugin: 'groovy'
+apply plugin: 'application'
+apply plugin: 'maven'
+
+mainClassName = 'WelcomeService'
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'log4j:log4j:1.2.17'
+    compile('org.codehaus.groovy:groovy-all:2.3.0')
+    compile("org.groovyrest:gserv:0.0.1")
+
+    /// needed for Grab/Grape
+    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile "junit:junit:4.11"
+}
+</pre>
+
+<p>
+    Copy this code to WelcomeService.groovyin your WelcomeService folder.
+    Tell Gradle to build and run your program.
+    <pre>
+    gradlew clean run
+    </pre>
+Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your browser.
+
+You may add a single resource / method handler to the service but its usually more useful to group the operations in a
+resource together. So, a more realistic example would be:
+</p>
+
+<pre>
+import org.groovyrest.gserv.GServ
+class WelcomeService {
+
+    public static void main(String[] args) {
+        new WelcomeService();
+    }
+
+    def WelcomeService() {
+        def gserv = new GServ()
+
+        gserv.http {
+            get("/welcome", {->
+                write("Welcome to gserv, The embeddable REST server for Groovy!")
+            });
+
+        }.start(8080)
+    }
+}
+</pre>
+
+<p>
+    Tell Gradle to build and run your program.
+    <pre>
+    gradlew clean run
+    </pre>
+Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your browser.
+</p>
+
+You may add a single resource / method handler to the service but its usually
+more useful to group the operations in a resource together.
+
+<h2>Defining Resources</h2>
+
+Here we use GServ.resource to define a REST resource. The resource definition closure has methods for each of the HTTP
+commands GET, PUT, POST, DELETE.
+Methods include:
+Resource
+<table>
+    <tr>
+        <td>void</td>
+        <td>get(String name, String path, Closure requestHandler)<br/>Binds a GET request for URL to a Request Handler
+        </td>
+    </tr>
+    <td>void</td>
+    <td>put(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>post(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>delete(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>after(String name, String path, String method, Map options, int order, Closure requestHandler)<br/>Creates a
+        filter that is called to post-process the output.
+    </td>
+    </tr>
+    <td>void</td>
+    <td>before(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>get(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>get(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>get(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    <td>void</td>
+    <td>get(String name, String path, Closure requestHandler)<br/>Binds a URL to a Request Handler</td>
+    </tr>
+    put(String name, String path, Closure requestHandler)
+    post(String name, String path, Closure requestHandler)
+    delete(String name, String path, Closure requestHandler)
+    after(String name, String path, Closure requestHandler)
+    writeText(String contentType, String text )
+    writeJSON( Map )
+    writeJSON( List )
+    forward()
+    call()
+    template()
+    to.[json|xml](istream)
+</table>
+
+<pre>
+writeText(String contentType, String text )
+writeJSON(  Map  )
+writeJSON(  List  )
+forward()
+call()
+template()
+to.[json|xml](istream)
+</pre>
+
+</body>
+</html>

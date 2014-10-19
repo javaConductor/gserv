@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<style ng-click="">
+    pre {
+    font-family: "Consolas", "Menlo", "Courier", monospace;border: groove;border-color: navy;
+    padding: 1em;min-width: 20%;max-width: 90%;
+    }
+    body{
+    padding: 2em;
+    }
+</style>
+<h1>Defining Filters</h1>
+
+<p>Server Config may include a Filter definitions.
+    There are 3 builtin functions:
+    <pre>
+    before( name, url, method, options, order, filterBehaviorClosure )
+        filterBehaviorClosure( ) returns HttpExchange
+    after(name, url, method, options, order, filterBehaviorClosure)
+        filterBehaviorClosure( HttpExchange, data) returns data or nothing
+    filter(name, url, method, filterBehaviorClosure)
+        filterBehaviorClosure( ) returns nothing
+    </pre>
+
+<p>As you can probably guess, before-filters are called <b>before</b> the Route code is called.
+    Similarly, after-filters are called <b>after</b> the Route code is called and has a chance to modify the output
+    produced by the Route.
+
+<p>The filter may choose to: call a different Route, return a response or error, pre/post process the output of the
+    Route processing.
+    A filter may be passive and do nithin more than record activity rather than effect input or output.
+</p>
+
+<p></p>
+<table width="100%">
+    <thead>
+    <tr>
+        <th>Option</th>
+        <th>Type</th>
+        <th>Description.</th>
+    </tr>
+    </thead>
+    <tr>
+        <th>PassRouteParams</th>
+        <td>Boolean</td>
+        <td>If true, the Route variables will be passed to the filterBehaviorClosure. Default is false.</td>
+    </tr>
+    <tr>
+        <th>MatchedRoutesOnly</th>
+        <td>Boolean</td>
+        <td>If true, the filterBehaviorClosure will ONLY be called when the request path actually matches a resource
+            route or static path. Default is false.
+        </td>
+    </tr>
+
+</table>
+
+<h2>Filter Examples</h2>
+
+<h3>Before Filter</h3>
+<pre>
+    // Add a filter to intercept and reject letters to 'Lee'
+    before("rejectLee", "/letter/:name", "GET", [(FilterOptions.PassRouteParams): true] ) { name ->
+        if ( name == "Lee")
+            error(403, "Lee not allowed");
+        else
+            return exchange;
+    }
+    </pre>
+
+<h3>After Filter</h3>
+<pre>
+    // Add a filter to capture the response and change its text to uppercase
+    after("upperCaseFilter", "/letter/:name", "GET", [:] ) { exchange, data ->
+        def newData = new String(data).toUpperCase().bytes;
+        return newData;
+    } </pre>
+</body>
+</html>

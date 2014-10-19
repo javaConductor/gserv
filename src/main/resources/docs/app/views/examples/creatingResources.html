@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<h2>Creating REST Resources:</h2>
+
+<p>Creating REST resources is easy to do. Simply use the static function:
+<pre>GServ.Resource<(name, config)</pre>
+<br/>
+Here, we will reate a Books REST resource with 2 method GET
+</p>
+<pre>
+def gserv = new GServ()
+def bookService = ...
+/// Create a Books REST resource
+
+/* the root path is passed to the GServ.resource() method
+along with a closure defining the endpoints or the resource
+*/
+
+def bkResource = gserv.resource("/books") {
+      ////
+      // responds  to /books/faq
+      get("/faq", file("BooksFaq.html"))
+      // responds  to /books/xyz
+      get(":id"), { id ->
+          def book = bookService.get( id )
+          writeJSON(book)
+      }
+      // responds  to /books/all
+      get("/all", {  ->
+        def books = bookService.allBooks ()
+        writeJSON(books)
+    })
+}
+
+// The http() method creates a GServInstance that can later listen on a port and handle REST requests
+
+gserv.http {
+    // setup a directory for static files
+    static_root ("webapp")
+    /// add Book REST resources to our GServ instance
+    resource(bkResource)
+}.start(8080);
+</pre>
+
+</body>
+</html>

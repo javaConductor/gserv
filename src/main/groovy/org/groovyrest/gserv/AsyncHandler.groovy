@@ -57,7 +57,11 @@ class AsyncHandler extends DynamicDispatchActor {
         _templateEngineName = templateEngineName
         _seq = ++Seq
     }
-
+/** This method is called when this Actor receives a message
+ *
+ * @param request
+ * @return void
+ */
     def onMessage(request) {
         def pattern
         try {
@@ -109,13 +113,19 @@ class AsyncHandler extends DynamicDispatchActor {
         args
     }
 
-    def process(HttpExchange exchange, pattern) {
+    def prepareClosure(exchange, pattern) {
         def cl = pattern.requestHandler()//_handler
         HttpMethodDelegate dgt = prepareDelegate(exchange, pattern)
         cl.delegate = dgt
         cl.resolveStrategy = Closure.DELEGATE_FIRST
+        cl
+    }
+
+    def process(HttpExchange exchange, pattern) {
+        Closure cl = prepareClosure(exchange, pattern)
         def args = prepareArguments(exchange.requestURI, exchange.requestBody, pattern)
-        def errorHandlingWrapper = { clozure, argList ->
+//        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
+        ({ clozure, argList ->
             try {
                 EventManager.instance().publish(Events.ResourceProcessing, [
                         requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
@@ -129,7 +139,7 @@ class AsyncHandler extends DynamicDispatchActor {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
                         requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
                         uri      : exchange.requestURI.path, msg: e.message, e: e])
-                dgt.error(500, e.message)
+                cl.delegate.error(500, e.message)
                 log.error "Error Running AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} : ${e.message}", e
                 exchange
             }
@@ -138,9 +148,8 @@ class AsyncHandler extends DynamicDispatchActor {
                         requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
                         uri      : exchange.requestURI.path, msg: 'Resource processing done.'])
             }
-        }
-//        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
-        errorHandlingWrapper(cl, args)
+        })(cl, args);
+
     }
 
     /**
