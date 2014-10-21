@@ -152,6 +152,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
 
     def process(HttpExchange httpExchange) {
 
+        println "Processing exchange(${httpExchange.dump()})"
         Route pattern = _matcher.matchRoute(_routes, httpExchange)
         if (pattern) {
             httpExchange.setAttribute(GServ.exchangeAttributes.matchedRoute, pattern)

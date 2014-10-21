@@ -30,6 +30,7 @@
 
 package org.groovyrest.gserv.delegates.functions
 
+import com.sun.net.httpserver.HttpExchange
 import org.groovyrest.gserv.utils.StaticFileHandler
 
 /**
@@ -80,9 +81,13 @@ class FilterFunctions {
     def _nextFilterCalled = false
 
     def nextFilter() {
+        nextFilter(exchange)
+    }
+
+    def nextFilter(HttpExchange e) {
         if (_nextFilterCalled)
             throw new IllegalStateException("nextFilter() has already been called.")
-        value("chain").doFilter(exchange)
+        value("chain").doFilter(e)
         _nextFilterCalled = true
     }
 }

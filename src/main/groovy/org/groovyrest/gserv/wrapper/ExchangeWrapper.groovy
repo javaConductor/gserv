@@ -31,6 +31,7 @@ import com.sun.net.httpserver.Headers
 import com.sun.net.httpserver.HttpContext
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpPrincipal
+import org.groovyrest.gserv.filters.FilterByteArrayOutputStream
 
 /**
  * Exchange Wrapper usually used for Filters
@@ -40,11 +41,11 @@ class ExchangeWrapper extends HttpExchange {
     Headers _requestHdrs, _responseHdrs
     URI _uri
     int _code
-    OutputStream _originalOutputStream
-    InputStream _originalInputStream
+    OutputStream _originalOutputStream, _responseBody
+    InputStream _originalInputStream, _requestBody
     boolean _closed
 
-    def ExchangeWrapper(HttpExchange exchange) {
+    def ExchangeWrapper(HttpExchange exchange, URI uri = null) {
         if (!exchange)
             throw new IllegalArgumentException("exchange must NOT be null. Should be valid HttpExchange impl.")
         _exchange = exchange
@@ -52,9 +53,14 @@ class ExchangeWrapper extends HttpExchange {
         _responseHdrs = _exchange.responseHeaders
         _responseHdrs.putAll(_exchange.responseHeaders)
         _originalOutputStream = _exchange.responseBody
-        _originalInputStream = _exchange.requestBody
-        _uri = _exchange.requestURI
+
+        _requestBody = _originalInputStream = _exchange.requestBody
+        _responseBody = new FilterByteArrayOutputStream(defaultClose)
+        _uri = uri ?: _exchange.requestURI
         setAttribute(GServ.exchangeAttributes.isWrapper, true)
+    }
+    def defaultClose = { _this ->
+        writeIt(_responseBody.bytes)
     }
 
     def originalOutputStream() { _originalOutputStream }
@@ -102,14 +108,19 @@ class ExchangeWrapper extends HttpExchange {
 //        _exchange.close()
     }
 
+    /**
+     * Done POORLY!!!
+     * MUST wrap the stream or whats the point
+     * @return
+     */
     @Override
     InputStream getRequestBody() {
-        return _exchange.requestBody
+        return _requestBody
     }
 
     @Override
     OutputStream getResponseBody() {
-        return _exchange.responseBody
+        return _responseBody
     }
 
     @Override
@@ -117,6 +128,7 @@ class ExchangeWrapper extends HttpExchange {
 
         /// must NOT send anything YET
         _code = statusCode
+        //dataLength may change before the data is sent
 //        _exchange.sendResponseHeaders(statusCode, dataLength)
     }
 
@@ -152,10 +164,9 @@ class ExchangeWrapper extends HttpExchange {
 
     @Override
     void setStreams(InputStream inputStream, OutputStream outputStream) {
-        /// swap the streams on underlying exchange
-        /// this.requestBody = inputStream
-        /// this.responseBody = outputStream
-        _exchange.setStreams(inputStream, outputStream)
+        _requestBody = inputStream
+        _responseBody = outputStream
+        //lets not bother the original        _exchange.setStreams(inputStream, outputStream)
     }
 
     @Override
@@ -179,7 +190,7 @@ class ExchangeWrapper extends HttpExchange {
                     message  : "Writing ${bytes.size()} Bytes on stream.close()"])
 
             _exchange.responseHeaders.putAll this._responseHdrs
-            _exchange.sendResponseHeaders(_code, bytes.size())
+            _exchange.sendResponseHeaders(_code ?: 200, bytes.size())
             try {
                 originalOutputStream().write(bytes)
                 println "Wrote response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path}) size=${bytes.size()}"

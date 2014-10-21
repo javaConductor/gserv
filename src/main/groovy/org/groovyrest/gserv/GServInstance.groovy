@@ -24,28 +24,20 @@
 
 package org.groovyrest.gserv
 
-import org.groovyrest.gserv.events.EventManager
-import org.groovyrest.gserv.events.Events
-import org.groovyrest.gserv.jmx.GServJMX
-import org.groovyrest.gserv.jmx.GServJMXMXBean
-import org.groovyrest.gserv.wrapper.ExchangeWrapper
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpsServer
 import groovy.jmx.builder.JmxBuilder
 import groovy.util.logging.Log4j
+import org.groovyrest.gserv.events.EventManager
+import org.groovyrest.gserv.events.Events
+import org.groovyrest.gserv.filters.FilterByteArrayOutputStream
+import org.groovyrest.gserv.jmx.GServJMX
+import org.groovyrest.gserv.wrapper.ExchangeWrapper
 
-import javax.management.Attribute
-import javax.management.AttributeList
 import javax.management.MBeanServer
-import javax.management.MBeanServerConnection
-import javax.management.ObjectInstance
 import javax.management.ObjectName
-import javax.management.StandardMBean
-import javax.management.remote.JMXConnectorFactory
-import javax.management.remote.JMXServiceURL
 import javax.net.ssl.*
 import java.lang.management.ManagementFactory
-import java.rmi.registry.LocateRegistry
 import java.security.KeyStore
 
 /**
@@ -127,9 +119,42 @@ class GServInstance {
             }
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
-            exchange = applyDefaultResourceIfNecessary(exchange)
-            nextFilter()
-            exchange
+
+            URI uri = applyDefaultResourceToURI(config().defaultResource(), exchange.requestURI);
+
+            /// add wrap code here
+            // Wrap the exchange
+            //println "Wrapping the Exchange - filter: ${theFilter.name}"
+            // wrap the Exchange
+            HttpExchange httpExchange = new ExchangeWrapper(exchange, uri)
+            httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, [])
+            def baos = new FilterByteArrayOutputStream({ _this ->
+                println "Running ppList for ${httpExchange.requestURI.path} - req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}"
+                /// run the PostProcess List
+                def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList).toList()
+
+                def s = _this
+                /// get bytes from BAOS
+                def bytes = s.toByteArray()
+
+                ppList.each { fn ->
+                    try {
+                        println("Processing Filter Fn: ${fn.delegate.$this.name}  ")
+                        bytes = fn(httpExchange, bytes) ?: bytes
+                    } catch (Throwable ex) {
+                        System.err.println("FilterError: ${ex.message}")
+                        ex.printStackTrace(System.err)
+//                            eventMgr.publish(Events.FilterError, [filter   : theFilter.name ?: "-",
+//                                                                  requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
+//                                                                  path     : httpExchange.requestURI.path,
+//                                                                  method   : httpExchange.requestMethod])
+                    }
+                }
+                httpExchange.writeIt(bytes)
+            })
+            httpExchange.setStreams(httpExchange.requestBody, baos)
+            nextFilter(httpExchange)
+            httpExchange
         }
 
         _filters = _filters ?: []
@@ -159,23 +184,15 @@ class GServInstance {
         return _cfg;
     }
 
-    /// here we should check for a blank file name
-    /// if file name is blank and we have a defaultResource then we use that.
-    HttpExchange applyDefaultResourceIfNecessary(com.sun.net.httpserver.HttpExchange exchange) {
-        if (!config().defaultResource())
-            return exchange;
-        def path = exchange.requestURI.path
-        def bUseDefaultResource = (!path || path == '\\')
-        if (!bUseDefaultResource)
-            return exchange;
-        ExchangeWrapper nuExchange = new ExchangeWrapper(exchange);
-        URI oldUri = nuExchange.requestURI
-        URI uri = new URI(
-                oldUri.scheme, oldUri.userInfo, oldUri.host,
-                oldUri.port, config().defaultResource(), oldUri.query, oldUri.fragment);
-        nuExchange.requestURI = uri
-        //new URI(scheme userInfo, host,port,path, query, fragment)
-        nuExchange
+
+    URI applyDefaultResourceToURI(defaultResource, uri) {
+        if (!defaultResource || (!(uri.path == '/')))
+            return uri;
+
+        new URI(
+                uri.scheme, uri.userInfo, uri.host,
+                uri.port, config().defaultResource(),
+                uri.query, uri.fragment);
     }
 
 }

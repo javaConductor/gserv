@@ -24,16 +24,15 @@
 
 package org.groovyrest.gserv.filters
 
+import com.sun.net.httpserver.Filter
+import com.sun.net.httpserver.HttpExchange
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.FilterMatcher
 import org.groovyrest.gserv.GServ
 import org.groovyrest.gserv.Utils
 import org.groovyrest.gserv.delegates.FilterDelegate
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.events.Events
-import org.groovyrest.gserv.wrapper.ExchangeWrapper
-import com.sun.net.httpserver.Filter
-import com.sun.net.httpserver.HttpExchange
-import groovy.util.logging.Log4j
 
 /**
  * User: javaConductor
@@ -57,65 +56,34 @@ class FilterProxy extends Filter {
         _serverConfig = serverConfig
     }
 
+    /**
+     *
+     * @param httpExchange
+     * @param chain
+     * @throws IOException
+     */
     @Override
     void doFilter(HttpExchange httpExchange, com.sun.net.httpserver.Filter.Chain chain) throws IOException {
         /// Check the request against the filter's  route.
-        synchronized (requestId) {
-            if (!httpExchange.getAttribute(GServ.exchangeAttributes.requestId))
-                httpExchange.setAttribute(GServ.exchangeAttributes.requestId, requestId++)
-        }
+        if (!httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS))
+            httpExchange.setAttribute(GServ.exchangeAttributes.receivedMS, "" + new Date().time)
 
         def theFilter = m.matchRoute(_filterList, httpExchange)
         if (theFilter) {
             eventMgr.publish(Events.RequestMatchedFilter, [
-                    filter   : theFilter.name ?: "-",
-                    requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                    route    : theFilter.toString(),
-                    path     : httpExchange.requestURI.path,
-                    method   : httpExchange.requestMethod
+                    filter       : theFilter.name ?: "-",
+                    requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                    route        : theFilter.toString(),
+                    path         : httpExchange.requestURI.path,
+                    method       : httpExchange.requestMethod
             ]
             );
-            //  if route is required and not matched  return immediately
+            //  if route is required  for this filter and not matched  return immediately
             if (theFilter.options()[FilterOptions.MatchedRoutesOnly]) {
                 if (!_serverConfig.requestMatched(httpExchange)) {
                     chain.doFilter(httpExchange);
                     return
                 }
-            }
-
-            if (!(httpExchange instanceof ExchangeWrapper)) {
-                //println "Wrapping the Exchange - filter: ${theFilter.name}"
-                // wrap the Exchange
-                httpExchange = new ExchangeWrapper(httpExchange)
-                httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, [])
-                def baos = new FilterByteArrayOutputStream({ _this ->
-                    println "Running ppList for ${httpExchange.requestURI.path} - req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}"
-                    /// run the PostProcess List
-                    def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList).toList()
-
-                    def s = _this
-                    /// get bytes from BAOS
-                    def bytes = s.toByteArray()
-
-                    ppList.each { fn ->
-                        try {
-                            println("Processing Filter Fn: ${fn.delegate.$this.name}  ")
-                            bytes = fn(httpExchange, bytes) ?: bytes
-                        } catch (Throwable ex) {
-                            System.err.println("FilterError: ${ex.message}")
-                            ex.printStackTrace(System.err)
-//                            eventMgr.publish(Events.FilterError, [filter   : theFilter.name ?: "-",
-//                                                                  requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-//                                                                  path     : httpExchange.requestURI.path,
-//                                                                  method   : httpExchange.requestMethod])
-                        }
-                    }
-
-                    httpExchange.writeIt(bytes)
-                })
-                httpExchange.setStreams(httpExchange.requestBody, baos)
-            } else {
-                //println "The Exchange is already wrapped - filter: ${theFilter.name}"
             }
 
             switch (theFilter.filterType) {
@@ -124,11 +92,12 @@ class FilterProxy extends Filter {
                     /// We will set the delegate for the closure before we put in the list
                     //////////////////////////////////////////////////////////////////////
                     def fn = theFilter.requestHandler()
+                    //TODO the After filter will have a potentially OLD exchange injected but the current one passed in
                     fn.delegate = prepareDelegate(theFilter, httpExchange, chain)
 
                     /// add after closure to PostProcessList
                     def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList) ?: []
-                    log.debug "FilterProxy: adding ${theFilter.name} afterClosure to ppList"
+                    log.debug "FilterProxy: Scheduling after filter ${theFilter.name} for req @${httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS)} "
                     ppList << fn
                     //println "adding $fn to ppList"
                     httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, ppList)
@@ -145,16 +114,16 @@ class FilterProxy extends Filter {
                     } catch (Throwable ex) {
                         ex.printStackTrace(System.err)
                         eventMgr.publish(Events.FilterError, [
-                                filter   : (theFilter.name ?: "-"),
-                                requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                                message  : ex.message,
-                                path     : httpExchange.requestURI.path,
-                                method   : httpExchange.requestMethod])
+                                filter       : (theFilter.name ?: "-"),
+                                requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                                message      : ex.message,
+                                path         : httpExchange.requestURI.path,
+                                method       : httpExchange.requestMethod])
                     } finally {
-                        eventMgr.publish(Events.FilterComplete, [filter   : theFilter.name ?: "-",
-                                                                 requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                                                                 path     : httpExchange.requestURI.path,
-                                                                 method   : httpExchange.requestMethod])
+                        eventMgr.publish(Events.FilterComplete, [filter       : theFilter.name ?: "-",
+                                                                 requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                                                                 path         : httpExchange.requestURI.path,
+                                                                 method       : httpExchange.requestMethod])
                     }
                     httpExchange
                     break;
@@ -225,16 +194,16 @@ class FilterProxy extends Filter {
         FilterDelegate dgt = prepareDelegate(theFilter, exchange, chain)
         def errorHandlingWrapper = { clozure, List argList ->
             try {
-                eventMgr.publish(Events.FilterProcessing, [filter   : theFilter.name ?: "-",
-                                                           requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                                                           route    : theFilter.toString(), path: exchange.requestURI.path, args: argList])
+                eventMgr.publish(Events.FilterProcessing, [filter       : theFilter.name ?: "-",
+                                                           requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                                                           route        : theFilter.toString(), path: exchange.requestURI.path, args: argList])
                 return clozure(*argList)
             } catch (Throwable e) {
                 log.debug("FilterProxy error: ${e.message}", e)
                 e.printStackTrace(System.err)
-                eventMgr.publish(Events.FilterError, [filter   : theFilter.name ?: "-",
-                                                      requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                                                      route    : theFilter.toString(), path: exchange.requestURI.path, args: argList, error: e.message])
+                eventMgr.publish(Events.FilterError, [filter       : theFilter.name ?: "-",
+                                                      requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                                                      route        : theFilter.toString(), path: exchange.requestURI.path, args: argList, error: e.message])
                 dgt.error(500, e.message)
                 exchange
             }

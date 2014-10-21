@@ -45,6 +45,7 @@ import org.groovyrest.gserv.delegates.*
 class GServ {
     def factory = new GServFactory();
     static def exchangeAttributes = [
+            "receivedMS": 'g$$when',
             "serverConfig"   : 'g$$serverConfig',
             "currentRoute"   : 'g$$route',
             "requestId"      : 'g$$requestId',

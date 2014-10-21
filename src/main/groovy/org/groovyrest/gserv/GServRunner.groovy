@@ -54,11 +54,9 @@ class GServRunner {
         cli.i(longOpt: 'instanceScript', 'gserv instance script', args: 1, required: false)
         cli.s(longOpt: 'serverRoot', 'Server Static Root (used only when configFilePath is not present)', args: 1, required: false)
         cli.p(longOpt: 'port', 'Port (used only when configFilePath is not present)', args: 1, required: false)
-        cli.d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', required: false)
+        cli.d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', args: 1, required: false)
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
-        //d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
-//        cli.usage()
     }
 
     /**
@@ -150,7 +148,7 @@ class GServRunner {
     def start(cliArgs) {
         def options = cli.parse(cliArgs)
         if (!options || !validateOptions(options)) {
-            System.out.println(cli.usage)
+            cli.usage()
             return;
         }
 

@@ -1,20 +1,28 @@
 <div>
-    <h1>GServ Framework</h1>
+    <h1 class="header">GServ Framework</h1>
     GServ framework provides a container-free way to expose new or existing functionality as a REST based service.
     <hr/>
-    <h2>Requirements</h2>
+    <h2 class="header">Getting Started</h2>
     <hr/>
-    <p>Add GServ to your dependencies:<br/>
-        Gradle: "org.groovyrest:gserv:0.0.1"<br/>
-        Maven: group: "org.groovyrest", name::"gserv", version:"0.0.1"
-    </p>
+    <li>Download and install <a href="http://www.gradle.org/downloads">Gradle</a></li>
+    <li>Clone gServ from <a href="https://github.com/javaConductor/gserv.git">GitHub</a></li>
+    <li>At the commandline, in the root directory of the gServ project, run:
+        <pre>prompt> gradle install</pre>
+        This will add it to your local Maven repository as <strong>'org.groovyrest:gserv:[latest version]'</strong>
+        so you can use it your Maven/Gradle apps or just get the jar file and use it directly..
+    </li>
 
-    <h2>Creating REST Resources:</h2>
-    <hr/>
-    <p>Creating REST resources is easy to do. Simply use the static function:
-    <pre>GServ.Resource<(name, config)</pre>
+    <h2 class="header">Creating REST Resources:</h2>
+    Creating REST resources is easy to do. Either use the static or instance methods:
+    <pre>
+        GServ.Resource<(path, config)
+        new GServ().resource<(path, config)</pre>
+    The <i>path</i> argument contains the path prefix for this resource<br/>
+    The <i>config</i> argument is a Closure defining the endpoint of this resource
     <br/>
-    Here, we will create a Books REST resource.
+
+    <p>
+        Here, we will create a Books REST resource.
     </p>
 <pre>
 def gserv = new GServ()
@@ -24,11 +32,12 @@ def gserv = new GServ()
 /* the root path is passed to the GServ.resource() method
 along with a closure defining the endpoints of the resource
 */
+def bookService = ...
 
 def bkResource = gserv.resource("/books") {
       ////
       // responds  to /books/faq
-      get("/faq", file("BooksFaq.html"))
+      get("/faq", file("text/html", "BooksFaq.html"))
       // responds  to /books/xyz
       get(":id"), { id ->
           def book = bookService.get( id )
@@ -47,11 +56,11 @@ def bkResource = gserv.resource("/books") {
     After this call, bkResource represents a resource with root '/books' and 3 routes:<br/>
     <li>GET path='/books/faq'</li>
     <li>GET path='/books/all'</li>
-   <li>GET path='/books/:id' (where 'id' is a valid book ID.)</li>
-    This resource can now be added to a ServerInstance
+   <li>GET path='/books/:id' (where 'id' could be a book ID.)</li>
+    This resource can now be added to a Service.
 </span>
     <hr/>
-    <h2>Composing resources into Services</h2>
+    <h2 class="header">Composing resources into Services</h2>
     <hr/>
    <span>Services are made of Resources, additional Routes and Config Settings
    Creating services in gServ is extremely simple.<br/>
@@ -63,20 +72,23 @@ def bkResource = gserv.resource("/books") {
     gserv.http {
         // setup a directory for static files
         static_root ("webapp")
+       useResources(true)
         /// add Book REST resources to our GServ instance
         resource(bkResource)
     }.start(8080);
 
    </pre>
 
-    <span>In addition to serving the Books Resource, we also serve static docs from the folder 'webapp'.  This folder can be on the file-system or on the classpath.</span>
+    <span>In addition to serving the Books Resource, we also serve static docs from
+        the folder 'webapp'.  This folder can be on the file-system or on the
+        classpath. The above call to useResourceDocs(true) tells gServ to look on the
+        classpath as well as the "webapp" folder. </span>
     <hr/>
-    <h2>Complete Example</h2>
+    <h2 class="header">Complete Example</h2>
     <hr/>
     <p>
         Create a folder: WelcomeTest
         In the new directory, add file 'build.gradle' with contents below:
-
     </p>
 <pre>
 
@@ -98,7 +110,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'log4j:log4j:1.2.17'
     compile('org.codehaus.groovy:groovy-all:2.3.0')
-    compile("org.groovyrest:g-serv:0.0.1")
+    compile("org.groovyrest:gserv:0.0.1")
 
     /// needed for Grab/Grape
     groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
