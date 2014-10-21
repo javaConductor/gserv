@@ -45,13 +45,11 @@ import sun.misc.BASE64Decoder
  *
  * @author lcollins
  */
-class ServerConfigFunctions {//extends DelegateFunctions {
-    def ServerConfigFunctions() {
-    }
+class ServerConfigFunctions {
 
     def addRoute(rte) {
         this.value("routeList").add(rte)
-        println("addRoute($rte): " + value('routeList'))
+        println("addRoute($rte)")
     }
 
     def addResource(GServResource resource) {
