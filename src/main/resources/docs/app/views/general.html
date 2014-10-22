@@ -1,15 +1,36 @@
 <div ng-controller="GServGeneralDocsCtrl">
     <h1 class="header">gServ</h1>
 
-<span>
-    gServ can be used in two ways:
-        <li>as a <a ng-click="gotoPage('/framework')">Framework</a></li>
-        <li>or <a ng-click="gotoPage('/standalone')">Standalone</a></li>
+    <h2>What is gServ?</h2>
+    <span>
+        gServ is a tool for creating and deploying REST based services without the hassle of a container (JBoss, Jetty, etc.) .  Using gServ, you can easily define REST resources in Groovy.
 </span>
+    <br/><strong><h3>Features:</h3></strong>
+    <ul>
+        <li>Container Free
+        <li>No other dependencies
+        <li>Serve Groovy script as REST reources
+        <li>Plugin Framework
+        <li>Embeddable
+        <li>Standalone Mode
+        <li>CORS support
+        <li>Compression support
+        <li>ETag support
+        <li>Basic Authentication
+        <li> HTTPS
 
-    <h1 class="header">gServ Basics</h1>
+            Requirements:
+        <li>Java JDK 1.6+
+    </ul>
+
+    <span>
+        <strong><h3>gServ can be used in two ways</h3></strong>
+            <li><a ng-click="gotoPage('/framework')">Framework</a></li>
+            <li><a ng-click="gotoPage('/standalone')">Standalone</a></li>
+    </span>
 
     <h2 class="header">Basic Concepts</h2>
+
 
     <h3 class="header">Resources</h3>
 
@@ -20,7 +41,7 @@
     <h2 class="header">Advanced Concepts</h2>
 
     <h3 class="header">Filters</h3>
-
+    <ng-include src="/views/general/filters.html"></ng-include>
     <h3 class="header">Plugins</h3>
 
     <h2 class="header">gServ Services</h2>

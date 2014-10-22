@@ -128,3 +128,8 @@ div.menu {
     border-color: navy;
     border: groove;
 }
+
+p {
+    padding: 2em;
+    margin: 1em;
+}

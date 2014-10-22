@@ -16,7 +16,7 @@ import static groovyx.net.http.Method.GET
 class DocsSpec {
     def baseDir = "src/main/resources/docs/"
 
-    @Ignore
+    @Test
     public final void testToServeDocs() {
 
         def http = new HTTPBuilder('http://localhost:11000/')
@@ -25,9 +25,10 @@ class DocsSpec {
                     "-s", dir]
         def stopFn = new GServRunner().start(args);
 
-        while (13 != System.in.read()) {
+        while (10 != System.in.read()) {
             Thread.sleep(2000)
         }
 
+        stopFn();
     }
 }
