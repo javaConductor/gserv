@@ -16,7 +16,7 @@ import static groovyx.net.http.Method.GET
 class DocsSpec {
     def baseDir = "src/main/resources/docs/"
 
-    @Test
+    @Ignore
     public final void testToServeDocs() {
 
         def http = new HTTPBuilder('http://localhost:11000/')

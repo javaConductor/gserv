@@ -45,7 +45,7 @@ class CORSMode {
 class CorsPlugin extends AbstractPlugin {
 
     def allowAllHandler = { CORSConfig corsConfig ->
-        println "CorsPlugin.allowAllHandler(): ${exchange.requestMethod}(${exchange.requestURI})"
+//        println "CorsPlugin.allowAllHandler(): ${exchange.requestMethod}(${exchange.requestURI})"
         switch (exchange.requestMethod) {
 
             case "OPTIONS":
@@ -76,13 +76,13 @@ class CorsPlugin extends AbstractPlugin {
                 def origin = exchange.requestHeaders.get("Origin")
                 // if found add the "Access-Control-Allow-Origin: *" header to response
                 if (origin) {
-                    println "CorsPlugin filter: Allowing Origin: $origin"
+//                    println "CorsPlugin filter: Allowing Origin: $origin"
                     exchange.responseHeaders.add("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
                     exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
                 } else {
-                    println "CorsPlugin filter: No Origin Header."
+                    //                  println "CorsPlugin filter: No Origin Header."
                 }
-                println "CorsPlugin Filter: Calling chain"
+//                println "CorsPlugin Filter: Calling chain"
                 nextFilter()
                 exchange
                 break;
@@ -109,7 +109,7 @@ class CorsPlugin extends AbstractPlugin {
                 def accessReqHeaders = exchange.requestHeaders.get("Access-Control-Request-Headers")
 
                 // if found add the "Access-Control-Allow-Origin: $origin" header to response
-                def ok = corsConfig.hasAccess(host, accessReqMethod)
+                def ok = corsConfig.hasAccess(host, accessReqMethod, accessReqHeaders)
                 // def ok = checkListFn(corsConfig, origin, accessReqMethod, accessReqHeaders)
                 log.debug "CorsPlugin.listHandler(): $origin can do $accessReqMethod = ${ok}"
                 if (ok) {
@@ -195,8 +195,6 @@ class CorsPlugin extends AbstractPlugin {
 
     @Override
     def init(options) {
-        //filter = new org.groovyrest.gserv.filters.Filter()
-        //this.corsConfig = options
         println "CorsPlugin: init($options)"
     }
 

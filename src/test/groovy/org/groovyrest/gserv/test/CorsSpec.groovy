@@ -145,4 +145,55 @@ public class CorsSpec extends Specification {
         cfg.hasAccess("127.0.0.1", "PUT")
     }
 
+
+    public void "should allow X-Other Header"() {
+        def cfg
+
+        when:
+        cfg = new CORSConfig(3600,
+                CORSMode.WhiteList, [
+                "127.0.0.1": [
+                        maxAge              : 3600,
+                        methods             : ["GET", "PUT", "POST"],
+                        customRequestHeaders: ['X-Other']
+                ]
+
+        ])
+        then:
+        cfg.hasAccess("127.0.0.1", "PUT", ['X-Other'])
+    }
+
+    public void "should not allow X-Same Header"() {
+        def cfg
+
+        when:
+        cfg = new CORSConfig(3600,
+                CORSMode.WhiteList, [
+                "127.0.0.1": [
+                        maxAge              : 3600,
+                        methods             : ["GET", "PUT", "POST"],
+                        customRequestHeaders: ['X-Other']
+                ]
+
+        ])
+        then:
+        !cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
+    }
+
+    public void "should allow X-Same Header when none specified"() {
+        def cfg
+
+        when:
+        cfg = new CORSConfig(3600,
+                CORSMode.WhiteList, [
+                "127.0.0.1": [
+                        maxAge : 3600,
+                        methods: ["GET", "PUT", "POST"]
+                ]
+
+        ])
+        then:
+        cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
+    }
+
 }

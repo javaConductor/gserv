@@ -47,7 +47,7 @@ class CORSConfig {
                     "129.25.192.33": [
                             methods             : ["GET"],
                             maxAge              : 7200,
-                            customRequestHeaders: []
+                            customRequestHeaders: ['X-Custom-Header']
                     ]
             ]
     ];
@@ -90,6 +90,11 @@ class CORSConfig {
         remoteHost ? list[remoteHost] : null
     }
 
+    def hasAccess(host, method, customReqHdrs) {
+        def hcfg = findHostConfig(host);
+        hcfg && hcfg.allowsCustomHeaders(customReqHdrs) && hasAccess(host, method)
+    };
+
     def hasAccess(host, method) {
         switch (mode) {
             case (CORSMode.AllowAll):
@@ -129,6 +134,13 @@ class HostConfig {
         this.maxAge = maxAge
         customRequestHeaders = customReqHdrs
         log.debug("HostConfig($h, ${methodList.join(',')}, $maxAge, ${customReqHdrs} )")
+    }
+
+    def allowsCustomHeaders(reqHeaders) {
+        if (!customRequestHeaders || customRequestHeaders.empty) {
+            return true
+        }
+        customRequestHeaders.intersect(reqHeaders).size() == reqHeaders.size()
     }
 
     def hasMethod(httpMethod) {
