@@ -1,4 +1,4 @@
-#    g-serv
+#    gServ
 
 ##Groovy API for <i><u><b>Container Free </b></u></i>RESTful Micro Services.
 
