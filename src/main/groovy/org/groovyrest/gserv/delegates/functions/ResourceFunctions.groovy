@@ -83,7 +83,7 @@ class ResourceFunctions {
      * @return
      */
     def get(routeName, url, clozure) {
-        println("serverInitClosure: get ${routeName ?: ''} base=${(value("path"))} url=$url")
+        log.trace("serverInitClosure: get ${routeName ?: ''} base=${(value("path"))} url=$url")
         def rte = _addUrlToPatternList("GET", url, clozure)
         if (routeName)
             value("linkBuilder").addLink(routeName, rte)
@@ -98,7 +98,7 @@ class ResourceFunctions {
      * @return
      */
     def put(url, clozure) {
-        println("serverInitClosure: put url=$url")
+        log.trace("serverInitClosure: put url=$url")
         def rte = _addUrlToPatternList("PUT", url, clozure)
         //if(routeName) linkBuilder.add(routeName, rte)
         rte
@@ -112,7 +112,7 @@ class ResourceFunctions {
      * @return
      */
     def post(url, clozure) {
-        println("serverInitClosure: post url=$url")
+        log.trace("serverInitClosure: post url=$url")
         _addUrlToPatternList("POST", url, clozure)
     }
 
@@ -124,7 +124,7 @@ class ResourceFunctions {
      * @return
      */
     def delete(url, clozure) {
-        println("serverInitClosure: delete url=$url")
+        log.trace("serverInitClosure: delete url=$url")
         _addUrlToPatternList("DELETE", url, clozure)
     }
 
@@ -136,8 +136,8 @@ class ResourceFunctions {
             }
             absUrl += url
         }
-        def s = "resourceInitClosure: _addUrlToPatternList url=$absUrl".toString();
-        println(s)
+        log.trace "resourceInitClosure: _addUrlToPatternList url=$absUrl".toString();
+
         def rte = RouteFactory.createURLPattern(method, absUrl, clozure)
         value("routeList").add(rte)
         rte

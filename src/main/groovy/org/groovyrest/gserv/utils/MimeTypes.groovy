@@ -321,10 +321,6 @@ public class MimeTypes {
         };
     }
 
-    public static void main(String[] args) {
-        System.out.println(mimeTypeMapping.size());
-    }
-
     /**
      * Registers MIME type for provided extension. Existing extension type will be overriden.
      */

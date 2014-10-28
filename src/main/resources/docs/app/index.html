@@ -17,7 +17,7 @@
 
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/bootstrap.css">
-    <link rel="stylesheet" href="styles/foundation.css">
+    <!--<link rel="stylesheet" href="styles/foundation.css">-->
     <link rel="stylesheet" href="lib/angular-ui-tree/dist/angular-ui-tree.min.css">
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="lib/angular-ui/build/angular-ui.css">
@@ -70,6 +70,12 @@
                             <ul>
                                 <li><a ng-click="gotoPage('/framework')">gServ Framework</a></li>
                                 <li><a ng-click="gotoPage('/standalone')">gServ Standalone</a></li>
+                                <li><a>Examples</a>
+                                    <ul>
+                                        <li><a ng-click="gotoPage('/examples/basicauth')">Basic Authentication</a></li>
+                                    </ul>
+                                </li>
+
                             </ul>
                         </li>
                     </ul>
@@ -105,6 +111,7 @@
 
     ga('create', 'UA-XXXXX-X');
     ga('send', 'pageview');
+
 
 </script>
 

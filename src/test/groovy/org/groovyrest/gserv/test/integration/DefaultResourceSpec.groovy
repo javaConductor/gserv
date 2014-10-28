@@ -3,6 +3,7 @@ package org.groovyrest.gserv.test.integration
 import groovyx.net.http.HTTPBuilder
 import org.groovyrest.gserv.GServRunner
 import org.junit.Test
+import spock.lang.Ignore
 
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.Method.GET

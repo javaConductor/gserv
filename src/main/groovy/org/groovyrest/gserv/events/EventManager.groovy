@@ -24,6 +24,7 @@
 
 package org.groovyrest.gserv.events
 
+import groovy.util.logging.Log4j
 import groovyx.gpars.GParsPool
 import groovyx.gpars.actor.Actors
 
@@ -45,6 +46,7 @@ class _broadcast {
 /**
  * Manages the Pub/Sub subSystem
  */
+@Log4j
 class EventManager {
     private def EventManager() {
     }
@@ -79,7 +81,7 @@ class EventManager {
             _act << new _broadcast([topic: topic, data: data])
         }
         catch (Throwable ex) {
-            System.err.println("EventManager.publish. Exception: ${ex.message}")
+            log.error("EventManager.publish. Exception: ${ex.message}")
             ex.printStackTrace(System.err)
         }
     }

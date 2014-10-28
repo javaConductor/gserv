@@ -1,0 +1,74 @@
+<div class="section">
+    <p class="section-header">Creating Services</p>
+    Services are composed of resources, staticRoots and filters.
+    Creating services in gServ is extremely simple.
+
+    The following code creates an HTTP server and starts it listening to port 8080:
+
+    <p class="sub-section-header">Example</p>
+
+    <p class="section-content">
+        Create a folder: WelcomeTest
+        In the new directory, add file 'build.gradle' with contents below:
+    </p>
+<pre>
+apply plugin: 'groovy'
+apply plugin: 'application'
+apply plugin: 'maven'
+
+mainClassName = 'WelcomeService'
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'log4j:log4j:1.2.17'
+    compile('org.codehaus.groovy:groovy-all:2.3.0')
+    compile("org.groovyrest:g-serv:0.0.1")
+
+    /// needed for Grab/Grape
+    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile "junit:junit:4.11"
+}</pre>
+
+    <p class="section-content">
+        Copy the code below to WelcomeService.groovy in your WelcomeService folder.
+<pre>import org.groovyrest.gserv.GServ
+class WelcomeService {
+
+    public static void main(String[] args) {
+        new WelcomeService();
+    }
+
+    def WelcomeService() {
+        def gserv = new GServ()
+
+        gserv.http {
+            get("/welcome", {->
+                write("Welcome to g-serv, The embeddable REST server for Groovy!")
+            });
+
+        }.start(8080)
+    }
+}</pre>
+
+    <p class="section-content">
+        Tell Gradle to build and run your program.
+<pre>
+gradlew clean run
+</pre>
+    Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your
+    browser.
+    </p>
+
+    You may add a single resource / method handler to the service but its usually
+    more useful to group the operations in a resource together.
+</div>

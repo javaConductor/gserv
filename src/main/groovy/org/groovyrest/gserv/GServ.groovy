@@ -73,7 +73,7 @@ class GServ {
         def dgt = new PluginsDelegate();
         definitionClosure = definitionClosure.rehydrate(dgt, this, this)
         definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        println "GServ.plugins(): delegate:${definitionClosure.delegate}: Calling plugins closure."
+        //println "GServ.plugins(): delegate:${definitionClosure.delegate}: Calling plugins closure."
         definitionClosure()
         serverPlugins = definitionClosure.delegate.plugins ?: serverPlugins
         return this
@@ -234,7 +234,6 @@ class gServHandler implements HttpHandler {
     private def _factory = new GServFactory();
     private def _routes
     private def _staticRoots
-//    def _matcher = new Matcher()
     private def _templateEngineName
     private def _dispatcher, _handler
     private def _cfg
@@ -261,7 +260,6 @@ class gServHandler implements HttpHandler {
         _handler = _nuHandler()
 
         def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
-        // def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
         //TODO Use the CORES + 1 strategy
         _nuDispatcher = {
             _factory.createDispatcher(actors, _routes, _staticRoots,
@@ -308,10 +306,6 @@ class gServHandler implements HttpHandler {
             httpExchange.responseBody.write(msg.bytes)
             httpExchange.responseBody.close()
         }
-        finally {
-            //System.out.println("gServHandler.handleWrapper(): Closing response stream: ${httpExchange.requestURI}")
-            //httpExchange.responseBody.close()
-        }
     }
 
     private void _handle(HttpExchange httpExchange) {
@@ -342,6 +336,7 @@ class gServPlugins {
         def delegates = prepareAllDelegates(DefaultDelegates.delegates)
         serverConfig.delegateManager(new DelegatesMgr(delegates))
         /// for each plugin we add to the patterns, filters, and staticRoots
+        //TODO plugins MAY also contribute to the Type formatter (to)
         plugins.each {
             serverConfig.addRoutes(it.routes())
                     .addFilters(it.filters())

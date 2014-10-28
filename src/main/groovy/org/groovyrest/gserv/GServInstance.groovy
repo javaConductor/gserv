@@ -51,6 +51,8 @@ class GServInstance {
     protected def _filters
     protected def _templateEngineName;
     protected def _cfg;
+    def mbean
+    static def requestId = 1L;
 
     /**
      *
@@ -65,7 +67,6 @@ class GServInstance {
         _templateEngineName = cfg.templateEngineName();
     }
 
-    def mbean
 
     def exportMBean(actualPort, jmxBean) {
 
@@ -96,6 +97,7 @@ class GServInstance {
      * This method will start the server on 'port'.
      *
      * @param port
+     * @return Function to close the server
      */
     def start(port = null) {
         def actualPort = (port ?: _cfg.port())
@@ -104,9 +106,9 @@ class GServInstance {
                 new GServJMX()
         );
 
+        ///// Underlying Server Impl -
         def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(actualPort as Integer), 0);
         def context = server.createContext("/", _handler);
-        def requestId = 1L;
 
         ////////////////////////////////
         /// create and add the InitFilter
@@ -119,7 +121,6 @@ class GServInstance {
             }
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
-
             URI uri = applyDefaultResourceToURI(config().defaultResource(), exchange.requestURI);
 
             /// add wrap code here
@@ -129,7 +130,7 @@ class GServInstance {
             HttpExchange httpExchange = new ExchangeWrapper(exchange, uri)
             httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, [])
             def baos = new FilterByteArrayOutputStream({ _this ->
-                println "Running ppList for ${httpExchange.requestURI.path} - req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}"
+                log.trace "Running ppList for ${httpExchange.requestURI.path} - req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}"
                 /// run the PostProcess List
                 def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList).toList()
 
@@ -139,10 +140,10 @@ class GServInstance {
 
                 ppList.each { fn ->
                     try {
-                        println("Processing Filter Fn: ${fn.delegate.$this.name}  ")
+                        log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
                         bytes = fn(httpExchange, bytes) ?: bytes
                     } catch (Throwable ex) {
-                        System.err.println("FilterError: ${ex.message}")
+                        log.error("FilterError: ${ex.message}")
                         ex.printStackTrace(System.err)
 //                            eventMgr.publish(Events.FilterError, [filter   : theFilter.name ?: "-",
 //                                                                  requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
@@ -184,7 +185,13 @@ class GServInstance {
         return _cfg;
     }
 
-
+    /**
+     * Takes a URI pointing to the  root and returns a URI pointing to the defaultResource
+     *
+     * @param defaultResource
+     * @param uri
+     * @return
+     */
     URI applyDefaultResourceToURI(defaultResource, uri) {
         if (!defaultResource || (!(uri.path == '/')))
             return uri;

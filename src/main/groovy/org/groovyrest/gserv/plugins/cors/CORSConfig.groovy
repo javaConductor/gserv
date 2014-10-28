@@ -137,10 +137,7 @@ class HostConfig {
     }
 
     def allowsCustomHeaders(reqHeaders) {
-        if (!customRequestHeaders || customRequestHeaders.empty) {
-            return true
-        }
-        customRequestHeaders.intersect(reqHeaders).size() == reqHeaders.size()
+        (!customRequestHeaders) || customRequestHeaders.intersect(reqHeaders).size() == reqHeaders.size()
     }
 
     def hasMethod(httpMethod) {

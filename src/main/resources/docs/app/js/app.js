@@ -15,6 +15,9 @@ theModule.config(function ($routeProvider) {
       }).when('/standalone', {
         templateUrl: 'views/standalone.html',
         controller: "GServStandaloneDocsCtrl"
+      }).when('/examples/basicauth', {
+        templateUrl: 'views/examples/basicAuth.html',
+        controller: "ExampleCtrl"
       })
       .otherwise({
         redirectTo: '/general'

@@ -47,7 +47,7 @@ class FilterFunctions {
      */
     void error(int code, String message) {
         message = message ?: "Error!"
-        println "requestHandlerDelegate.error($code, $message)"
+        //println "requestHandlerDelegate.error($code, $message)"
         exchange.sendResponseHeaders(code, message.bytes.size())
         exchange.getResponseBody().write(message.bytes)
         exchange.getResponseBody().close()

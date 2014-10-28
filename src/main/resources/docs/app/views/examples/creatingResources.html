@@ -1,16 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<h2>Creating REST Resources:</h2>
+<div>
+    <h2>Creating REST Resources:</h2>
 
-<p>Creating REST resources is easy to do. Simply use the static function:
-<pre>GServ.Resource<(name, config)</pre>
-<br/>
-Here, we will reate a Books REST resource with 2 method GET
-</p>
+    <p>Creating REST resources is easy to do. Simply use the static function:
+    <pre>GServ.Resource<(name, config)</pre>
+    <br/>
+    Here, we will reate a Books REST resource with 2 method GET
+    </p>
 <pre>
 def gserv = new GServ()
 def bookService = ...
@@ -46,5 +41,4 @@ gserv.http {
 }.start(8080);
 </pre>
 
-</body>
-</html>
+</div>

@@ -1,15 +1,19 @@
 <div ng-controller="GServGeneralDocsCtrl">
-    <h1 class="header">gServ</h1>
+    <span class="docs-header">gServ</span>
 
-    <h2>What is gServ?</h2>
-    <span>
-        gServ is a tool for creating and deploying REST based services without the hassle of a container (JBoss, Jetty, etc.) .  Using gServ, you can easily define REST resources in Groovy.
-</span>
-    <br/><strong><h3>Features:</h3></strong>
-    <ul>
+    <h2 class="docs-sub-header">What is gServ?</h2>
+        <span class="docs-content">
+            gServ is a tool for creating and deploying REST based services using Groovy without the
+            hassle of a container (JBoss, Jetty, etc.) .  Using gServ, you can easily define
+            REST resources in Groovy.
+        </span>
+
+
+    <br/><span class="docs-sub-header">Features:</span>
+    <ul class="docs-content">
         <li>Container Free
         <li>No other dependencies
-        <li>Serve Groovy script as REST reources
+        <li>Serve Groovy script as REST resources
         <li>Plugin Framework
         <li>Embeddable
         <li>Standalone Mode
@@ -23,27 +27,36 @@
         <li>Java JDK 1.6+
     </ul>
 
-    <span>
-        <strong><h3>gServ can be used in two ways</h3></strong>
+    <div class="docs-content">
+        <span class="docs-sub-header">Basic Concepts</span>
+        <table width="90%" class="docs-content">
+            <tr>
+                <th>Term</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td>Resources</td>
+                <td>Resources define resource handlers - one for each HTTP method.</td>
+            </tr>
+            <tr>
+                <td>Server Config</td>
+                <td>The config encapsulates any resources, end-points, filters, and plugins.</td>
+            </tr>
+            <tr>
+                <td>Server Instance</td>
+                <td>This is the actual server that will listen to the specified port and handle
+                    requests based on its configuration.
+                </td>
+            </tr>
+        </table>
+
+        <span class="docs-sub-header">gServ can be used in two ways</span>
+
+        <div class="docs-content">
             <li><a ng-click="gotoPage('/framework')">Framework</a></li>
             <li><a ng-click="gotoPage('/standalone')">Standalone</a></li>
-    </span>
+        </div>
 
-    <h2 class="header">Basic Concepts</h2>
-
-
-    <h3 class="header">Resources</h3>
-
-    <h3 class="header">Services</h3>
-
-    <h3 class="header">Route Handlers</h3>
-
-    <h2 class="header">Advanced Concepts</h2>
-
-    <h3 class="header">Filters</h3>
-    <ng-include src="/views/general/filters.html"></ng-include>
-    <h3 class="header">Plugins</h3>
-
-    <h2 class="header">gServ Services</h2>
+    </div>
 
 </div>

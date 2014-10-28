@@ -24,6 +24,7 @@
 
 package org.groovyrest.gserv.plugins.compression
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.GServ
 import org.groovyrest.gserv.Route
 import org.groovyrest.gserv.RouteFactory
@@ -41,6 +42,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Compression plugin
  */
+@Log4j
 class CompressionPlugin extends AbstractPlugin {
     @Override
     def init(Object options) {
@@ -111,7 +113,7 @@ class CompressionPlugin extends AbstractPlugin {
                     requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
                     name     : "Compression-Before-Filter",
                     message  : "Processing Compression Filter - NOT Replacing input stream."])
-            println("compressionPlugin: no compression here.")
+            //println("compressionPlugin: no compression here.")
         }
         exchange
     }
@@ -142,7 +144,7 @@ class CompressionPlugin extends AbstractPlugin {
                     ->
                     HttpExchange e = handleBefore(exchange) ?: exchange
                     nextFilter(e)
-                    println "CompressionPlugin: before $method doFilter()"
+                    log.trace "CompressionPlugin: before $method doFilter()"
                     e
                 },
                  RouteFactory.createAfterFilterURLPattern("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedRoutesOnly): true], 10) { exchange, data ->

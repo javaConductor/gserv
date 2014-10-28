@@ -8,9 +8,7 @@ def gserv = new GServ();
 
 gserv.http((Map)[:]) { ->
 /*
-
-    def basicAuthentication(methods, path, realm, challengeFn){
-
+    def basicAuthentication(methods, path, realm, challengeFn)
  */
     basicAuthentication(['GET',"POST","PUT"], "/*", "testRealm"){ user, pswd ->
         def ok =  ( user == "secret" && pswd == "thing" )

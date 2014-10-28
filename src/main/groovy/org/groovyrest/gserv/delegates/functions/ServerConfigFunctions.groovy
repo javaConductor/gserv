@@ -30,6 +30,7 @@
 
 package org.groovyrest.gserv.delegates.functions
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.GServ
 import org.groovyrest.gserv.RouteFactory
 import org.groovyrest.gserv.events.EventManager
@@ -45,11 +46,12 @@ import sun.misc.BASE64Decoder
  *
  * @author lcollins
  */
+@Log4j
 class ServerConfigFunctions {
 
     def addRoute(rte) {
         this.value("routeList").add(rte)
-        println("addRoute($rte)")
+        //println("addRoute($rte)")
     }
 
     def addResource(GServResource resource) {
@@ -173,12 +175,12 @@ class ServerConfigFunctions {
         def options = [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedRoutesOnly): true];
         methods.each { method ->
             before("basicAuth($method->$path)", path, method, options, 2) { ->
-                println("basicAuth before()");
-                exchange.requestHeaders.keySet().each {
-                    println "h: $it -> ${exchange.requestHeaders[it]}";
-                }
+                log.trace("basicAuth before()");
+//                exchange.requestHeaders.keySet().each {
+//                    println "h: $it -> ${exchange.requestHeaders[it]}";
+//                }
                 def userPswd = getBasicAuthUserPswd(exchange);
-                println("basicAuth before(): userPswd:$userPswd");
+                log.trace("basicAuth before(): userPswd:$userPswd");
                 if (!userPswd) {
                     exchange.responseHeaders.add("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
@@ -198,7 +200,7 @@ class ServerConfigFunctions {
 
     def getBasicAuthUserPswd(exchange) {
         def basic = exchange.requestHeaders.get("Authorization");
-        println "basic: $basic"
+        //println "basic: $basic"
         if (!basic)
             return null;
         basic = basic[0];// we get a list as response but we only need the first one

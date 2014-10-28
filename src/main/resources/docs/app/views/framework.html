@@ -1,29 +1,31 @@
-<div>
-    <h1 class="header">gServ Framework</h1>
+<span class="docs-header">gServ Framework</span>
+<div class="docs-content">
     gServ framework provides a container-free way to expose new or existing functionality as a REST based service.
     <hr/>
-    <h2 class="header">Getting Started</h2>
+    <div class="docs-content">
+        <p class="docs-sub-header">Getting Started</p>
+        <li>Download and install <a href="http://www.gradle.org/downloads">Gradle</a></li>
+        <li>Clone gServ from <a href="https://github.com/javaConductor/gserv.git">GitHub</a></li>
+        <li>At the commandline, in the root directory of the gServ project, run:
+            <pre>prompt> gradle install</pre>
+            This will add it to your local Maven repository as <strong>'org.groovyrest:gserv:[latest version]'</strong>
+            so you can use it your Maven/Gradle apps or just get the jar file and use it directly..
+        </li>
+    </div>
     <hr/>
-    <li>Download and install <a href="http://www.gradle.org/downloads">Gradle</a></li>
-    <li>Clone gServ from <a href="https://github.com/javaConductor/gserv.git">GitHub</a></li>
-    <li>At the commandline, in the root directory of the gServ project, run:
-        <pre>prompt> gradle install</pre>
-        This will add it to your local Maven repository as <strong>'org.groovyrest:gserv:[latest version]'</strong>
-        so you can use it your Maven/Gradle apps or just get the jar file and use it directly..
-    </li>
-
-    <h2 class="header">Creating REST Resources:</h2>
-    Creating REST resources is easy to do. Either use the static or instance methods:
+    <div class="docs-content">
+        <p class="docs-sub-header">Creating REST Resources:</p>
+        Creating REST resources is easy to do. Either use the static or instance methods:
     <pre>
         GServ.Resource<(path, config)
         new GServ().resource<(path, config)</pre>
-    The <i>path</i> argument contains the path prefix for this resource<br/>
-    The <i>config</i> argument is a Closure defining the endpoint of this resource
-    <br/>
+        The <i>path</i> argument contains the path prefix for this resource<br/>
+        The <i>config</i> argument is a Closure defining the endpoint of this resource
+        <br/>
 
-    <p>
-        Here, we will create a Books REST resource.
-    </p>
+        <p>
+            Here, we will create a Books REST resource.
+        </p>
 <pre>
 def gserv = new GServ()
 
@@ -59,10 +61,12 @@ def bkResource = gserv.resource("/books") {
    <li>GET path='/books/:id' (where 'id' could be a book ID.)</li>
     This resource can now be added to a Service.
 </span>
-    <hr/>
-    <h2 class="header">Composing resources into Services</h2>
-    <hr/>
-   <span>Services are made of Resources, additional Routes and Config Settings
+    </div>
+    <div class="docs-content">
+        <hr/>
+        <p class="docs-sub-header">Composing resources into Services</p>
+        <hr/>
+   <span class="docs-content">Services are made of Resources, additional Routes and Config Settings
    Creating services in gServ is extremely simple.<br/>
    The following code creates an HTTP server and starts it listening to port 8080:
     </span>
@@ -83,90 +87,7 @@ def bkResource = gserv.resource("/books") {
         the folder 'webapp'.  This folder can be on the file-system or on the
         classpath.  <br/>The above call to useResourceDocs(true) tells gServ to look on the
         classpath as well as the "webapp" folder for static resources. </span>
-    <hr/>
-    <h2 class="header">Complete Example</h2>
-    <hr/>
-    <p>
-        Create a folder: WelcomeTest
-        In the new directory, add file 'build.gradle' with contents below:
-    </p>
-<pre>
+        <hr/>
+    </div>
 
-apply plugin: 'groovy'
-apply plugin: 'application'
-apply plugin: 'maven'
-
-mainClassName = 'WelcomeService'
-version = "0.0.1"
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
-// In this section you declare the dependencies for your production and test code
-dependencies {
-    // The production code uses the SLF4J logging API at compile time
-    compile 'org.slf4j:slf4j-api:1.7.5'
-    compile 'log4j:log4j:1.2.17'
-    compile('org.codehaus.groovy:groovy-all:2.3.0')
-    compile("org.groovyrest:gserv:0.0.1")
-
-    /// needed for Grab/Grape
-    groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
-
-    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile "junit:junit:4.11"
-}
-</pre>
-
-    You may add a single resource / method handler to the service but its usually more useful to group the operations in
-    a resource together. So, a more realistic example would be:
-    </p>
-
-<pre>
-import org.groovyrest.gserv.GServ
-class WelcomeService {
-
-    public static void main(String[] args) {
-        new WelcomeService();
-    }
-
-    def WelcomeService() {
-        def gserv = new GServ()
-        def bkResource = gserv.resource("/books") {
-              ////
-              // responds  to /books/faq
-              get("/faq", file("BooksFaq.html"))
-              // responds  to /books/xyz
-              get(":id"), { id ->
-                  def book = bookService.get( id )
-                  writeJson(book)
-              }
-              // responds  to /books/all
-              get("/all", {  ->
-                def books = bookService.allBooks ()
-                header("content-type", "application/json")
-                writeJSON(books)
-            })
-        }
-
-        gserv.http {
-            get("/welcome", {->
-                write("Welcome to g-serv, The embeddable REST server for Groovy!")
-            });
-        resource( bkResource )
-        }.start(8080)
-    }
-}
-</pre>
-
-    <p>
-        Tell Gradle to build and run your program.
-    <pre>
-    gradlew clean run
-    </pre>
-    Then navigate your browser to [http://localhost:8080/welcome]. You should see the welcome message above in your
-    browser.
-    </p>
 </div>

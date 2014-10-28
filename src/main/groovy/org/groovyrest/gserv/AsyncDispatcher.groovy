@@ -152,7 +152,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
 
     def process(HttpExchange httpExchange) {
 
-        println "Processing exchange(${httpExchange.dump()})"
+        log.trace "Processing exchange(${httpExchange.dump()})"
         Route pattern = _matcher.matchRoute(_routes, httpExchange)
         if (pattern) {
             httpExchange.setAttribute(GServ.exchangeAttributes.matchedRoute, pattern)
@@ -173,9 +173,9 @@ class AsyncDispatcher extends DynamicDispatchActor {
 
                 if (e.message.startsWith("The actor cannot accept messages at this point.")) {
                     //TODO needs new handler
-                    println "Actor in bad state: replacing."
+                    log.warn "Actor in bad state: replacing."
                     _actorPool.replaceActor(actr)
-                    println "Actor in bad state: replaced and reprocessed!"
+                    log.warn "Actor in bad state: replaced and reprocessed!"
                     process(httpExchange)
                 } else {
                     evtMgr.publish(Events.RequestProcessingError, [
@@ -189,7 +189,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
             //println "AsyncDispatcher.process(): route $pattern sent to processor."
             return
         }
-        println "AsyncDispatcher.process(): No matching dynamic resource for: ${httpExchange.requestURI}"
+        log.trace "AsyncDispatcher.process(): No matching dynamic resource for: ${httpExchange.requestURI}"
         //// if its a GET then try to match it to a static resource
         //
         if (httpExchange.requestMethod == "GET") {
@@ -205,7 +205,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 httpExchange.sendResponseHeaders(200, istream.available())
                 sendStream(istream, httpExchange.responseBody)
                 httpExchange.responseBody.close()
-                println "AsyncDispatcher.process(): Static resource ${httpExchange.requestURI.path} was sent for req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}."
+                log.trace "AsyncDispatcher.process(): Static resource ${httpExchange.requestURI.path} was sent for req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}."
                 return
             }
         }

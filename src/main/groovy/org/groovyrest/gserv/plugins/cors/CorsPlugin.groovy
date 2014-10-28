@@ -60,10 +60,7 @@ class CorsPlugin extends AbstractPlugin {
                 exchange.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
 
                 /// send 200 with header
-                def resp = new JsonBuilder([cors: [
-                        respones: 'OK'
-                ]
-                ]).toPrettyString();
+                def resp = new JsonBuilder([cors: [respones: 'OK']]).toPrettyString();
 
                 exchange.sendResponseHeaders(200, resp.bytes.length)
                 exchange.responseBody.write(resp.bytes);
@@ -170,7 +167,7 @@ class CorsPlugin extends AbstractPlugin {
 
     /**
      * @return a closure - fn(chain)
-     * the closure MUSt be a valid Filter closure
+     * the closure MUSt be a valid Before-Filter closure
      * @param corsConfig
      */
     def corsFilter(config) {
@@ -195,7 +192,7 @@ class CorsPlugin extends AbstractPlugin {
 
     @Override
     def init(options) {
-        println "CorsPlugin: init($options)"
+        // println "CorsPlugin: init($options)"
     }
 
 /**
@@ -213,7 +210,6 @@ class CorsPlugin extends AbstractPlugin {
         switch (delegateType) {
             case "http":
             case "https":
-                /// Convert into HTML - call a Markdown function
                 def corsCfgFn = { uri, CORSConfig cfg ->
                     log.debug("CorsPlugin.decorateDelegate: cors(uri=$uri)")
                     try {

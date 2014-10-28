@@ -39,10 +39,10 @@ class Matcher {
     def matchRoute(routeList, URI uri, String method) {
         //loop thru the routeList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
         def ret = routeList.find { p ->
-            println "Check route: $p"
+            //println "Check route: $p"
             (p.method() == method && match(p, uri))
         }
-        if (ret) println "Matched route: $ret"
+        //if (ret) println "Matched route: $ret"
         return ret;
     }
 

@@ -24,6 +24,7 @@
 
 package org.groovyrest.gserv.wrapper
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.GServ
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.events.Events
@@ -36,6 +37,7 @@ import org.groovyrest.gserv.filters.FilterByteArrayOutputStream
 /**
  * Exchange Wrapper usually used for Filters
  */
+@Log4j
 class ExchangeWrapper extends HttpExchange {
     HttpExchange _exchange
     Headers _requestHdrs, _responseHdrs
@@ -182,7 +184,7 @@ class ExchangeWrapper extends HttpExchange {
      * @param bytes
      */
     synchronized def writeIt(bytes) {
-        println "Wrapper.writeIt(): Writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
+        log.debug "Wrapper.writeIt(): Writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
         if (!isClosed) {
             EventManager.instance().publish(Events.FilterProcessing, [
                     stream   : this.class.name,
@@ -193,10 +195,9 @@ class ExchangeWrapper extends HttpExchange {
             _exchange.sendResponseHeaders(_code ?: 200, bytes.size())
             try {
                 originalOutputStream().write(bytes)
-                println "Wrote response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path}) size=${bytes.size()}"
+                log.debug "Wrote response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path}) size=${bytes.size()}"
             } catch (Throwable ex) {
-                println "Error writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}"
-            } finally {
+                log.error "Error writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}"
             }
             // println "Wrote response($_code) for ${requestURI.path} size=${bytes.size()}"
             originalOutputStream().close()

@@ -1,27 +1,9 @@
+
+
 /* Space out content a bit */
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-}
-
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
-.footer {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-/* Custom page header */
-.header {
-  border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
-  padding-bottom: 19px;
 }
 
 /* Custom page footer */
@@ -41,49 +23,11 @@ body {
   margin: 30px 0;
 }
 
-/* Main marketing message and sign up button */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-  font-size: 21px;
-  padding: 14px 24px;
-}
-
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
-
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
-}
-
 li.menuItem {
     padding-left: 5px;
     padding-right: 5px;
     display: inline-block;
 }
-
 
 .main {
     margin: 15px;
@@ -104,10 +48,54 @@ pre {
     font-family: "Consolas", "Menlo", "Courier", monospace;
     border: groove;
     border-color: navy;
-    padding: 1em;min-width: 20%;max-width: 90%;
+    padding: 1em;
+    min-width: 20%;max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 body{
     padding: 2em;
+}
+
+.section {
+    border-color: navy;
+    background-color: lightyellow;
+    color: navy;
+}
+
+.doc-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: xx-large;
+    width:100%;
+
+}
+
+.section-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: x-large;
+    width:99%;
+}
+
+.sub-section-header {
+    color: lightyellow;
+    background-color: navy;
+    font-weight:normal;
+    font-size: medium;
+    width:99%;
+}
+
+.section-content {
+    background-color: lightyellow;
+    color: navy;
+    font-weight:400;
+    width:99%;
+    margin: 10px;
+    font-size: large;
+
 }
 
 .mainContent {
@@ -129,7 +117,72 @@ div.menu {
     border: groove;
 }
 
-p {
-    padding: 2em;
-    margin: 1em;
+.example-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: xx-large;
+    width:99%;
+}
+.example-howto-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: x-large;
+    width:99%;
+}
+.example-complete-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: x-large;
+    width:99%;
+}
+
+.example-sub-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: large;
+    width:99%;
+}
+
+.example-content {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: normal;
+    font-size: medium;
+    width:99%;
+}
+
+
+.docs-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: xx-large;
+    width:99%;
+}
+.docs-sub-header {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: bold;
+    font-size: x-large;
+    width:99%;
+}
+
+.docs-heading {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: normal;
+    font-size: x-large;
+    width:99%;
+}
+
+.docs-content {
+    background-color: lightyellow;
+    color: navy;
+    font-weight: normal;
+    font-size: medium;
+    width:99%;
 }
