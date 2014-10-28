@@ -24,12 +24,14 @@
 
 package org.groovyrest.gserv.delegates.functions
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.RouteFactory
 
 /**
  *
  * @author lcollins
  */
+@Log4j
 class ResourceFunctions {
 
     /**

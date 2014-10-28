@@ -24,6 +24,7 @@
 
 package org.groovyrest.gserv.configuration.scriptloader
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.GServInstance
 import org.groovyrest.gserv.configuration.GServConfig
 import org.groovyrest.gserv.resourceloader.InstanceScriptException
@@ -33,6 +34,7 @@ import org.groovyrest.gserv.resourceloader.ResourceScriptException
 /**
  * Created by javaConductor on 8/26/2014.
  */
+@Log4j
 class ScriptLoader {
 
     ResourceLoader resourceLoader = new ResourceLoader();
