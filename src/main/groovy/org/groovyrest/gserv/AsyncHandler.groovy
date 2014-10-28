@@ -68,7 +68,7 @@ class AsyncHandler extends DynamicDispatchActor {
             def exchange = request.exchange
             pattern = request.pattern
 //            println "$this recieved req #${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
-            log.debug "$this received req #${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
+            log.trace "$this received req #${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
             process(exchange, pattern)
         } catch (Throwable e) {
             _evtMgr.publish(Events.ResourceProcessingError,
@@ -132,9 +132,9 @@ class AsyncHandler extends DynamicDispatchActor {
                         uri      : exchange.requestURI.path,
                         msg      : "Resource Processing."])
                 //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
-                log.debug "Running AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
+                log.trace "Running AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
                 clozure(*argList)
-                log.debug "AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} - Finished."
+                log.trace "AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} - Finished."
             } catch (Throwable e) {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
                         requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),

@@ -98,21 +98,21 @@ class CORSConfig {
     def hasAccess(host, method) {
         switch (mode) {
             case (CORSMode.AllowAll):
-                log.debug("CORSConfig(AllowAll): allows: $host")
+                log.trace("CORSConfig(AllowAll): allows: $host")
                 return true
 
             case (CORSMode.BlackList):
-                log.debug("CORSConfig(BlackList): Looking for $host in $list")
+                log.trace("CORSConfig(BlackList): Looking for $host in $list")
                 def hcfg = findHostConfig(host)
                 def allow = (!hcfg) || !hcfg.hasMethod(method)
-                log.debug("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} $host")
+                log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} $host")
                 return allow
 
             case (CORSMode.WhiteList):
-                log.debug("CORSConfig(WhiteList): Looking for $host in $list")
+                log.trace("CORSConfig(WhiteList): Looking for $host in $list")
                 def hcfg = findHostConfig(host)
                 def allow = hcfg?.hasMethod(method)
-                log.debug("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} $host")
+                log.trace("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} $host")
                 return allow;
         }// switch
     }// hasAccess
@@ -133,7 +133,7 @@ class HostConfig {
         methods = methodList ?: ["*"]
         this.maxAge = maxAge
         customRequestHeaders = customReqHdrs
-        log.debug("HostConfig($h, ${methodList.join(',')}, $maxAge, ${customReqHdrs} )")
+        log.trace("HostConfig($h, ${methodList.join(',')}, $maxAge, ${customReqHdrs} )")
     }
 
     def allowsCustomHeaders(reqHeaders) {

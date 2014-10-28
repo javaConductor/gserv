@@ -184,7 +184,7 @@ class ExchangeWrapper extends HttpExchange {
      * @param bytes
      */
     synchronized def writeIt(bytes) {
-        log.debug "Wrapper.writeIt(): Writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
+        log.trace "Wrapper.writeIt(): Writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
         if (!isClosed) {
             EventManager.instance().publish(Events.FilterProcessing, [
                     stream   : this.class.name,
@@ -195,7 +195,7 @@ class ExchangeWrapper extends HttpExchange {
             _exchange.sendResponseHeaders(_code ?: 200, bytes.size())
             try {
                 originalOutputStream().write(bytes)
-                log.debug "Wrote response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path}) size=${bytes.size()}"
+                log.trace "Wrote response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestMethod}( ${requestURI.path}) size=${bytes.size()}"
             } catch (Throwable ex) {
                 log.error "Error writing response($_code) for req #${getAttribute(GServ.exchangeAttributes.requestId)} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}"
             }

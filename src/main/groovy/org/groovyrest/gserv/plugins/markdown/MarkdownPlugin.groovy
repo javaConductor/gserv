@@ -94,7 +94,7 @@ class MarkdownPlugin extends AbstractPlugin {
     private def handleAfter(ExchangeWrapper exchange, data) {
         /// if the name is known MD extension
         def convertMarkdown = isMarkdownFilePath(fileExtensions, exchange.requestURI.path)
-        log.debug("Found MD file: $convertMarkdown")
+        log.trace("Found MD file: $convertMarkdown")
         def bytes = (!convertMarkdown) ? data : pegDownProcessor.markdownToHtml(new String(data)).bytes
         if (convertMarkdown) {
             exchange.responseHeaders.set('Content-type', "text/html")

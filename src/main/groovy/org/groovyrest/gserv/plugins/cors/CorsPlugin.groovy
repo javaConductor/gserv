@@ -87,20 +87,20 @@ class CorsPlugin extends AbstractPlugin {
     }
 
     def listHandler = { CORSConfig corsConfig ->
-        log.debug "CorsPlugin.listHandler(): ${exchange.requestMethod} - ${exchange.requestURI} List: ${corsConfig.list}"
+        log.trace "CorsPlugin.listHandler(): ${exchange.requestMethod} - ${exchange.requestURI} List: ${corsConfig.list}"
         switch (exchange.requestMethod) {
             case "OPTIONS":
                 /// Check the List to see if this host has access according to the CORS Config
                 // get the Origin
                 String origin = exchange.requestHeaders.get("Origin")
                 if (!origin) {
-                    log.debug("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
+                    log.trace("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
                     nextFilter()
                     return
                 }
                 def host = originToHost(origin)
-                log.debug("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
-                log.debug("CorsPlugin.listHandler():HOST: $host")
+                log.trace("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
+                log.trace("CorsPlugin.listHandler():HOST: $host")
 
                 def accessReqMethod = exchange.requestHeaders.get("Access-Control-Request-Method")
                 def accessReqHeaders = exchange.requestHeaders.get("Access-Control-Request-Headers")
@@ -108,7 +108,7 @@ class CorsPlugin extends AbstractPlugin {
                 // if found add the "Access-Control-Allow-Origin: $origin" header to response
                 def ok = corsConfig.hasAccess(host, accessReqMethod, accessReqHeaders)
                 // def ok = checkListFn(corsConfig, origin, accessReqMethod, accessReqHeaders)
-                log.debug "CorsPlugin.listHandler(): $origin can do $accessReqMethod = ${ok}"
+                log.trace "CorsPlugin.listHandler(): $origin can do $accessReqMethod = ${ok}"
                 if (ok) {
                     def cfgForHost = corsConfig.findOriginConfig(host)
                     // send back the allow headers
@@ -136,22 +136,22 @@ class CorsPlugin extends AbstractPlugin {
                 // look for origin header
                 def originList = exchange.requestHeaders.get("Origin");
                 if (!originList) {
-                    log.debug("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
+                    log.trace("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
                     nextFilter()
                     return
                 }
                 def origin = originList[0];
                 def host = originToHost(origin)
-                log.debug("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
-                log.debug("CorsPlugin.listHandler():HOST: $host")
+                log.trace("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
+                log.trace("CorsPlugin.listHandler():HOST: $host")
                 def ok = corsConfig.hasAccess(host, exchange.requestMethod)
-                log.debug "CorsPlugin.listHandler(): $origin can do ${exchange.requestMethod} = ${ok}"
+                log.trace "CorsPlugin.listHandler(): $origin can do ${exchange.requestMethod} = ${ok}"
                 if (ok) {
                     def cfgForHost = corsConfig.findHostConfig(host)
                     exchange.responseHeaders.add("Access-Control-Allow-Origin", (String) origin)
                     def maxAge = cfgForHost?.maxAge ?: (corsConfig?.maxAge ?: 3600)
                     exchange.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
-                    log.debug("CorsPlugin.listHandler():Response HEADERS: ${exchange.responseHeaders}")
+                    log.trace("CorsPlugin.listHandler():Response HEADERS: ${exchange.responseHeaders}")
                     nextFilter()
                     return
                 } else {
@@ -211,7 +211,7 @@ class CorsPlugin extends AbstractPlugin {
             case "http":
             case "https":
                 def corsCfgFn = { uri, CORSConfig cfg ->
-                    log.debug("CorsPlugin.decorateDelegate: cors(uri=$uri)")
+                    log.trace("CorsPlugin.decorateDelegate: cors(uri=$uri)")
                     try {
                         //    def before(name, url, method, options, order = 5, clozure) {
                         before("CORSPlugin-" + cfg.mode, uri, "*", [passRouteParams: false], 5, corsFilter(cfg))

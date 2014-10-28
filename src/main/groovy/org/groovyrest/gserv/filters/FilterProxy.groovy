@@ -97,7 +97,7 @@ class FilterProxy extends Filter {
 
                     /// add after closure to PostProcessList
                     def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList) ?: []
-                    log.debug "FilterProxy: Scheduling after filter ${theFilter.name} for req @${httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS)} "
+                    log.trace "FilterProxy: Scheduling after filter ${theFilter.name} for req @${httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS)} "
                     ppList << fn
                     //println "adding $fn to ppList"
                     httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, ppList)
@@ -199,7 +199,7 @@ class FilterProxy extends Filter {
                                                            route        : theFilter.toString(), path: exchange.requestURI.path, args: argList])
                 return clozure(*argList)
             } catch (Throwable e) {
-                log.debug("FilterProxy error: ${e.message}", e)
+                log.error("FilterProxy error: ${e.message}", e)
                 e.printStackTrace(System.err)
                 eventMgr.publish(Events.FilterError, [filter       : theFilter.name ?: "-",
                                                       requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),

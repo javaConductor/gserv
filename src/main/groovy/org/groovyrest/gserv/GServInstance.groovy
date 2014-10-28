@@ -115,7 +115,7 @@ class GServInstance {
         ////////////////////////////////
         def initFilter = RouteFactory.createBeforeFilterURLPattern("gServInit", "*", "/*", [:], -1) { ->
             synchronized (requestId) {
-                log.debug("initFilter: new request #$requestId")
+                log.trace("initFilter: new request #$requestId")
                 exchange.setAttribute(GServ.exchangeAttributes.requestId, requestId)
                 ++requestId
             }
@@ -258,7 +258,7 @@ class gServHttpsInstance extends GServInstance {
 
             @Override
             void configure(com.sun.net.httpserver.HttpsParameters params) {
-                log.debug("HTTPSConfigurator.onConfigure($params) - handling");
+                log.info("HTTPSConfigurator.onConfigure($params) - handling");
                 try {
                     // initialise the SSL context
                     SSLContext c = sslContext;//.getDefault();
@@ -275,7 +275,7 @@ class gServHttpsInstance extends GServInstance {
                 catch (Exception ex) {
                     log.error("Failed to create HTTPS port: ", ex);
                 } finally {
-                    log.debug("HTTPSConfigurator.onConfigure($params) - handled!");
+                    log.info("HTTPSConfigurator.onConfigure($params) - handled!");
                 }
             }
         });
