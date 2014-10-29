@@ -18,6 +18,9 @@ theModule.config(function ($routeProvider) {
       }).when('/examples/basicauth', {
         templateUrl: 'views/examples/basicAuth.html',
         controller: "ExampleCtrl"
+      }).when('/examples/cors', {
+        templateUrl: 'views/examples/cors.html',
+        controller: "ExampleCtrl"
       })
       .otherwise({
         redirectTo: '/general'
