@@ -1,6 +1,6 @@
 #    gServ
 
-##Groovy API for <u><b>Container Free, </b></u>RESTful Services.
+##Groovy API for <u><b>Container Free</b></u>RESTful Services.
 
 ####Java 1.6+ is required.
 
