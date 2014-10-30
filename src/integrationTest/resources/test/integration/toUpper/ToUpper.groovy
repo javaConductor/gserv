@@ -1,3 +1,4 @@
+package test.integration.toUpper
 /*
  * The MIT License (MIT)
  *
@@ -23,15 +24,11 @@
  */
 
 import org.groovyrest.gserv.*
-import com.soulsys.gserv.test.cli.math.CliMathService
 
-def service = new CliMathService()
 [
-        GServ.Resource("/math") {
-            get("/add/:num1/:num2") { num1, num2 ->
-                def ans = service.calc("add", num1, num2)
-                def msg = "Adding $num1 to $num2 == $ans"
-                write(msg.bytes)
+        GServ.Resource("/upper") {
+            get("/:word") { word ->
+                write(word.toUpperCase().bytes)
             }
         }
 ]

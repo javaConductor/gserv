@@ -32,6 +32,20 @@ mainClassName = 'org.groovyrest.gserv.Main'
 group = "org.groovyrest"
 version = "0.0.1"
 
+sourceSets {
+    integrationTest {
+        java.srcDir file('src/integrationTest/groovy')
+        resources.srcDir file('src/integrationTest/resources')
+    }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+check.dependsOn integrationTest
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -51,14 +65,25 @@ dependencies {
 
     /// needed for Grab/Grape
     compile 'org.apache.ivy:ivy:2.2.0'
-
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     testCompile 'cglib:cglib-nodep:3.1'
     testCompile 'org.objenesis:objenesis:1.2'
     testCompile "junit:junit:4.11"
+
+    integrationTestCompile sourceSets.main.output
+    integrationTestCompile configurations.testCompile
+    integrationTestCompile sourceSets.test.output
+    integrationTestRuntime configurations.testRuntime
+
 }
+
+task integration(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
 
 groovydoc {
 }

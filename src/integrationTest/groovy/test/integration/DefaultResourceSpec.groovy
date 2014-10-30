@@ -1,9 +1,8 @@
-package org.groovyrest.gserv.test.integration
+package test.integration
 
 import groovyx.net.http.HTTPBuilder
 import org.groovyrest.gserv.GServRunner
 import org.junit.Test
-import spock.lang.Ignore
 
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.Method.GET
@@ -12,7 +11,7 @@ import static groovyx.net.http.Method.GET
  * Created by javaConductor on 10/5/2014.
  */
 class DefaultResourceSpec {
-    def baseDir = "src/test/resources/test/integration/"
+    def baseDir = "src/integrationTest/resources/test/integration/"
 
     @Test
     public final void testDefaultResource() {

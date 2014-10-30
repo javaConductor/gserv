@@ -1,3 +1,4 @@
+package test.integration.cliClasspath
 /*
  * The MIT License (MIT)
  *
@@ -23,12 +24,14 @@
  */
 
 import org.groovyrest.gserv.*
+import com.soulsys.gserv.test.cli.math.CliMathService
 
-[
-        GServ.Resource("/upper") {
-            get("/:word") { word ->
-                write(word.toUpperCase().bytes)
-            }
-        }
-]
+def service = new CliMathService()
 
+new GServ().http {
+    get("/math/add/:num1/:num2") { num1, num2 ->
+        def ans = service.calc("add", num1, num2)
+        def msg = "Adding $num1 to $num2 == $ans"
+        write(msg.bytes)
+    }
+}

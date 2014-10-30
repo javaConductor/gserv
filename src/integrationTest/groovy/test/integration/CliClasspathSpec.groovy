@@ -1,15 +1,11 @@
-package org.groovyrest.gserv.test.integration
+package test.integration
 
-import org.groovyrest.gserv.GServRunner
-import org.groovyrest.gserv.utils.Encoder
 import groovyx.net.http.HTTPBuilder
-import org.junit.Assert
-import org.junit.Ignore
+import org.groovyrest.gserv.GServRunner
 import org.junit.Test
 
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.Method.GET
-import org.junit.Assert
 
 /**
  * Created by javaConductor on 10/5/2014.
@@ -32,15 +28,18 @@ class CliClasspathSpec {
 
             headers.'User-Agent' = 'Mozilla/5.0'
             response.success = { resp, Reader reader ->
+                stopFn()
                 println "Cli returned: ${reader.text}"
                 assert resp.status == 200
                 //stop the server
-                stopFn()
+
             }
             // called only for a 404 (not found) status code:
             response.'404' = { resp ->
+                stopFn()
                 assert "Not found.", false
-                println 'Not found'
+
+
             }
         }
     }

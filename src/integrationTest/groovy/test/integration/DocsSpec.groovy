@@ -1,14 +1,8 @@
-package org.groovyrest.gserv.test.integration
+package test.integration
 
-import org.groovyrest.gserv.GServRunner
-import org.groovyrest.gserv.Utils
-import org.groovyrest.gserv.utils.Encoder
 import groovyx.net.http.HTTPBuilder
+import org.groovyrest.gserv.GServRunner
 import org.junit.Ignore
-import org.junit.Test
-
-import static groovyx.net.http.ContentType.TEXT
-import static groovyx.net.http.Method.GET
 
 /**
  * Created by javaConductor on 10/5/2014.

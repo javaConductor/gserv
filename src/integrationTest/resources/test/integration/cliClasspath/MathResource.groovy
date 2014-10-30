@@ -27,11 +27,13 @@ import org.groovyrest.gserv.*
 import com.soulsys.gserv.test.cli.math.CliMathService
 
 def service = new CliMathService()
-
-    new GServ().http {
-        get("/math/add/:num1/:num2") { num1, num2 ->
-            def ans = service.calc("add", num1, num2)
-            def msg = "Adding $num1 to $num2 == $ans"
-            write(msg.bytes)
+[
+        GServ.Resource("/math") {
+            get("/add/:num1/:num2") { num1, num2 ->
+                def ans = service.calc("add", num1, num2)
+                def msg = "Adding $num1 to $num2 == $ans"
+                write(msg.bytes)
+            }
         }
-    }
+]
+

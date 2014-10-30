@@ -1,13 +1,11 @@
-package org.groovyrest.gserv.test.integration
+package test.integration
 
+import groovyx.net.http.HTTPBuilder
 import org.groovyrest.gserv.GServRunner
 import org.junit.Test
-import spock.lang.*
-import groovyx.net.http.HTTPBuilder
-import static groovyx.net.http.Method.GET
+
 import static groovyx.net.http.ContentType.TEXT
-import org.junit.Before
-import org.junit.Test
+import static groovyx.net.http.Method.GET
 
 /**
  * Created by javaConductor on 10/5/2014.
