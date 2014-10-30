@@ -12,7 +12,7 @@ import static groovyx.net.http.Method.GET
  * Created by javaConductor on 10/5/2014.
  */
 class BasicAuthSpec {
-    def baseDir = "src/test/resources/test/integration/"
+    def baseDir = "src/integrationTest/resources/test/integration/"
 
     @Test
     public final void testToUpper() {
