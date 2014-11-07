@@ -3,7 +3,6 @@ package test.integration
 import groovyx.net.http.HTTPBuilder
 import org.groovyrest.gserv.GServRunner
 import org.groovyrest.gserv.utils.Encoder
-import org.junit.Ignore
 import org.junit.Test
 
 import static groovyx.net.http.ContentType.TEXT
@@ -15,7 +14,7 @@ import static groovyx.net.http.Method.GET
 class BasicAuthHttpsSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @Ignore
+    @Test
     public final void testToUpper() {
 
         def http = new HTTPBuilder('https://localhost:11000/')
@@ -39,12 +38,17 @@ class BasicAuthHttpsSpec {
                         stopFn()
                 }
                 // called only for a 404 (not found) status code:
+                response.'403' = { resp ->
+                    println 'Unauthorized'
+                }
+                // called only for a 404 (not found) status code:
                 response.'404' = { resp ->
                     println 'Not found'
                 }
             }
         } catch (Exception e) {
-            assert e.message == "Unauthorized"
+            if (e.message != 'peer not authenticated')
+                assert false, "Should recognize the basic auth stuff."
         }
 
         try {
@@ -67,7 +71,7 @@ class BasicAuthHttpsSpec {
                 }
             }
         } catch (Exception e) {
-            assert e.message == "Unauthorized"
+            assert (e.message == "Unauthorized" || e.message == "peer not authenticated")
             --testCnt
             if (testCnt == 0)
                 stopFn()

@@ -45,7 +45,7 @@ import org.groovyrest.gserv.delegates.*
 class GServ {
     def factory = new GServFactory();
     static def exchangeAttributes = [
-            "receivedMS": 'g$$when',
+            "receivedMS"     : 'g$$when',
             "serverConfig"   : 'g$$serverConfig',
             "currentRoute"   : 'g$$route',
             "requestId"      : 'g$$requestId',
@@ -193,8 +193,6 @@ class GServ {
     }
 
     def https(Map options, Closure instanceDefinition) {
-        //TODO verify https in options
-
         http(options, instanceDefinition, true);
     }
 

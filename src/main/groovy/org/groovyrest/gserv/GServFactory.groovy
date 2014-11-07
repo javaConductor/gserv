@@ -50,6 +50,7 @@ class GServFactory {
     }
 
     def createHttpInstance(cfg) {
+        log.debug("$cfg is ${(cfg.https()) ? 'HTTPS' : 'HTTP'}")
         cfg.https() ? new gServHttpsInstance(cfg)
                 : new GServInstance(cfg)
     }
