@@ -81,7 +81,7 @@ class GServ {
 
     /**
      *
-     * Defines a resource that may be added to a ServerInstance
+     * Convenience
      *
      * @param basePath URL pattern prefix
      * @param definitionClosure The definition of the resource. All methods of ResourceDelegate are available.
@@ -89,16 +89,11 @@ class GServ {
      * @return gServResource
      */
     static def Resource(basePath, Closure definitionClosure) {
-        //println "GServ.resource(): Creating resource [$basePath]"
-        def dgt = new ResourceDelegate(basePath);
-        definitionClosure.delegate = dgt
-        definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        //println "GServ.resource(): delegate:${definitionClosure.delegate}: Calling resource init closure."
+        GServResource.Resource(basePath, definitionClosure)
+    }
 
-        definitionClosure()
-        def patterns = definitionClosure.delegate.patterns()
-        def linkBldr = definitionClosure.delegate.linkBuilder()
-        return new GServResource(basePath, patterns, linkBldr)
+    static def Resource(basePath, ResourceObject target) {
+        GServResource.Resource(basePath, target)
     }
 
     /**
@@ -150,8 +145,15 @@ class GServ {
                 .routes(_patterns)
                 .addFilters(_filters);
 
-        /// each plugin is applied to the configuration
-        cfg = serverPlugins.applyPlugins(cfg);
+        /// if this an HTTPS config , check the following locations in order:
+        // - httpsConfig in cfg
+        // - global one
+        // - - - global  should be in $GSERV_HOME/https.cfg.json
+        if (options.https) {
+            cfg.applyHttpsConfig(options.https)
+        } else {
+            //TODO Check for a global https setting  and apply it
+        }
 
         /// get the delegate
         instanceDefinition.delegate = cfg.delegateMgr.createHttpDelegate();
@@ -160,6 +162,7 @@ class GServ {
         instanceDefinition()
         def _useResourceDocs
         def templateEngineName
+        def lBuilder
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
             _patterns = patterns()
@@ -167,7 +170,7 @@ class GServ {
             _filters = filters()
             _staticRoots = staticRoots()
             templateEngineName = templateEngine ?: "default"
-            linkBuilder = linkBuilder()
+            lBuilder = linkBuilder()
         }
 
         cfg.with {
@@ -178,6 +181,9 @@ class GServ {
                     .addRoutes(_patterns)
                     .useResourceDocs(_useResourceDocs)
                     .templateEngineName(templateEngineName)
+
+            linkBuilder(lBuilder)
+
         }
         factory.createHttpInstance(cfg)
     }
@@ -187,42 +193,11 @@ class GServ {
     }
 
     def https(Map options, Closure instanceDefinition) {
+        //TODO verify https in options
+
         http(options, instanceDefinition, true);
     }
 
-    private def prepareDelegate(delegateType, delegates) {
-        /// delegates is a map of delegates by type -> ExpandoMetaClass
-        /// we invoke the constructor and return the newly created object
-        if (!delegates[delegateType])
-            throw new IllegalArgumentException("$delegateType is not a valid delegate type.")
-        delegates[delegateType].invokeConstructor()
-    }
-}
-
-/**
- * An HTTP/REST resource definition.
- * These resources may be added to a ServerInstance which, when deployed,
- * will publish all imported resources.
- *
- */
-class GServResource {
-    def routes
-    def basePath
-    def linkBuilder
-
-    /**
-     *
-     *
-     * @param path URL Prefix
-     * @param routeList List of Routes (URLPrefix/Method/Behavior combination)
-     * @param linkBldr The LinkBuilder to use with this Resource
-     *
-     */
-    def GServResource(path, routeList, linkBldr) {
-        routes = routeList
-        basePath = path
-        linkBuilder = linkBldr
-    }
 }
 
 /**

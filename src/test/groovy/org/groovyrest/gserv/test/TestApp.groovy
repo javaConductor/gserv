@@ -25,6 +25,7 @@
 package org.groovyrest.gserv.test
 
 import org.groovyrest.gserv.GServ
+import org.groovyrest.gserv.GServResource
 import org.groovyrest.gserv.plugins.PluginMgr
 import org.groovyrest.gserv.plugins.compression.CompressionPlugin
 import org.groovyrest.gserv.plugins.cors.CorsPlugin
@@ -61,7 +62,6 @@ class TestApp {
                 write("Books Resource !!!!!")
             }
         }
-
         def movieRes = gserv.resource("/movies") {
             get("/film") { ->
                 write("Movies Resource !!!!!")
@@ -130,3 +130,27 @@ class TestApp {
 
 
 }
+
+class Test {
+
+    def doFunkyThing() {
+
+    }
+
+    Test(String path, Closure op) {
+
+    }
+
+}
+
+class Test2 extends GServResource {
+    def Test2() {
+        super("/books", { ->
+            get("/") {
+                writeJson([success: true])
+            }
+        })
+    }
+}
+
+;

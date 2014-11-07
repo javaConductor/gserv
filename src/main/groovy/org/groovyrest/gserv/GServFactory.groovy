@@ -24,13 +24,17 @@
 
 package org.groovyrest.gserv
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.configuration.GServConfig
+import org.groovyrest.gserv.configuration.GServConfigFile
+import org.groovyrest.gserv.configuration.scriptloader.ScriptLoader
+import org.groovyrest.gserv.resourceloader.ResourceLoader
 
 /**
  *
  * @author lcollins
  */
-
+@Log4j
 class GServFactory {
 
     def createGServConfig() {
@@ -61,5 +65,69 @@ class GServFactory {
         new AsyncDispatcher()
     }
 
-}
+    /**
+     * Parses a gserv Config file
+     *
+     * @param cfgFile
+     * @return GServConfig instances that were created from the parsing.
+     */
+    def createConfigs(File cfgFile) {
+        //TODO must add the [get('\', file(defaultPage) )] to the server config.
+        /// read the config to get the 'https' and 'apps' info
+        try {
+            return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
+        } catch (Exception ex) {
+            log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
+            throw ex;
+        }
+    }//createConfig
 
+    /**
+     * Created a gserv Config
+     *
+     * @param staticRoot
+     * @param port
+     * @param defaultResource
+     * @param instanceScript
+     * @param resourceScripts
+     * @return list of configs (containing one config)
+     */
+    def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts, classpath) {
+        GServConfig cfg
+        ClassLoader classLoader = GServ.classLoader
+        ResourceLoader resourceLoader = new ResourceLoader()
+        ScriptLoader scriptLoader = new ScriptLoader()
+
+        if (instanceScript) {
+            cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
+        }
+
+        //either we already have an httpsConfig in the cfg or we add it here from somewhere
+        /// httpsConfig is either in the instanceScript or in the global settings.
+        cfg = cfg ?: createGServConfig()
+        if (resourceScripts) {
+            try {
+                def resources = scriptLoader.loadResources(resourceScripts, classpath)
+                cfg.addResources(resources)
+            } catch (Throwable ex) {
+                log.error("Could not load resource script: ${ex.message}")
+                println ex.message
+                throw ex
+            }
+        }
+        if (staticRoot) {
+            cfg.addStaticRoots([staticRoot])
+        }
+
+        if (defaultResource) {
+            cfg.defaultResource(defaultResource)
+        }
+
+        [cfg
+                 .port(port)
+        ];
+
+    }//createConfig
+
+
+}

@@ -273,5 +273,21 @@ class GServConfig {
         _defaultResource
     }
 
+    def applyHttpsConfig(cfgObj) {
+        if (cfgObj.password) {
+            def httpsCfg = new HttpsConfig()
+            httpsCfg.password = cfgObj.password
+            httpsCfg.keyManagerAlgorithm = cfgObj.keyManagerAlgorithm
+            httpsCfg.keyStoreFilePath = cfgObj.keyStoreFilePath ?: (System.getProperty("user.home") + "/gserv.keystore")
+
+            httpsCfg.keyStoreImplementation = cfgObj.keyStoreImplementation
+            httpsCfg.trustManagerAlgorithm = cfgObj.trustManagerAlgorithm
+            httpsCfg.sslProtocol = cfgObj.sslProtocol
+            httpsConfig(httpsCfg)
+        } else {
+            throw new IllegalArgumentException("Password is required for HTTPS.")
+        }
+
+    }
 }
 

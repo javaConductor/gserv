@@ -32,6 +32,7 @@ package org.groovyrest.gserv.delegates.functions
 
 import groovy.util.logging.Log4j
 import org.groovyrest.gserv.GServ
+import org.groovyrest.gserv.ResourceObject
 import org.groovyrest.gserv.RouteFactory
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.events.Events
@@ -77,8 +78,9 @@ class ServerConfigFunctions {
      *
      */
     def resource(GServResource r) {
-        //resource.routes.each{ -> println( ) }
-        //println("Resource: ${r.basePath}: ${r.routes.toString()}: ")
+        if (r instanceof ResourceObject) {
+            r = GServResource.Resource(r.basePath, r)
+        }
         addResource(r)
         addLinkBuilder r.linkBuilder
     }

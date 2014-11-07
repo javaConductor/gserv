@@ -39,17 +39,17 @@ class ScriptLoader {
 
     ResourceLoader resourceLoader = new ResourceLoader();
 
-    GServConfig loadInstance(instanceScript, classLoader) {
+    GServConfig loadInstance(instanceScript, classpath) {
         def f = new File(instanceScript)
         if (!f.exists()) {
             System.err.println("No gserv instanceScript: ${f.absolutePath}")
             return null
         }
         /// script file exists - so run  it
-        return (resourceLoader.loadInstance(f, classLoader) ?: null)
+        return (resourceLoader.loadInstance(f, classpath) ?: null)
     }
 
-    List<GServInstance> loadResources(resourceScripts, classLoader) {
+    List<GServInstance> loadResources(resourceScripts, classpath) {
         (!resourceScripts) ? [] :
                 resourceScripts.collect { scriptFileName ->
                     def f = new File(scriptFileName)
@@ -59,7 +59,7 @@ class ScriptLoader {
                     }
                     def instances = []
                     try {
-                        instances = resourceLoader.loadResources(f, classLoader)
+                        instances = resourceLoader.loadResources(f, classpath)
                     } catch (ResourceScriptException ex) {
                         throw new InstanceScriptException(ex.message)
                     } catch (Throwable ex) {

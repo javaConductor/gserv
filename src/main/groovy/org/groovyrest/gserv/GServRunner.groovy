@@ -60,75 +60,6 @@ class GServRunner {
     }
 
     /**
-     * Parses a gserv Config file
-     *
-     * @param cfgFile
-     * @return GServConfig instances that were created from the parsing.
-     */
-    def createConfigs(File cfgFile) {
-        //TODO must add the [get('\', file(defaultPage) )] to the server config.
-        /// read the config to get the 'https' and 'apps' info
-        GServConfigFile configFile = new GServConfigFile()
-        try {
-            return configFile.parse(cfgFile);
-        } catch (Exception ex) {
-            log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
-            throw ex;
-        }
-    }//createConfig
-
-    /**
-     * Created a gserv Config
-     *
-     * @param staticRoot
-     * @param port
-     * @param defaultResource
-     * @param instanceScript
-     * @param resourceScripts
-     * @return list of configs (containing one config)
-     */
-    def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts, classpath) {
-        GServConfig cfg
-        ClassLoader classLoader = GServ.classLoader
-
-        if (classpath) {
-            classLoader = this.addClasspath(classLoader, classpath)
-        }
-
-        if (instanceScript) {
-            cfg = resourceLoader.loadInstance(new File(instanceScript), classLoader)
-        }
-
-        cfg = cfg ?: factory.createGServConfig()
-        if (resourceScripts) {
-
-            try {
-                def resources = scriptLoader.loadResources(resourceScripts, classLoader)
-                cfg.addResources(resources)
-            } catch (Throwable ex) {
-                log.error("Could not load resource script: ${ex.message}")
-                println ex.message
-                throw ex
-//                System.exit(GServ.returnCodes.ResourceCompilationError);
-            }
-
-
-        }
-        if (staticRoot) {
-            cfg.addStaticRoots([staticRoot])
-        }
-
-        if (defaultResource) {
-            cfg.defaultResource(defaultResource)
-        }
-
-        [cfg
-                 .port(port)
-        ];
-
-    }//createConfig
-
-    /**
      * Make sure user entered valid command-line args
      *
      * @param options
@@ -167,7 +98,7 @@ class GServRunner {
                 resourceScripts = options.rs;
                 instanceScript = options.i;
                 classpath = options.js;
-                configs = createConfigs(
+                configs = factory.createConfigs(
                         staticRoot,
                         port,
                         defaultResource,
@@ -179,7 +110,7 @@ class GServRunner {
                 if (!configFile.exists()) {
                     throw new IllegalArgumentException("ConfigFile $configFilename not found!");
                 }
-                configs = createConfigs(configFile)
+                configs = factory.createConfigs(configFile)
             }
         } catch (ResourceScriptException ex) {
             log.error("Could not start app.", ex)
@@ -199,21 +130,11 @@ class GServRunner {
             def instance = factory.createHttpInstance(cfg);
             instance.start(cfg.port())
         }
-
         Thread.sleep(300)
-
         return ({ ->
             stopFns.each { stopFn -> stopFn() }
         });
 
     }//start
-
-    ClassLoader addClasspath(ClassLoader classLoader, List classpath) {
-        def urls = classpath.collect { jar ->
-            new File(jar).toURI().toURL()
-        }
-        new URLClassLoader(urls as URL[], classLoader)
-//        URLClassLoader.newInstance(urls, classLoader)
-    }
 
 }//class

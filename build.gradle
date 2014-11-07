@@ -32,6 +32,19 @@ mainClassName = 'org.groovyrest.gserv.Main'
 group = "org.groovyrest"
 version = "0.0.1"
 
+task uberjar(type: Jar) {
+    from files(sourceSets.main.output.classesDir)
+    from { configurations.compile.collect { zipTree(it) } } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+
+    manifest {
+        attributes 'Main-Class': 'org.groovyrest.gserv.Main'
+    }
+}
+
 sourceSets {
     integrationTest {
         java.srcDir file('src/integrationTest/groovy')
@@ -83,7 +96,6 @@ task integration(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
-
 
 groovydoc {
 }

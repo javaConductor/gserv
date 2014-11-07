@@ -39,7 +39,7 @@ public class ResourceLoaderSpec extends Specification {
 
         when:
         resourceLoader = new ResourceLoader()
-        resources = resourceLoader.loadResources(new File(uri), classLoader)
+        resources = resourceLoader.loadResources(new File(uri), [])
 
         then:
         resources.size() == 1

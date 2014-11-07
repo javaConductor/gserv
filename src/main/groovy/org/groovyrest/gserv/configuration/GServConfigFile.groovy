@@ -53,19 +53,11 @@ class GServConfigFile {
         } catch (Exception e) {
             throw new ConfigException("Could not parse file: ${configFile.absolutePath}: ${e.message}")
         }
+
         ///// CREATE the initial GServConfig from the file values
         HttpsConfig httpsCfg
         if (cfg.https) {
-            if (!cfg.https.password)
-                throw new IllegalArgumentException("Password is required for HTTPS.")
-            httpsCfg = new HttpsConfig()
-            httpsCfg.password = cfg.https.password
-            httpsCfg.keyManagerAlgorithm = cfg.https.keyManagerAlgorithm
-            httpsCfg.keyStoreFilePath = cfg.https.keyStoreFilePath ?: (System.getProperty("user.home") + "/gserv.keystore")
-
-            httpsCfg.keyStoreImplementation = cfg.https.keyStoreImplementation
-            httpsCfg.trustManagerAlgorithm = cfg.https.trustManagerAlgorithm
-            httpsCfg.sslProtocol = cfg.https.sslProtocol
+            cfg.applyHttpsConfig(cfg.https)
         }
 
         if (!cfg.apps) {//else
@@ -78,12 +70,15 @@ class GServConfigFile {
             classLoader = addClasspath(classLoader, cfg.classpath)
         }
 
-
         GServConfig newCfg;
         def configs = cfg.apps.collect { app ->
 
             try {
                 newCfg = appToConfig(app)
+                if (app.https) {
+
+                    newCfg.httpsConfig(cfg.httpsConfig())
+                }
             } catch (Exception ex) {
                 log.error("Unable to instantiate configuration", ex)
                 throw ex;
@@ -118,7 +113,6 @@ class GServConfigFile {
         config.addResources(resources)
         config;
     };////
-
 
     def appToConfig(app) {
         def config = factory.createGServConfig()

@@ -24,6 +24,8 @@
 
 package org.groovyrest.gserv.resourceloader
 
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.groovyrest.gserv.GServ
 import org.groovyrest.gserv.GServInstance
 import org.groovyrest.gserv.configuration.GServConfig
@@ -43,10 +45,12 @@ class ResourceLoader {
      * @param instanceScriptFile
      * @return List < gServResource >
      */
-    def loadResources(File resourceScriptFile, ClassLoader classLoader) {
+    def loadResources(File resourceScriptFile, classPath) {
         if (!(resourceScriptFile?.exists()))
             return [];
-        GroovyShell groovyShell = new GroovyShell(classLoader)
+
+        classPath = classPath ?: []
+        GroovyShell groovyShell = createGroovyShell(classPath)
         def resources
         try {
             resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
@@ -66,11 +70,28 @@ class ResourceLoader {
      * @param instanceScriptFile
      * @return GServConfig
      */
-    GServConfig loadInstance(File instanceScriptFile, ClassLoader classLoader) {
+    GServConfig loadInstance(File instanceScriptFile, classpath) {
         if (!(instanceScriptFile?.exists()))
             return null;
-        GroovyShell groovyShell = new GroovyShell(classLoader)
+        classpath = classpath ?: []
+        GroovyShell groovyShell = createGroovyShell(classpath)
+//   GroovyShell groovyShell = new GroovyShell (classLoader)
         GServInstance instance = groovyShell.evaluate(instanceScriptFile)
         instance ? instance.config() : null
+    }
+
+    def createGroovyShell(classpath) {
+        // Add imports for script.
+        def importCustomizer = new ImportCustomizer()
+        importCustomizer.addStaticStars 'org.groovyrest.gserv.GServ'
+        //importCustomizer.addImport 'Article', 'com.mrhaki.blog.Post'
+
+        def configuration = new CompilerConfiguration()
+        configuration.classpathList = classpath
+        configuration.addCompilationCustomizers(importCustomizer)
+
+        // Create shell.
+        new GroovyShell(configuration)
+
     }
 }
