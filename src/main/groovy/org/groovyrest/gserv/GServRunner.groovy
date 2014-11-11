@@ -45,8 +45,9 @@ class GServRunner {
     def scriptLoader = new ScriptLoader();
     def resourceLoader = new ResourceLoader();
     CliBuilder cli = new CliBuilder(
+            usage: 'gserv [options]',
             header: '\nAvailable options (use -h for help):\n',
-            footer: '\nInformation provided via above options is used to generate printed'
+            footer: '\ngServ © 2014 Lee Collins.  All rights reserved.'
     );
 
     def GServRunner() {
