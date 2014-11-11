@@ -57,12 +57,9 @@ class GServFactory {
 
     def createDispatcher(actors, routes, staticRoots, templateEngineName, bUseResourceDocs) {
         new AsyncDispatcher(actors, routes, staticRoots, templateEngineName, bUseResourceDocs);
-        //new AsyncDispatcher(actors, routes, staticRoots, templateEngineName, bUseResourceDocs);
-
     }
 
     def createDispatcher() {
-        //new AsyncDispatcher(actors, _routes, _staticRoots, templateEngineName, _cfg.bUseResourceDocs);
         new AsyncDispatcher()
     }
 
@@ -73,15 +70,13 @@ class GServFactory {
      * @return GServConfig instances that were created from the parsing.
      */
     def createConfigs(File cfgFile) {
-        //TODO must add the [get('\', file(defaultPage) )] to the server config.
-        /// read the config to get the 'https' and 'apps' info
         try {
             return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
         } catch (Exception ex) {
             log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
             throw ex;
         }
-    }//createConfig
+    }//createConfigs
 
     /**
      * Created a gserv Config
@@ -95,7 +90,6 @@ class GServFactory {
      */
     def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts, classpath) {
         GServConfig cfg
-        ClassLoader classLoader = GServ.classLoader
         ResourceLoader resourceLoader = new ResourceLoader()
         ScriptLoader scriptLoader = new ScriptLoader()
 
@@ -103,8 +97,6 @@ class GServFactory {
             cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
         }
 
-        //either we already have an httpsConfig in the cfg or we add it here from somewhere
-        /// httpsConfig is either in the instanceScript or in the global settings.
         cfg = cfg ?: createGServConfig()
         if (resourceScripts) {
             try {
@@ -128,7 +120,5 @@ class GServFactory {
                  .port(port)
         ];
 
-    }//createConfig
-
-
+    }//createConfigs
 }

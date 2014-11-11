@@ -69,11 +69,9 @@ class GServ {
      * @return
      */
     def plugins(Closure definitionClosure) {
-        //println "GServ.plugins(): Creating plugins delegate."
         def dgt = new PluginsDelegate();
         definitionClosure = definitionClosure.rehydrate(dgt, this, this)
         definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        //println "GServ.plugins(): delegate:${definitionClosure.delegate}: Calling plugins closure."
         definitionClosure()
         serverPlugins = definitionClosure.delegate.plugins ?: serverPlugins
         return this
@@ -119,6 +117,21 @@ class GServ {
      */
     def http(Closure instanceDefinition) {
         http([:], instanceDefinition)
+    }
+
+/**
+ *
+ * @param configFile
+ * @param instanceDefinition
+ * @param https
+ * @return
+ */
+    def http(String configFile, Closure instanceDefinition, https = false) {
+        Properties p = new Properties();
+        InputStream is = new FileInputStream(new File(configFile))
+        p.load(is)
+        is.close()
+        http(p, instanceDefinition, https)
     }
 
     /**
@@ -220,7 +233,6 @@ class gServHandler implements HttpHandler {
      * @param cfg
      * @return
      */
-
     def gServHandler(GServConfig cfg) {
         _cfg = cfg;
         this._routes = cfg.routes()
@@ -232,10 +244,10 @@ class gServHandler implements HttpHandler {
         }
         _handler = _nuHandler()
 
-        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
-        //TODO Use the CORES + 1 strategy
+        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false)), _nuHandler);
+//        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
         _nuDispatcher = {
-            _factory.createDispatcher(actors, _routes, _staticRoots,
+            _factory.createDispatcher(actors, _routes, cfg.staticRoots(),
                     _templateEngineName,
                     _cfg.bUseResourceDocs);
         }
@@ -251,7 +263,6 @@ class gServHandler implements HttpHandler {
      */
     void handle(HttpExchange httpExchange) {
         try {
-//            println "handle()"
             httpExchange.setAttribute(GServ.exchangeAttributes.serverConfig, _cfg)
             EventManager.instance().publish(Events.RequestRecieved, [
                     requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
@@ -262,7 +273,6 @@ class gServHandler implements HttpHandler {
             _handle(httpExchange)
             EventManager.instance().publish(Events.RequestDispatched, [
                     requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                    //time: cal.getTimeInMillis() - start,
                     method   : httpExchange.requestMethod,
                     uri      : httpExchange.requestURI,
                     headers  : httpExchange.requestHeaders])
@@ -282,7 +292,7 @@ class gServHandler implements HttpHandler {
     }
 
     private void _handle(HttpExchange httpExchange) {
-        //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages
+        //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
         _dispatcher << [exchange: httpExchange]
     }
 }

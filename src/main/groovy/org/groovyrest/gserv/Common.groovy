@@ -26,6 +26,9 @@ package org.groovyrest.gserv
 
 import org.groovyrest.gserv.filters.Filter
 import org.groovyrest.gserv.filters.FilterType
+import java.util.regex.Pattern
+
+import static org.groovyrest.gserv.utils.TextUtils.*;
 
 /**
  * Misc Utils for Pattern matching
@@ -62,6 +65,89 @@ class Utils {
         }
         m
     }
+
+    static def hasType(pathElement) {
+        //:name:Number
+        getType(pathElement) != null
+    }
+
+    static def getType(pathElement) {
+        //:name:Number
+        // only look at variables
+        if (!pathElement.startsWith(':')) {
+            return null;
+        }
+        def parts = pathElement.split(":")
+        parts = parts.findAll { it }// remove nulls
+        if (parts.size() < 2)
+            return null
+        else
+            return createType(parts[1])
+    }
+
+    static def createType(elementType) {
+        switch (elementType) {
+            case "Number":
+            case "Integer":
+//            case "List":
+                createKnownType(elementType)
+                break;
+            default:
+                def regEx = stripBackTicks(elementType)
+                createRegExType(regEx)
+                break;
+        }
+    }
+
+    static def createKnownType(elementType) {
+
+        def numberType = [
+                name    : "Number",
+                validate: { s ->
+                    isNumber(s)
+                },
+                toType  : { s -> Double.parseDouble(s) }
+        ]
+        def integerType = [
+                name    : "Integer",
+                validate: { s ->
+                    isInteger(s)
+                },
+                toType  : { s -> Integer.parseInt(s) }
+        ]
+//        def listType = [
+//                name: "List",
+//                validate: { ->  isInteger(it) },
+//                toType: { -> Integer.parseInt(it)}
+//        ]
+
+        switch (elementType) {
+            case "Number":
+                return numberType
+            case "Integer":
+                return integerType
+            default:
+                return null
+        }
+
+    }
+
+    static def createRegExType(regEx) {
+        def regExType = [
+                name    : "RegEx",
+                validate: { s ->
+                    Pattern p = new Pattern(regEx, 0)
+                    p.matcher(s).matches()
+                },
+                toType  : { s -> (s) }
+        ]
+        regExType
+    }
+
+    static def extractElement(pathElement) {
+        def parts = pathElement.split(':')
+        ":${parts[1]}"
+    }
 }
 
 /**
@@ -82,12 +168,28 @@ class RouteFactory {
         /// Example: /Thing/:id/?page=:pg&chapter=:chpt
         def u2 = new java.net.URI(uri)
         def paths = u2.path.split("/")
+
+        //def paths = uri.split("/\\?")
         paths = paths.findAll { p -> p }
         //println "paths -> "+paths.toString()
+
         def pathPatterns = paths.collect { t ->
-            new RoutePathElement(t, Utils.isMatchingPattern(t), false)
+            def type
+            def element = t
+            if (Utils.hasType(t)) {
+                type = Utils.getType(t)
+                element = Utils.extractElement(t)
+            }
+            new RoutePathElement(element, Utils.isMatchingPattern(element), type)
         }
-        def qryPattern = new RouteQuery(u2.query)
+        def qryPattern
+        def qry = uri.split('\\?', 2)
+        if (qry.size() > 1) { // no query string
+            qryPattern = new RouteQuery(qry[1])
+        } else {
+            qryPattern = new RouteQuery("")
+        }
+//        def qryPattern = new RouteQuery(u2.query)
         (name) ? new Route(name, method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
                 : new Route(method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
     }
@@ -101,7 +203,7 @@ class RouteFactory {
         paths = paths.findAll { p -> p }
         //println "paths -> "+paths.toString()
         def pathPatterns = paths.collect { t ->
-            new RoutePathElement(t, Utils.isMatchingPattern(t), false)
+            new RoutePathElement(t, Utils.isMatchingPattern(t))
         }
         def qryPattern = new RouteQuery(u2.query)
         new Filter(name, method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
@@ -170,6 +272,11 @@ class Route {
     //returns number of elements in path
     def pathSize() {
         _urlPatterns.size()
+    }
+
+    //returns list of elements in path
+    def pathElements() {
+        (_urlPatterns as List).asImmutable()
     }
 
     //returns number of query values
@@ -257,12 +364,16 @@ class RouteQuery {
  * Represents one element of the URL path - either fixed string or Variable
  */
 class RoutePathElement {
-    private def _pathSegment, _isVar, _isRegEx
+    private def _pathSegment, _isVar, _elementType
 
-    def RoutePathElement(pathElement, isVar, isRegEx) {
+    def RoutePathElement(pathElement, isVar, elementType = null) {
         _pathSegment = pathElement
         _isVar = isVar
-        _isRegEx = isRegEx
+        _elementType = elementType
+    }
+
+    def type() {
+        _elementType
     }
 
     def text() { _pathSegment }
@@ -271,7 +382,7 @@ class RoutePathElement {
 
     def variableName() { _isVar ? _pathSegment.toString().substring(1) : "" }
 
-    def isRegEx() { _isRegEx }
+    //  def isRegEx() { _isRegEx }
 
     String toString() {
         return text()

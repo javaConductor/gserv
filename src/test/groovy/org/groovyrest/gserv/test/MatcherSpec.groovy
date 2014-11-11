@@ -39,13 +39,12 @@ public class MatcherSpec extends Specification {
         m = new Matcher();
     }
 
-
     public void "route should be empty"() {
 
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                "http://x.y.com",
+                "/",
                 { ->
 
                 })
@@ -59,14 +58,13 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                "http://x.y.com/thing",
+                "/thing",
                 { ->
 
                 })
         then:
         pat.pathSize() == 1;
     }
-
 
     public void "simple path size should be 1"() {
 
@@ -80,7 +78,6 @@ public class MatcherSpec extends Specification {
         then:
         pat.pathSize() == 1;
     }
-
 
     public void "path size should be 2"() {
 
@@ -121,7 +118,6 @@ public class MatcherSpec extends Specification {
         pat.pathSize() == 2;
         pat.queryPattern().queryKeys().size() == 2;
     }
-
 
     public void "should match path"() {
 
@@ -214,7 +210,6 @@ public class MatcherSpec extends Specification {
         !m.match(pat, new URI("/first/second?q1=notRight"));
     }
 
-
     public void "should fail query match but not path"() {
 
         when:
@@ -226,6 +221,132 @@ public class MatcherSpec extends Specification {
 
         then:
         !m.match(pat, new URI("/first/second/third?q1=query"));
+    }
+
+    public void "should match path with type"() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                "/:thing:Number",
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        m.match(pat, new URI("http://acme.com/009"))
+    }
+
+    public void "should not match path with type"() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                "/:thing:Number",
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        !m.match(pat, new URI("http://acme.com/notnumber"))
+    }
+
+    public void "should NOT match int path with double value"() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                "/:thing:Integer",
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        !m.match(pat, new URI("http://acme.com/75.9"))
+    }
+
+    public void "should match regEx path."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d*`', "UTF-8"),
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        m.match(pat, new URI("http://acme.com/75"))
+    }
+
+    public void "should not match regEx path."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d*`', "UTF-8"),
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        !m.match(pat, new URI("http://acme.com/notnumber"))
+    }
+
+    public void "should match regEx path w space."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d_\\d*`', 'UTF-8'),
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        m.match(pat, new URI("http://acme.com/7_5"))
+    }
+
+    public void "should not match regEx path too many spaces."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d\\s\\d*`', 'UTF-8'),
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        !m.match(pat, new URI("http://acme.com/7%20%205"))
+    }
+
+    public void "should match regEx path 3 spaces."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d\\s\\s\\s\\d*`', 'UTF-8'),
+                { ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        m.match(pat, new URI("http://acme.com/7%20%20%205"))
+    }
+
+    public void "should match SSN regEx."() {
+
+        when:
+        Route pat = RouteFactory.createURLPattern(
+                "GET",
+                URLEncoder.encode('/:thing:`\\d\\d\\d-\\d\\d-\\d\\d\\d\\d`', 'UTF-8'),
+                { ssn ->
+
+                })
+        then:
+        pat.pathSize() == 1;
+        m.match(pat, new URI("http://acme.com/359-99-7447"))
     }
 
 }

@@ -59,16 +59,17 @@ class Matcher {
         if (a == 0)
             return true
 
+        def ans
         for (int i = 0; i != route.pathSize(); ++i) {
-            def ans = matchRoutePathSegment(route.path(i), parts[i]) &&
-                    matchRouteQuery(
-                            route.queryPattern().queryMap(),
-                            (route.queryPattern().queryMatchMap().keySet().toList()),
-                            Utils.queryStringToMap(uri.query));
+            ans = matchRoutePathSegment(route.path(i), parts[i])
             if (!ans)
                 return false;
         }
-        return true;
+
+        return matchRouteQuery(
+                route.queryPattern()?.queryMap() ?: [:],
+                (route.queryPattern()?.queryMatchMap()?.keySet()?.toList() ?: []),
+                Utils.queryStringToMap(uri.query));
     }
 
     def matchRoutePathSegment(routePathPattern, uriValue) {
@@ -77,10 +78,21 @@ class Matcher {
         //	it matches if pathPattern is regExpr and the uriValue matches
         //	it matches if pathPattern is var and the uriValue is not empty NOW
         //	else it returns false NOW
+        //TODO If segment specifies type, Check for Type -
         def routeText = routePathPattern.text()
         if ('*' == routeText)
             return true
-        (routePathPattern.isVariable()) ? !(!uriValue) : (uriValue == routeText)
+
+        if (routePathPattern.isVariable()) {
+            /// check for type compatibility
+            if (routePathPattern.type()) {
+                return routePathPattern.type().validate(uriValue)
+            }
+            /// check for presence only
+            return !(!uriValue)
+        }
+        /// does it match what the route says
+        (uriValue == routeText)
     }
 
     boolean matchRouteQuery(Map qryMap, List<String> queryKeys, Map requestQueryMap) {

@@ -39,7 +39,6 @@ class CliClasspathSpec {
                 stopFn()
                 assert "Not found.", false
 
-
             }
         }
     }
