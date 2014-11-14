@@ -88,7 +88,7 @@ class GServFactory {
      * @param resourceScripts
      * @return list of configs (containing one config)
      */
-    def createConfigs(staticRoot, port, defaultResource, instanceScript, resourceScripts, classpath) {
+    def createConfigs(staticRoot, bindAddress, port, defaultResource, instanceScript, resourceScripts, classpath) {
         GServConfig cfg
         ResourceLoader resourceLoader = new ResourceLoader()
         ScriptLoader scriptLoader = new ScriptLoader()
@@ -115,6 +115,7 @@ class GServFactory {
         if (defaultResource) {
             cfg.defaultResource(defaultResource)
         }
+
 
         [cfg
                  .port(port)

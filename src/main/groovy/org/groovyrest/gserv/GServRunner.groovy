@@ -56,6 +56,7 @@ class GServRunner {
         cli.s(longOpt: 'serverRoot', 'Server Static Root (used only when configFilePath is not present)', args: 1, required: false)
         cli.p(longOpt: 'port', 'Port (used only when configFilePath is not present)', args: 1, required: false)
         cli.d(longOpt: 'defaultStaticResource', 'Default file to load when no file is specified', args: 1, required: false)
+        cli.b(longOpt: 'bindAddress', 'If specified, the App will only respond to requests for the specified IP address. By default, responds to requests for all IP addresses on the machine.', args: 1, required: false)
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
     }
@@ -89,11 +90,12 @@ class GServRunner {
         def configFilename = options.c;
         try {
             if (!configFilename) {
-                def staticRoot, port, classpath, defaultResource, resourceScripts, instanceScript;
+                def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
                 if (!options.p)
                     throw new ConfigException("Port is required for gserv cli.")
 
                 staticRoot = options.s;
+                bindAddress = options.b;
                 port = options.p as int;
                 defaultResource = options.d;
                 resourceScripts = options.rs;
@@ -101,6 +103,7 @@ class GServRunner {
                 classpath = options.js;
                 configs = factory.createConfigs(
                         staticRoot,
+                        bindAddress,
                         port,
                         defaultResource,
                         instanceScript,

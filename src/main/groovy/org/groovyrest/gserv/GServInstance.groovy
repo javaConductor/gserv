@@ -107,7 +107,7 @@ class GServInstance {
         );
 
         ///// Underlying Server Impl -
-        def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(actualPort as Integer), 0);
+        def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(_cfg.bindAddress() , actualPort as Integer), 0);
         def context = server.createContext("/", _handler);
 
         ////////////////////////////////
