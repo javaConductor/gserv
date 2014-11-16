@@ -61,7 +61,7 @@ class GServConfig {
     def delegateMgr
     def linkBuilder
     def _defaultResource
-    InetAddress _bindAddress
+    InetSocketAddress _bindAddress
     StaticFileHandler _staticFileHandler = new StaticFileHandler()
     org.groovyrest.gserv.Matcher matcher = new Matcher()
     def serverIPs = []
@@ -75,17 +75,20 @@ class GServConfig {
      *
      * @return the BindAddress for Instances using this gServ Config
      */
-    def bindAddress(){ return _bindAddress ?: new Inet4Address('0.0.0.0', null)}
+    def bindAddress() {
+        return _bindAddress;// ?: new Inet4Address('0.0.0.0', null)
+    }
 
     /**
      *
      * @param addr
      * @return 'this' - Fluent Interface
      */
-    def bindAddress(InetAddress addr){
+    def bindAddress(InetSocketAddress addr) {
         /// always use 0.0.0.0 for the default
-        _bindAddress = addr ?: new Inet4Address('0.0.0.0', null);
-        return this;}
+        _bindAddress = addr;//?: new InetSocketAddress()  ('0.0.0.0', null);
+        return this;
+    }
 
     def name() {
         _name

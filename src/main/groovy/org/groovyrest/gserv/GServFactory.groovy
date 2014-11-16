@@ -116,6 +116,11 @@ class GServFactory {
             cfg.defaultResource(defaultResource)
         }
 
+        if (bindAddress) {
+            def addr = InetAddress.getByName(bindAddress);
+            def socketAddr = new InetSocketAddress(addr, port);
+            cfg.bindAddress(socketAddr);
+        }
 
         [cfg
                  .port(port)

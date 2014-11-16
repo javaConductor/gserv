@@ -15,7 +15,7 @@ import static groovyx.net.http.Method.GET
 class BasicAuthSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @spock.lang.Ignore
+    @Ignore
     public final void testToUpper() {
 
         def http = new HTTPBuilder('http://localhost:11000/')

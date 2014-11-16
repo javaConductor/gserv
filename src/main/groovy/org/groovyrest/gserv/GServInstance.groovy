@@ -107,7 +107,8 @@ class GServInstance {
         );
 
         ///// Underlying Server Impl -
-        def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(_cfg.bindAddress() , actualPort as Integer), 0);
+//        def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(_cfg.bindAddress() , actualPort as Integer), 0);
+        def server = com.sun.net.httpserver.HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
         def context = server.createContext("/", _handler);
 
         ////////////////////////////////
@@ -171,7 +172,8 @@ class GServInstance {
         context.authenticator = _authenticator;
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"
-        println "$appName starting HTTP on port ${server.address.port}"
+
+        println "$appName starting HTTP bound to ${server.address.hostName} on port ${server.address.port}"
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
         Thread.start {
             server.start();
@@ -307,7 +309,7 @@ class gServHttpsInstance extends GServInstance {
         context.authenticator = _authenticator;
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"
-        println "$appName starting HTTPS on port ${server.address.port}"
+        println "$appName starting HTTPS bound to ${_cfg.bindAddress()} on port ${server.address.port}"
 
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
         Thread.start {
