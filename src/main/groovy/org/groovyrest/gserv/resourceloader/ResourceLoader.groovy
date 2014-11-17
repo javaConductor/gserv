@@ -84,7 +84,6 @@ class ResourceLoader {
         // Add imports for script.
         def importCustomizer = new ImportCustomizer()
         importCustomizer.addStaticStars 'org.groovyrest.gserv.GServ'
-        //importCustomizer.addImport 'Article', 'com.mrhaki.blog.Post'
 
         def configuration = new CompilerConfiguration()
         configuration.classpathList = classpath
@@ -92,6 +91,5 @@ class ResourceLoader {
 
         // Create shell.
         new GroovyShell(configuration)
-
     }
 }

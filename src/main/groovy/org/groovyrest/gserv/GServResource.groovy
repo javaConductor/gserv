@@ -1,6 +1,7 @@
 package org.groovyrest.gserv
 
 import org.groovyrest.gserv.delegates.ResourceDelegate
+import org.groovyrest.gserv.utils.LinkBuilder
 
 /**
  * An HTTP/REST resource definition.
@@ -34,6 +35,8 @@ class GServResource {
  */
     def GServResource(String path) {
         basePath = path
+        routes = []
+        linkBuilder = new LinkBuilder(path)
     }
 
     /**
@@ -57,23 +60,30 @@ class GServResource {
     }
 
     static def Resource(basePath, ResourceObject target) {
-        //println "GServ.resource(): Creating resource [$basePath]"
-        def definitionClosure = target.resourceDefinition
-        def dgt = new ResourceDelegate(basePath);
-        definitionClosure.delegate = dgt
-        definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        definitionClosure()
-        target.routes = definitionClosure.delegate.patterns()
-        target.linkBuilder = definitionClosure.delegate.linkBuilder()
+        def addRoute = { routeList, route ->
+            routeList = Utils.removeRoute(routeList, route)
+            routeList << route
+            routeList
+        };
+
+        def addRoutes = { routeList, List routes ->
+            routes.inject(routeList) { acc, route ->
+                addRoute(acc, route)
+            }
+
+        };
+
+        target.resourceDefinitions.each { definitionClosure ->
+
+            def dgt = new ResourceDelegate(basePath);
+            definitionClosure.delegate = dgt
+            definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
+            definitionClosure()
+            target.routes = addRoutes(target.routes, definitionClosure.delegate.patterns())
+            target.linkBuilder += definitionClosure.delegate.linkBuilder()
+        }
         target
     }
 
 }
 
-class ResourceObject extends GServResource {
-    Closure resourceDefinition
-    ResourceObject(String path, Closure resourceDef) {
-        super(path)
-        this.resourceDefinition = resourceDef;
-    }
-}

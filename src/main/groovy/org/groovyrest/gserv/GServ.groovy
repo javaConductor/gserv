@@ -158,10 +158,6 @@ class GServ {
                 .routes(_patterns)
                 .addFilters(_filters);
 
-        /// if this an HTTPS config , check the following locations in order:
-        // - httpsConfig in cfg
-        // - global one
-        // - - - global  should be in $GSERV_HOME/https.cfg.json
         if (options.https) {
             cfg.applyHttpsConfig(options.https)
         } else {
@@ -245,7 +241,6 @@ class gServHandler implements HttpHandler {
         _handler = _nuHandler()
 
         def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false)), _nuHandler);
-//        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false, 20)), _nuHandler);
         _nuDispatcher = {
             _factory.createDispatcher(actors, _routes, cfg.staticRoots(),
                     _templateEngineName,

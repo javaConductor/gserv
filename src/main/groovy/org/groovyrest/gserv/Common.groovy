@@ -35,6 +35,56 @@ import static org.groovyrest.gserv.utils.TextUtils.*;
  */
 class Utils {
 
+    static def removeRoute(List routeList, Route route) {
+        routeList.findAll { rte ->
+            !routesMatchEqual(rte, route)
+        }
+
+    }
+
+    static def routesMatchEqual(Route a, Route b) {
+        if (a.method() != b.method())
+            return false;
+        def matches = elementsMatchEqual(a.pathElements(), b.pathElements());
+        if (!matches)
+            return false;
+        queriesMatchEqual(a.queryPattern(), b.queryPattern())
+    }
+
+    static def elementsMatchEqual(List<RoutePathElement> a, List<RoutePathElement> b) {
+
+        if ((a.size() != b.size())) return false;
+        if (a.size() == 0)
+            return true;
+        def aElement = a.head();
+        def bElement = b.head();
+
+        def matches = elementsMatchEqual(aElement, bElement);
+        return matches && elementsMatchEqual(a.tail(), b.tail());
+    }
+
+    static def elementsMatchEqual(RoutePathElement aElement, RoutePathElement bElement) {
+
+        if (aElement.isVariable() != bElement.isVariable())
+            return false;
+        if (!aElement.isVariable() && (aElement.text() != bElement.text()))
+            return false;
+
+        return true;
+    }
+
+    static def queriesMatchEqual(RouteQuery aQry, RouteQuery bQry) {
+        def aKeys = aQry.queryKeys()
+        def bKeys = bQry.queryKeys()
+        if (aKeys.size() != bKeys.size()) return false;
+
+        for (int x = 0; x > aKeys.size(); ++x) {
+            if (aKeys[x] != bKeys[x])
+                return false;
+        }
+        return true;
+    }
+
     static def isValuePattern(name) {
         //returns true if name is matching pattern with ‘:’
         !(isMatchingPattern(name) || isDataOnlyPattern(name))
