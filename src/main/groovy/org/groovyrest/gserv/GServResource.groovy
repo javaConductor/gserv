@@ -30,7 +30,7 @@ class GServResource {
 
 /**
  *
-  * @param path
+ * @param path
  * @return
  */
     def GServResource(String path) {
@@ -86,4 +86,3 @@ class GServResource {
     }
 
 }
-

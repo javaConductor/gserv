@@ -24,22 +24,19 @@
 
 package org.groovyrest.gserv.delegates
 
-import org.groovyrest.gserv.delegates.functions.ResourceFunctions
+import groovy.util.logging.Log4j
+import org.groovyrest.gserv.delegates.functions.ResourceFn
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.utils.LinkBuilder
 
 /**
  *  This class contains all the functions available inside a Resource definition closure
  */
-@Mixin([ResourceFunctions])
-class ResourceDelegate {
-    Map _properties = [:]
+//@Mixin([ResourceFunctions])
+@Log4j
+class ResourceDelegate extends DelegateFunctions implements ResourceFn {
+//    Map _properties = [:]
 
-    def value(String key, Object value) { _properties.put(key, value) }
-
-    def value(String key) { _properties[key] }
-
-    def values() { _properties }
 
     def templateEngine = "default"
     def eventManager = EventManager.instance()

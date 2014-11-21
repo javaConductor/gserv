@@ -173,7 +173,12 @@ class GServInstance {
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"
 
-        println "$appName starting HTTP bound to ${server.address.hostName} on port ${server.address.port}"
+        def bindStr = bindAddrString(_cfg.bindAddress())
+        if (bindStr)
+            println "$appName starting HTTP ${bindStr}"
+        else
+            println "$appName starting HTTP on port ${server.address.port}"
+
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
         Thread.start {
             server.start();
@@ -182,6 +187,10 @@ class GServInstance {
             server.stop(0);
         });
     };
+
+    def bindAddrString(bindAddress) {
+        (bindAddress && !bindAddress.toString().contains("0:0:0:0")) ? "bound to ${bindAddress.toString().substring(1)} " : ""
+    }
 
     def config() {
         return _cfg;
@@ -309,7 +318,11 @@ class gServHttpsInstance extends GServInstance {
         context.authenticator = _authenticator;
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"
-        println "$appName starting HTTPS bound to ${_cfg.bindAddress()} on port ${server.address.port}"
+        def bindStr = bindAddrString(_cfg.bindAddress())
+        if (bindStr)
+            println "$appName starting HTTPS ${bindStr}"
+        else
+            println "$appName starting HTTPS on port ${server.address.port}"
 
         EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
         Thread.start {

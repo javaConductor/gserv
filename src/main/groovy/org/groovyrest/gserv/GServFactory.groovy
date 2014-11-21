@@ -32,7 +32,7 @@ import org.groovyrest.gserv.resourceloader.ResourceLoader
 
 /**
  *
- * @author lcollins
+ * @author javaConductor
  */
 @Log4j
 class GServFactory {

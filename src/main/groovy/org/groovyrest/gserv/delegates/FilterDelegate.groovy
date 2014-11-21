@@ -24,12 +24,12 @@
 
 package org.groovyrest.gserv.delegates
 
-import org.groovyrest.gserv.converters.InputStreamTypeConverter
-import org.groovyrest.gserv.delegates.functions.FilterFunctions
-import org.groovyrest.gserv.delegates.functions.ResourceFunctions
-import org.groovyrest.gserv.delegates.functions.ResourceHandlerFunctions
-import org.groovyrest.gserv.events.EventManager
 import com.sun.net.httpserver.Filter.Chain
+import org.groovyrest.gserv.converters.InputStreamTypeConverter
+import org.groovyrest.gserv.delegates.functions.FilterFn
+import org.groovyrest.gserv.delegates.functions.ResourceFn
+import org.groovyrest.gserv.delegates.functions.ResourceHandlerFn
+import org.groovyrest.gserv.events.EventManager
 
 /**
  *
@@ -41,16 +41,7 @@ import com.sun.net.httpserver.Filter.Chain
 
  */
 
-@Mixin([ResourceFunctions, FilterFunctions, ResourceHandlerFunctions])
-class FilterDelegate {
-    Map _properties = [:]
-
-    def value(String key, Object value) { _properties.put(key, value) }
-
-    def value(String key) { _properties[key] }
-
-    def values() { _properties }
-
+class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
     def exchange
     def $this
     def eventManager = EventManager.instance()

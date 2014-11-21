@@ -40,10 +40,9 @@ import org.apache.commons.io.IOUtils
 
 /**
  * Created with IntelliJ IDEA.
- * User: lcollins
+ * User: javaConductor
  * Date: 1/5/14
  * Time: 10:13 PM
- * To change this template use File | Settings | File Templates.
  */
 @Log4j
 class AsyncDispatcher extends DynamicDispatchActor {

@@ -24,24 +24,15 @@
 
 package org.groovyrest.gserv.delegates
 
-import org.groovyrest.gserv.delegates.functions.ResourceHandlerFunctions
+import org.groovyrest.gserv.delegates.functions.ResourceHandlerFn
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.templating.TemplateManager
 
 /**
  * This is the delegate for any HTTP Method handler closure
  */
-@Mixin(ResourceHandlerFunctions)
-class HttpMethodDelegate {
-
-    Map _properties = [:]
-
-    def value(String key, Object value) { _properties.put(key, value) }
-
-    def value(String key) { _properties[key] }
-
-    def values() { _properties }
-
+//@Mixin(ResourceHandlerFunctions)
+class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
     def exchange
     def serverConfig
     def $this

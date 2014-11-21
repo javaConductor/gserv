@@ -51,7 +51,9 @@ class GServConfigFile {
         try {
             cfg = new JsonSlurper().parse(configFile);
         } catch (Exception e) {
-            throw new ConfigException("Could not parse file: ${configFile.absolutePath}: ${e.message}")
+            def msg = "Could not parse file: ${configFile.absolutePath}: ${e.message}";
+            log.error(msg, e)
+            throw new ConfigException(msg, e)
         }
 
         ///// CREATE the initial GServConfig from the file values

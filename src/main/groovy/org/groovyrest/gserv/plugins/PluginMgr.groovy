@@ -44,6 +44,7 @@ class PluginMgr {
     def register(name, Class pluginClass) {
         plugins[name] = pluginClass
         EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
+        this
     }
 
     IPlugin plugin(name, options) {

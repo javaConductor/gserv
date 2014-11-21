@@ -270,21 +270,21 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d*`', "UTF-8"),
+                ('/:thing:`\\d*`'),
                 { ->
 
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/75"))
-    }
+        m.match(pat, new URI(URLDecoder.decode("http://acme.com/75", "UTF-8")))
+    };
 
     public void "should not match regEx path."() {
 
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d*`', "UTF-8"),
+                ('/:thing:`\\d*`'),
                 { ->
 
                 })
@@ -298,7 +298,7 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d_\\d*`', 'UTF-8'),
+                ('/:thing:`\\d_\\d*`'),
                 { ->
 
                 })
@@ -312,7 +312,7 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d\\s\\d*`', 'UTF-8'),
+                ('/:thing:`\\d\\s\\d*`'),
                 { ->
 
                 })
@@ -326,7 +326,7 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d\\s\\s\\s\\d*`', 'UTF-8'),
+                ('/:thing:`\\d\\s\\s\\s\\d*`'),
                 { ->
 
                 })
@@ -340,7 +340,7 @@ public class MatcherSpec extends Specification {
         when:
         Route pat = RouteFactory.createURLPattern(
                 "GET",
-                URLEncoder.encode('/:thing:`\\d\\d\\d-\\d\\d-\\d\\d\\d\\d`', 'UTF-8'),
+                ('/:thing:`\\d\\d\\d-\\d\\d-\\d\\d\\d\\d`'),
                 { ssn ->
 
                 })

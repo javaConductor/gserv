@@ -24,8 +24,9 @@
 
 package org.groovyrest.gserv.delegates
 
-import org.groovyrest.gserv.delegates.functions.ResourceFunctions
-import org.groovyrest.gserv.delegates.functions.ServerConfigFunctions
+import groovy.util.logging.Log4j
+import org.groovyrest.gserv.delegates.functions.ResourceFn
+import org.groovyrest.gserv.delegates.functions.ServerConfigFn
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.utils.LinkBuilder
 import org.groovyrest.gserv.utils.StaticFileHandler
@@ -34,15 +35,16 @@ import org.groovyrest.gserv.utils.StaticFileHandler
  * Delegate for Server Configuration Closure
  *
  */
-@Mixin([StaticFileHandler, ServerConfigFunctions, ResourceFunctions])
-class ServerInstanceDelegate {
+@Log4j
+@Mixin([StaticFileHandler])
+class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
     Map _properties = [:]
-
-    def value(String key, Object value) { _properties.put(key, value) }
-
-    def value(String key) { _properties[key] }
-
-    def values() { _properties }
+//
+//    def value(String key, Object value) { _properties.put(key, value) }
+//
+//    def value(String key) { _properties[key] }
+//
+//    def values() { _properties }
     def templateEngine = "default"
     def eventManager = EventManager.instance()
     def patterns = {

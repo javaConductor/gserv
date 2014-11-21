@@ -26,6 +26,8 @@ package org.groovyrest.gserv
 
 import org.groovyrest.gserv.filters.Filter
 import org.groovyrest.gserv.filters.FilterType
+import org.groovyrest.gserv.utils.ParseUtils
+
 import java.util.regex.Pattern
 
 import static org.groovyrest.gserv.utils.TextUtils.*;
@@ -39,7 +41,6 @@ class Utils {
         routeList.findAll { rte ->
             !routesMatchEqual(rte, route)
         }
-
     }
 
     static def routesMatchEqual(Route a, Route b) {
@@ -52,14 +53,11 @@ class Utils {
     }
 
     static def elementsMatchEqual(List<RoutePathElement> a, List<RoutePathElement> b) {
-
         if ((a.size() != b.size())) return false;
         if (a.size() == 0)
             return true;
-        def aElement = a.head();
-        def bElement = b.head();
 
-        def matches = elementsMatchEqual(aElement, bElement);
+        def matches = elementsMatchEqual(a.head(), b.head());
         return matches && elementsMatchEqual(a.tail(), b.tail());
     }
 
@@ -165,11 +163,6 @@ class Utils {
                 },
                 toType  : { s -> Integer.parseInt(s) }
         ]
-//        def listType = [
-//                name: "List",
-//                validate: { ->  isInteger(it) },
-//                toType: { -> Integer.parseInt(it)}
-//        ]
 
         switch (elementType) {
             case "Number":
@@ -216,15 +209,28 @@ class RouteFactory {
 
     static def createURLPattern(name, method, uri, options, clozure) {
         /// Example: /Thing/:id/?page=:pg&chapter=:chpt
-        def u2 = new java.net.URI(uri)
+
+        def parsed = new ParseUtils().parsePath(uri)
+
+        def u2 = new java.net.URI(URLEncoder.encode(uri, "UTF-8"))
         def paths = u2.path.split("/")
 
         //def paths = uri.split("/\\?")
         paths = paths.findAll { p -> p }
         //println "paths -> "+paths.toString()
+        // check to see if the last param has a '?' - qry is appended to last param
+        if (paths.size() > 0) {
+            def last = paths.last().split("\\?")
+            if (last.length > 1) {
+                // the query is appended to the last param
+                // replace the last param with the real value
+                paths = paths.subList(0, paths.size() - 1) + last[0];
+            }
+        }
 
         def pathPatterns = paths.collect { t ->
             def type
+            // t = URLDecoder.decode( t, "UTF-8")
             def element = t
             if (Utils.hasType(t)) {
                 type = Utils.getType(t)
@@ -239,7 +245,7 @@ class RouteFactory {
         } else {
             qryPattern = new RouteQuery("")
         }
-//        def qryPattern = new RouteQuery(u2.query)
+
         (name) ? new Route(name, method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
                 : new Route(method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
     }
@@ -356,7 +362,7 @@ class RouteQuery {
         if (!qString) {
             return
         }
-        _queryString = qString
+        _queryString = URLDecoder.decode(qString, "UTF-8")
         def queries = _queryString.split("&")
         //println "queries -> " + queries.toString()
         _matchQueryKeys = queries.inject([]) { acc, qry ->
