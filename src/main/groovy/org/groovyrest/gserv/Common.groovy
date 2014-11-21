@@ -208,16 +208,11 @@ class RouteFactory {
     }
 
     static def createURLPattern(name, method, uri, options, clozure) {
-        /// Example: /Thing/:id/?page=:pg&chapter=:chpt
+        /// Example: /Thing/:id:Number/?page=:pg&chapter=:chpt
+        def paths =  new ParseUtils().parsePath(uri);//u2.path.split("/")
+        // remove empty entries - encode each element of the path
+        paths = paths.findAll { p -> p }//.collect { URLEncoder.encode(it, "UTF-8") }
 
-        def parsed = new ParseUtils().parsePath(uri)
-
-        def u2 = new java.net.URI(URLEncoder.encode(uri, "UTF-8"))
-        def paths = u2.path.split("/")
-
-        //def paths = uri.split("/\\?")
-        paths = paths.findAll { p -> p }
-        //println "paths -> "+paths.toString()
         // check to see if the last param has a '?' - qry is appended to last param
         if (paths.size() > 0) {
             def last = paths.last().split("\\?")
