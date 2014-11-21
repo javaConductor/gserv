@@ -114,7 +114,6 @@ class StaticFileHandler {
         //URL u = ClassLoader.getSystemResource("/docs/$filePath")
         //URL u = Class.getClassLoader().getResource("/docs/$filePath")
         URL u = Class.getResource("/docs/$filePath")
-
         u?.content
     }
 
