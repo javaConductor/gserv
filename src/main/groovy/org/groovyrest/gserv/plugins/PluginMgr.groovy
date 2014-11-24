@@ -24,24 +24,41 @@
 
 package org.groovyrest.gserv.plugins
 
+import groovy.util.logging.Log4j
 import org.groovyrest.gserv.events.EventManager
 import org.groovyrest.gserv.events.Events
+import org.groovyrest.gserv.plugins.caching.CachingPlugin
+import org.groovyrest.gserv.plugins.compression.CompressionPlugin
+import org.groovyrest.gserv.plugins.cors.CorsPlugin
 
 /**
  * Created by javaConductor on 1/24/14.
  */
+@Log4j
 class PluginMgr {
 
     private static final INSTANCE = new PluginMgr()
 
-    static def instance() { INSTANCE }
+    static PluginMgr instance() { INSTANCE }
 
     private def PluginMgr() {
+        initDefaultPlugins()
+    }
+
+    def initDefaultPlugins(){
+        register('cors', CorsPlugin.class)
+        register('caching', CachingPlugin.class)
+        register('compression', CompressionPlugin.class)
     }
 
     def plugins = [:]
 
     def register(name, Class pluginClass) {
+
+        if (plugins[name] ){
+            log.warn(  "Plugin name: $name is being overridden with class: ${ pluginClass.canonicalName }" )
+        }
+
         plugins[name] = pluginClass
         EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
         this

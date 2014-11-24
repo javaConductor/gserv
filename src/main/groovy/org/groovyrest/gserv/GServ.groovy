@@ -157,7 +157,8 @@ class GServ {
                 .addStaticRoots(_staticRoots)
                 .routes(_patterns)
                 .addFilters(_filters);
-
+        /// each plugin is applied to the configuration
+        cfg = serverPlugins.applyPlugins(cfg);
         if (options.https) {
             cfg.applyHttpsConfig(options.https)
         } else {
