@@ -41,3 +41,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'gserv'
+include 'gservInstaller'

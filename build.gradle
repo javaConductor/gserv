@@ -32,8 +32,17 @@ mainClassName = 'org.groovyrest.gserv.Main'
 group = "org.groovyrest"
 version = "0.0.1"
 
+task copyJarToInstaller(type: Copy)
+
+copyJarToInstaller {
+    from(new File(getRootProject().buildDir, "libs").listFiles().find { name ->
+        return name.name.startsWith("gserv") && name.name.endsWith(".jar")
+    })
+    into new File(getRootProject().buildDir, 'gservInstaller/src/main/resources/gserv.jar')
+}
 
 
+copyJarToInstaller.mustRunAfter assemble
 jar {
     from {
         configurations.compile.collect {
@@ -45,9 +54,7 @@ jar {
     }
 
     manifest.attributes("Main-Class": "org.groovyrest.gserv.Main")
-
 }
-
 
 sourceSets {
     integrationTest {

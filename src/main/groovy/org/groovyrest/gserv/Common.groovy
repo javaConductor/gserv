@@ -208,24 +208,20 @@ class RouteFactory {
     }
 
     static def createURLPattern(name, method, uri, options, clozure) {
+        def qry
         /// Example: /Thing/:id:Number/?page=:pg&chapter=:chpt
         def paths =  new ParseUtils().parsePath(uri);//u2.path.split("/")
+        if (paths?.last()?.startsWith("?")) {
+            qry = paths.last();
+            qry = qry.substring(1)
+            paths = paths.subList(0, paths.size() - 1)
+
+        }
         // remove empty entries - encode each element of the path
         paths = paths.findAll { p -> p }//.collect { URLEncoder.encode(it, "UTF-8") }
 
-        // check to see if the last param has a '?' - qry is appended to last param
-        if (paths.size() > 0) {
-            def last = paths.last().split("\\?")
-            if (last.length > 1) {
-                // the query is appended to the last param
-                // replace the last param with the real value
-                paths = paths.subList(0, paths.size() - 1) + last[0];
-            }
-        }
-
         def pathPatterns = paths.collect { t ->
             def type
-            // t = URLDecoder.decode( t, "UTF-8")
             def element = t
             if (Utils.hasType(t)) {
                 type = Utils.getType(t)
@@ -233,14 +229,7 @@ class RouteFactory {
             }
             new RoutePathElement(element, Utils.isMatchingPattern(element), type)
         }
-        def qryPattern
-        def qry = uri.split('\\?', 2)
-        if (qry.size() > 1) { // no query string
-            qryPattern = new RouteQuery(qry[1])
-        } else {
-            qryPattern = new RouteQuery("")
-        }
-
+        def qryPattern = qry ? new RouteQuery(qry) : new RouteQuery("")
         (name) ? new Route(name, method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
                 : new Route(method, pathPatterns, qryPattern, options ?: [passPathParams: true], clozure)
     }
@@ -398,7 +387,6 @@ class RouteQuery {
 
     def queryDataMap() {
         (queryKeys() + dataKeys()).inject([:]) { dataMap, dk -> dataMap + ["$dk": _queryMap[dk]] }
-        //queryMap()
     }
 
     def queryKeys() {
@@ -432,8 +420,6 @@ class RoutePathElement {
     def isVariable() { _isVar }
 
     def variableName() { _isVar ? _pathSegment.toString().substring(1) : "" }
-
-    //  def isRegEx() { _isRegEx }
 
     String toString() {
         return text()

@@ -6,8 +6,10 @@ package org.groovyrest.gserv.utils
 class ParseUtils {
 
     def parsePath(path, elements = []) {
-        if (!path || path.startsWith('?'))
+        if (!path)
             return elements
+        if (path.startsWith('?'))
+            return elements + path;
         def p = path
         if (p.startsWith('/'))
             p = p.substring(1)
