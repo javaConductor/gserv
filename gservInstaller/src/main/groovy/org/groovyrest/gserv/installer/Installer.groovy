@@ -1,4 +1,4 @@
-package org.groovyrest.gserv.installer
+package io.github.javaconductor.gserv.installer
 
 import org.apache.commons.io.IOUtils
 
@@ -29,7 +29,7 @@ class Installer {
 
     EnvPathUtils envPathUtils
     def Installer(){
-        /// PRE- CONDITION: org.groovyrest.gserv.installer.Installer MUST have 3 things on its classpath:
+        /// PRE- CONDITION: io.github.javaconductor.gserv.installer.Installer MUST have 3 things on its classpath:
         //// gserv.jar
         //// gserv.sh
         //// version.txt
@@ -60,7 +60,7 @@ class Installer {
         File dirBin = new File(gservHome, "bin")
         File dirScripts = new File(gservHome, "scripts")
 
-        /// 1. copy gserv jar to ~/.gserv/bin - it should be embedded in the org.groovyrest.gserv.installer.Installer.jar (classpath resource)
+        /// 1. copy gserv jar to ~/.gserv/bin - it should be embedded in the io.github.javaconductor.gserv.installer.Installer.jar (classpath resource)
         // The gserv.jar file should be on the classpath
         InputStream inJar= getJarStream()
         createFile( dirBin, "gserv.jar", inJar)

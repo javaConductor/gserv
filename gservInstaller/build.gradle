@@ -4,7 +4,7 @@ apply plugin: 'application'
 defaultTasks 'clean', 'assemble'
 sourceCompatibility = 1.7
 version = '1.0'
-mainClassName="org.groovyrest.gserv.installer.Installer"
+mainClassName="io.github.javaconductor.gserv.installer.Installer"
 
 jar {
     from {
@@ -16,7 +16,7 @@ jar {
         }
     }
 
-    manifest.attributes("Main-Class": "org.groovyrest.gserv.installer.Installer")
+    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.installer.Installer")
 }
 
 build.dependsOn assemble

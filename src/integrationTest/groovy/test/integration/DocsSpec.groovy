@@ -1,7 +1,7 @@
 package test.integration
 
 import groovyx.net.http.HTTPBuilder
-import org.groovyrest.gserv.GServRunner
+import io.github.javaconductor.gserv.GServRunner
 import org.junit.Ignore
 
 /**

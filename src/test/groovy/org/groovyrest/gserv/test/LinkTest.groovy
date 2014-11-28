@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.Route
-import org.groovyrest.gserv.RouteFactory
-import org.groovyrest.gserv.utils.LinkBuilder
+import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.utils.LinkBuilder
 import org.junit.Before
 import org.junit.Test
 
@@ -41,7 +41,7 @@ public class LinkTest {
 
     @Test
     public final void testLinkBuilder() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/books/:id",
                 { ->
@@ -54,7 +54,7 @@ public class LinkTest {
 
     @Test
     public final void testLinkBuilder2() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/books/:year/:rank",
                 { yr, rnk ->
@@ -67,7 +67,7 @@ public class LinkTest {
 
     @Test
     public final void testLinkBuilder3() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/books/:year/:rank/all",
                 { yr, rnk ->
@@ -80,7 +80,7 @@ public class LinkTest {
 
     @Test
     public final void testLinkBuilderWithQuery() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/books/:year/:rank/all?foo=:foo",
                 { yr, rnk, foo ->

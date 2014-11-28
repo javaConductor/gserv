@@ -22,15 +22,15 @@
  * THE SOFTWARE.
  */
 
-import org.groovyrest.gserv.*
+import io.github.javaconductor.gserv.*
 @Grab('com.gmongo:gmongo:1.0')
 import com.gmongo.GMongo
-import org.groovyrest.gserv.plugins.PluginMgr
-import org.groovyrest.gserv.plugins.caching.CachingPlugin
-import org.groovyrest.gserv.plugins.compression.CompressionPlugin
-import org.groovyrest.gserv.plugins.eventLogger.EventLoggerPlugin
-import org.groovyrest.gserv.plugins.markdown.MarkdownPlugin
-import org.groovyrest.gserv.utils.Encoder
+import io.github.javaconductor.gserv.plugins.PluginMgr
+import io.github.javaconductor.gserv.plugins.caching.CachingPlugin
+import io.github.javaconductor.gserv.plugins.compression.CompressionPlugin
+import io.github.javaconductor.gserv.plugins.eventLogger.EventLoggerPlugin
+import io.github.javaconductor.gserv.plugins.markdown.MarkdownPlugin
+import io.github.javaconductor.gserv.utils.Encoder
 
 def gmongo = new GMongo('localhost:27017')
 def db = gmongo.getDB('gserv')

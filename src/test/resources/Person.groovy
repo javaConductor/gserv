@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import org.groovyrest.gserv.GServ
+import io.github.javaconductor.gserv.GServ
 
 [
         GServ.Resource('member') {

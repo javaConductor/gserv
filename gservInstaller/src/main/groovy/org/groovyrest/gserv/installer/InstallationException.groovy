@@ -1,4 +1,4 @@
-package org.groovyrest.gserv.installer
+package io.github.javaconductor.gserv.installer
 /**
  * Created by lcollins on 10/31/2014.
  */

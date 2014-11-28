@@ -1,4 +1,4 @@
-package org.groovyrest.gserv.installer
+package io.github.javaconductor.gserv.installer
 
 import org.apache.commons.io.FileUtils
 

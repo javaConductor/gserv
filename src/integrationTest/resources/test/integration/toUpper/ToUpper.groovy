@@ -23,7 +23,7 @@ package test.integration.toUpper
  * THE SOFTWARE.
  */
 
-import org.groovyrest.gserv.*
+import io.github.javaconductor.gserv.*
 
 [
         GServ.Resource("/upper") {

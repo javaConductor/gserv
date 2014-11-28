@@ -28,8 +28,8 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven'
 
-mainClassName = 'org.groovyrest.gserv.Main'
-group = "org.groovyrest"
+mainClassName = 'io.github.javaconductor.gserv.Main'
+group = "io.github.javaconductor"
 version = "0.0.1"
 
 task copyJarToInstaller(type: Copy)
@@ -53,7 +53,7 @@ jar {
         }
     }
 
-    manifest.attributes("Main-Class": "org.groovyrest.gserv.Main")
+    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
 }
 
 sourceSets {

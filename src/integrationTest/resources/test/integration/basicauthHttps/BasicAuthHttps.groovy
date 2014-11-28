@@ -2,7 +2,7 @@ package test.integration.basicauthHttps
 /**
  * Created by javaConductor on 9/28/2014.
  */
-import org.groovyrest.gserv.GServ
+import io.github.javaconductor.gserv.GServ
 
 def gserv = new GServ();
 /*
@@ -34,12 +34,13 @@ gserv.https((Map) [
         ok
     }
 
-    get("/") { ->
-        write("text/plain", "You MUST be authorized!!");
+    get "/",  { ->
+        write "text/plain", "You MUST be authorized!!"
     }
 
-    get("/hello") { ->
-        write("text/plain", "You SHOULD HAVE BEEN authorized!!");
+    get "/hello",  { ->
+        write "text/plain", "You SHOULD HAVE BEEN authorized!!"
+
     }
 
 }

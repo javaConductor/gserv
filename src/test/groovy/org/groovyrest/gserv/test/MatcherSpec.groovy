@@ -22,13 +22,11 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.Matcher
-import org.groovyrest.gserv.Route
-import org.groovyrest.gserv.RouteFactory
-import org.junit.Before
-import org.junit.Test
+import io.github.javaconductor.gserv.Matcher
+import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.ResourceActionFactory
 import spock.lang.Specification
 
 public class MatcherSpec extends Specification {
@@ -42,7 +40,7 @@ public class MatcherSpec extends Specification {
     public void "route should be empty"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/",
                 { ->
@@ -56,7 +54,7 @@ public class MatcherSpec extends Specification {
     public void "path size should be 1"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/thing",
                 { ->
@@ -69,7 +67,7 @@ public class MatcherSpec extends Specification {
     public void "simple path size should be 1"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing",
                 { ->
@@ -82,7 +80,7 @@ public class MatcherSpec extends Specification {
     public void "path size should be 2"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing",
                 { o, t ->
@@ -96,7 +94,7 @@ public class MatcherSpec extends Specification {
     public void "should have 1 query param"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=:query",
                 { o, t, q ->
@@ -109,7 +107,7 @@ public class MatcherSpec extends Specification {
     public void "should have 2 query param"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=:query&q2=:again",
                 { o, t, q ->
@@ -122,7 +120,7 @@ public class MatcherSpec extends Specification {
     public void "should match path"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing",
                 { ->
@@ -136,7 +134,7 @@ public class MatcherSpec extends Specification {
     public void "should not match path"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing",
                 { ->
@@ -148,7 +146,7 @@ public class MatcherSpec extends Specification {
 
     public void "should match query variable"() {
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=:query",
                 { o, t, q ->
@@ -161,7 +159,7 @@ public class MatcherSpec extends Specification {
     public void "should fail because no qry params"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=:query",
                 { o, t, q ->
@@ -174,7 +172,7 @@ public class MatcherSpec extends Specification {
     public void "should match static query value"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=query",
                 { o, t, q ->
@@ -187,7 +185,7 @@ public class MatcherSpec extends Specification {
 
     public final void "should match static and variable query values"() {
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=query&yo=:yo",
                 { o, t, q ->
@@ -200,7 +198,7 @@ public class MatcherSpec extends Specification {
     public void "should fail with wrong static query value"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=query",
                 { o, t, q ->
@@ -213,7 +211,7 @@ public class MatcherSpec extends Specification {
     public void "should fail query match but not path"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:other/:thing?q1=query",
                 { o, t, q ->
@@ -226,7 +224,7 @@ public class MatcherSpec extends Specification {
     public void "should match path with type"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing:Number",
                 { ->
@@ -240,7 +238,7 @@ public class MatcherSpec extends Specification {
     public void "should not match path with type"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing:Number",
                 { ->
@@ -254,7 +252,7 @@ public class MatcherSpec extends Specification {
     public void "should NOT match int path with double value"() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/:thing:Integer",
                 { ->
@@ -268,7 +266,7 @@ public class MatcherSpec extends Specification {
     public void "should match regEx path."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d*`'),
                 { ->
@@ -282,7 +280,7 @@ public class MatcherSpec extends Specification {
     public void "should not match regEx path."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d*`'),
                 { ->
@@ -296,7 +294,7 @@ public class MatcherSpec extends Specification {
     public void "should match regEx path w space."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d_\\d*`'),
                 { ->
@@ -310,7 +308,7 @@ public class MatcherSpec extends Specification {
     public void "should not match regEx path too many spaces."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d\\s\\d*`'),
                 { ->
@@ -324,7 +322,7 @@ public class MatcherSpec extends Specification {
     public void "should match regEx path 3 spaces."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d\\s\\s\\s\\d*`'),
                 { ->
@@ -338,7 +336,7 @@ public class MatcherSpec extends Specification {
     public void "should match SSN regEx."() {
 
         when:
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 ('/:thing:`\\d\\d\\d-\\d\\d-\\d\\d\\d\\d`'),
                 { ssn ->

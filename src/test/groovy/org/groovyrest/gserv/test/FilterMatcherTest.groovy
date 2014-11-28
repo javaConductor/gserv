@@ -22,12 +22,12 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.FilterMatcher
-import org.groovyrest.gserv.Matcher
-import org.groovyrest.gserv.Route
-import org.groovyrest.gserv.RouteFactory
+import io.github.javaconductor.gserv.FilterMatcher
+import io.github.javaconductor.gserv.Matcher
+import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.ResourceActionFactory
 import org.junit.Before
 import org.junit.Test
 
@@ -42,7 +42,7 @@ public class FilterMatcherTest {
 
     @Test
     public void "testPathWildCardMatch"() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/*",
                 { ->
@@ -54,7 +54,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testWildcardMatchesRoot() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/*",
                 { ->
@@ -65,7 +65,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testEmptyPathMatchesAll() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/**",
                 { ->
@@ -76,7 +76,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testSlashMatchesSlash() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/",
                 { ->
@@ -87,7 +87,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testSlashMatches() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/yippy/**",
                 { ->
@@ -98,7 +98,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testSlashMatches3() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/yippy/**",
                 { ->
@@ -109,7 +109,7 @@ public class FilterMatcherTest {
 
     @Test
     public final void testSlashMatches2() {
-        Route pat = RouteFactory.createURLPattern(
+        ResourceAction pat = ResourceActionFactory.createAction(
                 "GET",
                 "/yippy/*/yahooey",
                 { ->

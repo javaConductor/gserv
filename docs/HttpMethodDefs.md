@@ -1,3 +1,0 @@
-##Http Method Definitions
-
-### 
