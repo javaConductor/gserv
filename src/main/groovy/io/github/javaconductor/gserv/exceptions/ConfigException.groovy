@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.exceptions
+package io.github.javaconductor.gserv.exceptions
 
 /**
  * Created by javaConductor on 8/18/2014.

@@ -22,56 +22,46 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.plugins
+package io.github.javaconductor.gserv.filters
 
-import io.github.javaconductor.gserv.Route
+import io.github.javaconductor.gserv.ResourceAction
+
 
 /**
- * Created by javaConductor on 3/22/14.
+ * Represents a URI/HttpMethod/Behavior Combination
+ * for a request filter.
  */
-abstract class AbstractPlugin implements IPlugin {
-    @Override
-    abstract def init(Object options)
+class Filter extends ResourceAction {
+    def order = 5
+    def filterType = FilterType.Normal
 
-    /**
-     * Returns the list of filters deployed by this Plugin
-     *
-     * @return List < Filter >
-     */
-    @Override
-    List<Route> filters() {
-        return []
+    def Filter(name, method, urlPatterns, qryPattern, opts, beforeClosure) {
+        super(name, method, urlPatterns, qryPattern, opts, beforeClosure);
     }
+}
+/**
+ * Supported Filter Types
+ */
+enum FilterType {
+    After, Normal, Before
+}
 
+/**
+ * Filter options. Specified when creating filters.
+ */
+class FilterOptions {
     /**
-     * Returns the list of routes deployed by this Plugin
+     *  Boolean:    if true, any path values corresponding to path variables will be passed to the Filter def closure
+     *  Note: Only applies to 'Before' Filters
      *
-     * @return List < Filter >
      */
-    @Override
-    List<Route> routes() {
-        return []
-    }
+    static final String PassActionParams =  'passActionParams'
 
-    /**
-     * Returns the list of static roots used by this Plugin
-     *
-     * @return List < Filter >
-     */
-    @Override
-    List<String> staticRoots() {
-        return []
-    }
+    @Deprecated
+    static final String PassRouteParams =PassActionParams
 
-    /**
-     * This function adds Plugin-specific methods and variables to the various delegateTypes
-     *
-     * @param delegateType
-     * @param delegateMetaClass
-     * @return
+/**
+     *  Boolean:    if true, the filter will only be activated when it matches a route
      */
-    @Override
-    MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
-        return delegateMetaClass
-    }
+    static final String MatchedActionsOnly = 'matchedActionsOnly'
 }

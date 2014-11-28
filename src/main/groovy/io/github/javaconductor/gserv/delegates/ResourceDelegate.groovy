@@ -22,45 +22,31 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.delegates
+package io.github.javaconductor.gserv.delegates
 
 import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.gserv.delegates.functions.ResourceFn
-import io.github.javaconductor.gserv.gserv.delegates.functions.ServerConfigFn
-import io.github.javaconductor.gserv.gserv.events.EventManager
-import io.github.javaconductor.gserv.gserv.utils.LinkBuilder
-import io.github.javaconductor.gserv.gserv.utils.StaticFileHandler
+import io.github.javaconductor.gserv.delegates.functions.ResourceFn
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.utils.LinkBuilder
 
 /**
- * Delegate for Server Configuration Closure
- *
+ *  This class contains all the functions available inside a Resource definition closure
  */
+//@Mixin([ResourceFunctions])
 @Log4j
-@Mixin([StaticFileHandler])
-class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
-    Map _properties = [:]
-//
-//    def value(String key, Object value) { _properties.put(key, value) }
-//
-//    def value(String key) { _properties[key] }
-//
-//    def values() { _properties }
+class ResourceDelegate extends DelegateFunctions implements ResourceFn {
+//    Map _properties = [:]
+
+
     def templateEngine = "default"
     def eventManager = EventManager.instance()
-    def patterns = {
-
-        value("routeList")
-
-    }
-    def filters = { value("filterList") }
-    def staticRoots = { value("staticRoots") }
+    def patterns = { value("actionList") }
     def linkBuilder = { value("linkBuilder") }
 
-    def ServerInstanceDelegate() {
-        value("routeList", [])
-        value("filterList", [])
-        value("staticRoots", [])
-        value("useResourceDocs", [])
+    def ResourceDelegate(path) {
+        value("path", path)
+        value("actionList", [])
         value("linkBuilder", new LinkBuilder())
     }
+
 }

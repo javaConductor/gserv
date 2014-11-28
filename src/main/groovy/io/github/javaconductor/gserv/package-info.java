@@ -22,55 +22,12 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.utils
-
-import java.security.MessageDigest
-
 /**
- * Created by javaConductor on 5/1/2014.
+ *
  */
-class Encoder {
+/**
+ * @author lcollins
+ *
+ */
+package io.github.javaconductor.gserv;
 
-    /**
-     *
-     * Returns MD5 of stuff
-     * @param stuff
-     * @return byte[] MD5 of the data
-     */
-    static def md5(byte[] stuff) {
-        MessageDigest digest = MessageDigest.getInstance("MD5")
-        digest.update(stuff)
-        digest.digest()
-    }
-
-    /**
-     * Does MD5 hash and returns base64 representation of hash.
-     *
-     * @param stuff
-     * @return byte[] MD5 of the data
-     */
-    static def md5WithBase64(byte[] stuff) {
-        base64(md5(stuff))
-    }
-
-    /**
-     * Returns base64 string
-     *
-     * @param stuff
-     * @return String Base-64 Encoded
-     */
-    static String base64(byte[] stuff) {
-        stuff.encodeBase64().toString()
-    }
-
-    /**
-     * Decodes base64String and returns byte array
-     *
-     * @param base64String
-     * @return byte[]
-     */
-    static byte[] base64decode(String base64String) {
-        base64String.decodeBase64();
-    }
-
-}

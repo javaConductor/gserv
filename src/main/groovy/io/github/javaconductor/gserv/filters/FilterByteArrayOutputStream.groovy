@@ -22,32 +22,35 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.delegates
-
-import io.github.javaconductor.gserv.gserv.delegates.functions.ResourceHandlerFn
-import io.github.javaconductor.gserv.gserv.events.EventManager
-import io.github.javaconductor.gserv.templating.TemplateManager
+package io.github.javaconductor.gserv.filters
 
 /**
- * This is the delegate for any HTTP Method handler closure
+ * ByteArrayOutputStream for use with filters.  You must supply your own
+ * close() function for the stream.
+ *
  */
-//@Mixin(ResourceHandlerFunctions)
-class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
-    def exchange
-    def serverConfig
-    def $this
-    def eventManager = EventManager.instance()
+class FilterByteArrayOutputStream extends ByteArrayOutputStream {
 
-    def HttpMethodDelegate(xchange, route, serverConfig) {
-        value("tmgr", new TemplateManager());
-        value("linkBuilder", serverConfig.linkBuilder());
-        value("staticRoots", serverConfig.staticRoots());
-        value("templateEngineName", serverConfig.templateEngineName());
-        //value("to", new InputStreamTypeConverter().converters);
-        // $this inside the closure will be the currently processing route
-        $this = route
-        exchange = xchange
-        this.serverConfig = serverConfig
+    Closure _closeFn
+/**
+ * Create OutputStream w/ user supplied close() function.
+ *
+ * @param closeFn
+ */
+    public FilterByteArrayOutputStream(Closure closeFn) {
+        _closeFn = closeFn
     }
 
+    /**
+     * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
+     * this class can be called after the stream has been closed without
+     * generating an <tt>IOException</tt>.
+     * Calls the user supplied close() function.
+     * <p>
+     *
+     */
+    @Override
+    void close() throws IOException {
+        _closeFn(this)
+    }
 }

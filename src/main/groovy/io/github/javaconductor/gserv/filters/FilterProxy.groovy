@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.filters
+package io.github.javaconductor.gserv.filters
 
 import com.sun.net.httpserver.Filter
 import com.sun.net.httpserver.HttpExchange
@@ -31,8 +31,8 @@ import io.github.javaconductor.gserv.FilterMatcher
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.Utils
 import io.github.javaconductor.gserv.delegates.FilterDelegate
-import io.github.javaconductor.gserv.gserv.events.EventManager
-import io.github.javaconductor.gserv.gserv.events.Events
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.events.Events
 
 /**
  * User: javaConductor
@@ -68,18 +68,18 @@ class FilterProxy extends Filter {
         if (!httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS))
             httpExchange.setAttribute(GServ.exchangeAttributes.receivedMS, "" + new Date().time)
 
-        def theFilter = m.matchRoute(_filterList, httpExchange)
+        def theFilter = m.matchAction(_filterList, httpExchange)
         if (theFilter) {
             eventMgr.publish(Events.RequestMatchedFilter, [
                     filter       : theFilter.name ?: "-",
                     requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                    route        : theFilter.toString(),
+                    action        : theFilter.toString(),
                     path         : httpExchange.requestURI.path,
                     method       : httpExchange.requestMethod
             ]
             );
             //  if route is required  for this filter and not matched  return immediately
-            if (theFilter.options()[FilterOptions.MatchedRoutesOnly]) {
+            if (theFilter.options()[FilterOptions.MatchedActionsOnly]) {
                 if (!_serverConfig.requestMatched(httpExchange)) {
                     chain.doFilter(httpExchange);
                     return
@@ -196,14 +196,14 @@ class FilterProxy extends Filter {
             try {
                 eventMgr.publish(Events.FilterProcessing, [filter       : theFilter.name ?: "-",
                                                            requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                                                           route        : theFilter.toString(), path: exchange.requestURI.path, args: argList])
+                                                           action        : theFilter.toString(), path: exchange.requestURI.path, args: argList])
                 return clozure(*argList)
             } catch (Throwable e) {
                 log.error("FilterProxy error: ${e.message}", e)
                 e.printStackTrace(System.err)
                 eventMgr.publish(Events.FilterError, [filter       : theFilter.name ?: "-",
                                                       requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                                                      route        : theFilter.toString(), path: exchange.requestURI.path, args: argList, error: e.message])
+                                                      action        : theFilter.toString(), path: exchange.requestURI.path, args: argList, error: e.message])
                 dgt.error(500, e.message)
                 exchange
             }

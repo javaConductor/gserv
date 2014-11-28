@@ -22,39 +22,45 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.delegates
+package io.github.javaconductor.gserv.delegates
 
-import com.sun.net.httpserver.Filter.Chain
-import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
-import io.github.javaconductor.gserv.gserv.delegates.functions.FilterFn
-import io.github.javaconductor.gserv.gserv.delegates.functions.ResourceFn
-import io.github.javaconductor.gserv.gserv.delegates.functions.ResourceHandlerFn
-import io.github.javaconductor.gserv.gserv.events.EventManager
+import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.delegates.functions.ResourceFn
+import io.github.javaconductor.gserv.delegates.functions.ServerConfigFn
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.utils.LinkBuilder
+import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
+ * Delegate for Server Configuration Closure
  *
- * The delegate for Filters
- *
- * User: javaConductor
- * Date: 1/7/14
- * Time: 2:19 AM
-
  */
-
-class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
-    def exchange
-    def $this
+@Log4j
+@Mixin([StaticFileHandler])
+class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
+    Map _properties = [:]
+//
+//    def value(String key, Object value) { _properties.put(key, value) }
+//
+//    def value(String key) { _properties[key] }
+//
+//    def values() { _properties }
+    def templateEngine = "default"
     def eventManager = EventManager.instance()
+    def patterns = {
 
-    def FilterDelegate(filter, xchange, Chain chain, serverConfig, templateEngineName) {
-        value("chain", chain);
-        value("linkBuilder", serverConfig.linkBuilder());
-        value("staticRoots", serverConfig.staticRoots());
-        value("templateEngineName", serverConfig.templateEngineName());
-        value("to", new InputStreamTypeConverter().converters);
-        value("serverConfig", serverConfig);
-        value('$this', filter);
-        exchange = xchange
-        $this = filter
+        value("actionList")
+
+    }
+    def filters = { value("filterList") }
+    def staticRoots = { value("staticRoots") }
+    def linkBuilder = { value("linkBuilder") }
+
+    def ServerInstanceDelegate() {
+        value("actionList", [])
+        value("filterList", [])
+        value("staticRoots", [])
+        value("useResourceDocs", [])
+        value("linkBuilder", new LinkBuilder())
     }
 }

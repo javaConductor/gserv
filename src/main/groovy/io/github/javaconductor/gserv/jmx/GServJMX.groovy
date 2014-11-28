@@ -1,4 +1,4 @@
-package io.github.javaconductor.gserv.gserv.jmx
+package io.github.javaconductor.gserv.jmx
 
 import groovy.time.Duration
 

@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.plugins.caching
+package io.github.javaconductor.gserv.plugins.caching
 
-import io.github.javaconductor.gserv.RouteFactory
-import io.github.javaconductor.gserv.gserv.filters.FilterOptions
-import io.github.javaconductor.gserv.gserv.plugins.AbstractPlugin
+import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.filters.FilterOptions
+import io.github.javaconductor.gserv.plugins.AbstractPlugin
 
 /**
  * Created by javaConductor on 4/23/2014.
@@ -65,7 +65,7 @@ class CachingPlugin extends AbstractPlugin {
             def weakHandler = etagFn
             /// we must create a beforeFilter to create am ETag value from the request before the output is generated.
 
-            def f = RouteFactory.createBeforeFilterURLPattern("CachingBeforeFilter", "GET", path, [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedRoutesOnly): true], 1) {
+            def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 1) {
                 ->
 
                 def calcETag = weakHandler(exchange)
@@ -97,7 +97,7 @@ class CachingPlugin extends AbstractPlugin {
         return { path, etagFn ->
             def strongHandler = etagFn
             /// we must create a afterFilter to create am ETag value from the output once it is generated.
-            def f = RouteFactory.createAfterFilterURLPattern("CachingAfterFilter", "GET", path, [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedRoutesOnly): true], 9) { e, data ->
+            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 9) { e, data ->
                 //check the hdr
                 def calcETag = strongHandler(e, data)
                 def etagValue = e.requestHeaders["If-None-Match"]

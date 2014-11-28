@@ -22,13 +22,13 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.gserv.resourceloader
+package io.github.javaconductor.gserv.resourceloader
 
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
-import io.github.javaconductor.gserv.gserv.GServ
+import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.GServInstance
-import io.github.javaconductor.gserv.gserv.configuration.GServConfig
+import io.github.javaconductor.gserv.configuration.GServConfig
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
