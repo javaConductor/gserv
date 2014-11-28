@@ -8,9 +8,9 @@
         "sslProtocol" : "TLS"
     },
     "plugins": {
-        "cors":             "org.groovyrest.gserv.plugins.cors.CorsPlugin",
-        "compression":"org.groovyrest.gserv.plugins.compression.CompressionPlugin.class",
-        "caching":        "org.groovyrest.gserv.plugins.caching.CachingPlugin.class"
+        "cors":             "io.github.javaconductor.gserv.plugins.cors.CorsPlugin",
+        "compression":"io.github.javaconductor.gserv.plugins.compression.CompressionPlugin.class",
+        "caching":        "io.github.javaconductor.gserv.plugins.caching.CachingPlugin.class"
         },
     "apps" : [{
             "https": false,

@@ -22,9 +22,9 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.events.EventManager
+import io.github.javaconductor.gserv.events.EventManager
 import org.junit.Before
 import org.junit.Test
 

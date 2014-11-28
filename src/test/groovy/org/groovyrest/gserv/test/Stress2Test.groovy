@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
-
-import org.groovyrest.gserv.GServ
+package io.github.javaconductor.gserv.test
+import io.github.javaconductor.gserv.GServ
 import org.junit.Before
 
 public class Stress2Test {

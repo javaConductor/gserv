@@ -1,0 +1,26 @@
+{
+    "https":{
+        "keyManagerAlgorithm": "SunX509",
+        "trustManagerAlgorithm": "SunX509",
+        "keystoreFilePath": "/Users/lcollins/gserv.keystore",
+        "keyStoreImplementation": "JKS",
+        "password": "remoteip",
+        "sslProtocol" : "TLS"
+    },
+    "plugins": {
+        "cors":             "io.github.javaconductor.gserv.plugins.cors.CorsPlugin",
+        "compression":"io.github.javaconductor.gserv.plugins.compression.CompressionPlugin.class",
+        "caching":        "io.github.javaconductor.gserv.plugins.caching.CachingPlugin.class"
+        },
+    "apps" : [{
+            "https": false,
+            "name" : "singlePageMath",
+            "resourceScripts" : [],
+            "port" : 11111,
+            "bindAddress": "192.168.2.102",
+            "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
+        }],
+
+    "classpath" : ["/apps/lib/*"]
+
+}

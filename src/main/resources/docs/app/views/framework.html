@@ -8,7 +8,7 @@
         <li>Clone gServ from <a href="https://github.com/javaConductor/gserv.git">GitHub</a></li>
         <li>At the commandline, in the root directory of the gServ project, run:
             <pre>prompt> gradle install</pre>
-            This will add it to your local Maven repository as <strong>'org.groovyrest:gserv:[latest version]'</strong>
+            This will add it to your local Maven repository as <strong>'io.github.javaconductor:gserv:[latest version]'</strong>
             so you can use it your Maven/Gradle apps or just get the jar file and use it directly..
         </li>
     </div>
@@ -55,7 +55,7 @@ def bkResource = gserv.resource("/books") {
 </pre>
 
 <span>
-    After this call, bkResource represents a resource with root '/books' and 3 routes:<br/>
+    After this call, bkResource represents a resource with root '/books' and 3 actions:<br/>
     <li>GET path='/books/faq'</li>
     <li>GET path='/books/all'</li>
    <li>GET path='/books/:id' (where 'id' could be a book ID.)</li>

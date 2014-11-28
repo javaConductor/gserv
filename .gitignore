@@ -1,0 +1,7 @@
+/.nb-gradle/private/
+build/
+gServ.log
+.idea/
+.gradle/
+.nb-gradle/
+gserv.iml

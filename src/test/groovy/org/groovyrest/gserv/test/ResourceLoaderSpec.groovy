@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.GServ
-import org.groovyrest.gserv.resourceloader.ResourceLoader
+import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import spock.lang.Specification
 
 public class ResourceLoaderSpec extends Specification {
@@ -44,7 +44,7 @@ public class ResourceLoaderSpec extends Specification {
         then:
         resources.size() == 1
         resources[0].basePath == "/hello"
-        resources[0].routes.size() == 2
+        resources[0].actions.size() == 2
 
     }
 

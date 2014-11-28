@@ -8,11 +8,11 @@ A path, HTTP method and the associated HTTPMethodHandler.
 Routes are defined by the: get(), put(), post(), and delete() functions available in any serverConfig or resource definition.
 
 ### Server Resource
-A collection of routes for a single URL prefix.
+A collection of Resource Actions for a single URL prefix.
 Server Resources are created by calling resource() on a GServ instance and passing the Path and a Resource Closure as arguments.
 
 ###  ServerConfig
-Defines filters, resources, routes, plugins, and static roots for a ServerInstance.
+Defines filters, resources, actions, plugins, and static roots for a ServerInstance.
 
 
 ###  Server Instance
@@ -24,7 +24,7 @@ This closure handles the requests for the corresponding resource
 
 ### Resource Config
 A closure defining a Server Resource.  It consists of a root path and one or more Routes derived from that path.
-Resource config closures have builtin functions for defining routes.
+Resource config closures have builtin functions for defining actions.
 
 ### FilterProxy
 

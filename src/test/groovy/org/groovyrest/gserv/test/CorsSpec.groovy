@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-package org.groovyrest.gserv.test
+package io.github.javaconductor.gserv.test
 
-import org.groovyrest.gserv.plugins.cors.CORSConfig
-import org.groovyrest.gserv.plugins.cors.CORSMode
+import io.github.javaconductor.gserv.plugins.cors.CORSConfig
+import io.github.javaconductor.gserv.plugins.cors.CORSMode
 import org.junit.Before
 import org.junit.Test
 import spock.lang.Specification

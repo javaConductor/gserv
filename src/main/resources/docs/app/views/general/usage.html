@@ -105,7 +105,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'log4j:log4j:1.2.17'
     compile('org.codehaus.groovy:groovy-all:2.3.0')
-    compile("org.groovyrest:g-serv:0.0.1")
+    compile("io.github.javaconductor:g-serv:0.0.1")
 
     /// needed for Grab/Grape
     groovy group: 'org.apache.ivy', name: 'ivy', version: '2.2.0'
@@ -128,7 +128,7 @@ resource together. So, a more realistic example would be:
 </p>
 
 <pre>
-import org.groovyrest.gserv.GServ
+import io.github.javaconductor.gserv.GServ
 class WelcomeService {
 
     public static void main(String[] args) {
