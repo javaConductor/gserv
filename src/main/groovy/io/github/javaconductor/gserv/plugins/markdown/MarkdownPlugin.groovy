@@ -77,11 +77,6 @@ class MarkdownPlugin extends AbstractPlugin {
         return super.decorateDelegate(delegateType, delegateMetaClass)
     }
 
-//    def writeMarkdown = { strData ->
-//        def bytes = pegDownProcessor.markdownToHtml(strData).bytes
-//        write( bytes )
-//    }
-
     def writeMarkdown = { inStream ->
         def writer = new StringWriter();
         IOUtils.copy(inStream, writer)

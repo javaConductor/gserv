@@ -41,7 +41,7 @@ import io.github.javaconductor.gserv.delegates.*
 /**
  * gServ main class
  */
-@Log
+@Log4j
 class GServ {
     def factory = new GServFactory();
     static def exchangeAttributes = [
@@ -314,7 +314,7 @@ class gServPlugins {
     def applyPlugins(GServConfig serverConfig) {
         def delegates = prepareAllDelegates(DefaultDelegates.delegates)
         serverConfig.delegateManager(new DelegatesMgr(delegates))
-        /// for each plugin we add to the patterns, filters, and staticRoots
+        /// for each plugin we add to the actions, filters, and staticRoots
         //TODO plugins MAY also contribute to the Type formatter (to)
         plugins.each {
             serverConfig.addActions(it.actions())

@@ -1,10 +1,13 @@
+apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
 
 defaultTasks 'clean', 'assemble'
 sourceCompatibility = 1.7
-version = '1.0'
+version = '0.9.0'
 mainClassName="io.github.javaconductor.gserv.installer.Installer"
+
+//copyInstallerToParent.mustRunAfter assemble
 
 jar {
     from {
