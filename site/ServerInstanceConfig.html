@@ -1,14 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>gServ - Server Instance Definition</title>
 </head>
 <body>
 
-The Server Instance Definition closure defines the actions, resources, filters, and plugins.
+<h2>Server Instance Definition</h2>
+Represents a set of actions, resources, filters, and plugins.  Server Instances are created by the GServ static methods:
+http() or https()
 
-<table>
-    <tr></tr>
+<table border="1">
+    <tr><th colspan="2" > Functions available in ALL Server Instance Definition closures</th></tr>
+    <tr><th > Function </th> <th>Arguments</th></tr>
+
+    <tr><th>resource(resourceObject)<br/> Adds a resource definition to this server instance. </th>
+        <td><ul>
+            <li>resourceObject <br/>GServResource: The resource to add. </li>
+        </ul></td>
+    </tr>
+
+    <tr><th>useResourceDocs(boolean useRes)<br/> Adds a resource definition to this server instance. </th>
+        <td><ul>
+            <li>useRes <br/>Optional: If true the <i>classpath:/docs</i> will used to resolve requests for static content. If no args passed, this function returns the current setting. </li>
+        </ul></td>
+    </tr>
+
+    <tr><th> after(name, url, method, options, order = 5, clozure)<br/> Creates a After filter.   See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a> </th>
+        <td><ul>
+            <li>name <br/>Optional: Name of the filter </li>
+            <li>url <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
+            <li>method <br/>HTTP method: GET, PUT, POST, DELETE.</li>
+            <li>options <br/></li>
+            <li>order<br/> Filter Order. Filters with lowest order value will run first. Valid values are 1 - 10. </li>
+            <li>closure <br/>clozure(exchange, byte[] data) </li>
+        </ul></td>
+    </tr>
+
+    <tr><th> before(name, url, method, options, order = 5, clozure)<br/> Creates a <i>Before</i> filter. See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a> </th>
+        <td><ul>
+            <li>name <br/>Optional: Name of the filter </li>
+            <li>url <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
+            <li>method <br/>HTTP method: GET, PUT, POST, DELETE.</li>
+            <li>options <br/></li>
+            <li>order<br/> Filter Order. Filters with lowest order value will run first. Valid values are 1 - 10. </li>
+            <li>closure <br/>Path.  Only when this path is matched will the filter bee considered for execution.</li>
+        </ul></td>
+    </tr>
+
 </table>
 </body>
 </html>

@@ -1,17 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Action Definitions</title>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>gServ - Action Definitions</title>
 </head>
 <body>
+<h3>
+The Action Definition defines the handlers for HTTP requests for resources.
+The available actions are named  after the HTTP method it supports: get(), put(), post(), and delete(). These functions are detailed below.
+</h3>
+<center>
+<table border="1">
+    <tr><th>Function</th><th>Arguments</th></tr>
+    <tr><td>get(name, path, actionHandlerClosure)<br/>Creates a GET action for resource</td>
+        <td><ul>
+            <li>name<br/>Optional name of the action. (for use with linkBuilder)  </li>
+            <li>path<br/><strong>**</strong> URI of the resource.</li>
+            <li>actionHandlerClosure<br/>The closure responsible for handling requests.  Closure will be passed all the variables parsed from the URL in order. </li>
+        </ul></td>
+    </tr>
+    <tr><td>put(path, actionHandlerClosure)<br/>Creates a PUT action for resource</td>
+        <td><ul>
+            <li>path<br/><strong>**</strong> URI of the resource.</li>
+            <li>actionHandlerClosure<br/>The closure responsible for handling requests.  Closure will be passed the inputStream to the content and all the variables parsed from the URL in order. </li>
+        </ul></td>
+    </tr>
+    <tr><td>post(path, actionHandlerClosure)<br/>Creates a POST action for resource </td>
+        <td><ul>
+            <li>path<br/><strong>**</strong> URI of the resource.  </li>
+            <li>actionHandlerClosure<br/>The closure responsible for handling requests.  Closure will be passed the inputStream to the content and all the variables parsed from the URL in order.  </li>
+        </ul>
+        </td>
+    </tr>
+    <tr><td>delete(path, actionHandlerClosure)<br/>Creates a DELETE action for resource </td>
+        <td><ul>
+            <li>path<br/><strong>**</strong> URI of the resource to delete</li>
+            <li>actionHandlerClosure<br/>The closure responsible for handling requests.  Closure will be passed all the variables parsed from the URL in order.  </li>
+        </ul></td>
+    </tr>
 
-The Action Definition closure defines the behavior of the action. The available actions are:
-get, put, post, and delete.
-
-<table>
-    <tr colspan="2"> Functions Available in ALL ActionDefinition closures.</tr>
-    <tr><th>Function</th><th>description</th></tr>
-    <tr><td>writeJSON(data)</td><td>data: Either a Map or List to be converted to JSON text before sending to the client. <span>This function sends JSON text to the client.</span></td></tr>
 </table>
+</center>
+<span>** This path can include placeholders for values to be passed to the actionHandlerClosure.
+    Examples are in the <a href="https://github.com/javaConductor/gserv/wiki/gServ-Request-URL-Action-Matching">Wiki</a>
+</span>
+
+<center>
+<table border="1">
+    <tr><th colspan="2" > Functions available in ALL Action Definition closures</th></tr>
+    <tr><th>Function</th><th>Arguments</th></tr>
+    <tr><td>writeJSON(data)<br/>This function sends JSON text to the client. This call closes the connection.</td>
+        <td><ul>
+            <li>data:<br/> Either a Map or List to be converted to JSON text before sending to the client.</li>
+        </ul> </td>
+    </tr>
+    <tr><td>write(contentType, data)<br/>This function sends data using the supplied Content-Type header. This call closes the connection.</td>
+        <td><ul>
+            <li>contentType<br/></li>
+            <li>content<br/>String or byte[] </li>
+        </ul> </td>
+    </tr>
+    <tr><td>error(statusCode, errorMessage)<br/>This function is used to send errors back to client. This call closes the connection.</td>
+        <td><ul>
+            <li>statusCode<br/> HTTP StatusCode</li>
+            <li>errorMessage<br/>Description of the error </li>
+        </ul> </td>
+    </tr>
+    <tr><td>contentType( type )<br/>This function sets the contentType of the response header.</td>
+        <td><ul>
+            <li>type<br/>String:  HTTP Content type (RFC 822)</li>
+        </ul> </td>
+    </tr>
+    <tr><td>redirect( url )<br/>sends a HTTP Redirect to the client. This call closes the connection.</td>
+        <td><ul>
+            <li>url<br/>String:  Redirect destination.</li>
+        </ul> </td>
+    </tr>
+    <tr><td>getFile( name )<br/>Returns an inputStream to the file <i>name</i> .</td>
+        <td><ul>
+            <li>name<br/> The name of the file. If static roots are defined, they will be searched first. If useResourceDocs() is set to true, <i>classpath:/docs</i> will be searched. </li>
+        </ul> </td>
+    </tr>
+    <tr><td>link( actionName, data )<br/>Creates a link to a resource.  This is to send links to other resources . (HATEOAS).</td>
+        <td><ul>
+            <li>actionName<br/> The name of the GET action. </li>
+            <li>data<br/>  Map of data with keys matching the variable names in the  path of action <i>actionName</i></li>
+        </ul> </td>
+    </tr>
+    <tr><td>header( headerName, headerValue )<br/>Sets the specified header.</td>
+        <td><ul>
+            <li>headerName<br/> String: The name of the HTTP Header. </li>
+            <li>headerValue<br/> String  vale of the header </li>
+        </ul> </td>
+    </tr>
+</table>
+</center>
+
 </body>
 </html>
