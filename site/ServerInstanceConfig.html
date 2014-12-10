@@ -1,49 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" type="text/css" href="stylesheets/gserv.css" >
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
     <title>gServ - Server Instance Definition</title>
 </head>
 <body>
 
 <h2>Server Instance Definition</h2>
-Represents a set of actions, resources, filters, and plugins.  Server Instances are created by the GServ static methods:
-http() or https()
-
+<span class="header-description">Represents a set of actions, resources, filters, and plugins.  Server Instances are created by the GServ static methods:
+<i>http()</i> or <i>https()</i>.  To start an instance, use the GServInstance method: <i>start(port)</i> passing the port on which to listen.
+</span>
 <table border="1">
-    <tr><th colspan="2" > Functions available in ALL Server Instance Definition closures</th></tr>
+    <tr><td colspan="2" > Functions available in ALL Server Instance Definition closures</td></tr>
     <tr><th > Function </th> <th>Arguments</th></tr>
 
-    <tr><th>resource(resourceObject)<br/> Adds a resource definition to this server instance. </th>
+    <tr><td ><span class="function-name"> resource(resourceObject)</span><br/> <span class="function-description">Adds a resource definition to this server instance. </span></td>
         <td><ul>
-            <li>resourceObject <br/>GServResource: The resource to add. </li>
+            <li>resourceObject <br/>GServResource: the resource to add. </li>
         </ul></td>
     </tr>
 
-    <tr><th>useResourceDocs(boolean useRes)<br/> Adds a resource definition to this server instance. </th>
+    <tr><td><span class="function-name"> static_root(directoryName)</span><br/><span class="function-description">Adds a directory to search when looking for static content.</span></td>
+        <td><ul>
+            <li>directoryName </li>
+        </ul></td>
+    </tr>
+
+    <tr><td><span class="function-name">useResourceDocs(boolean useRes)</span><br/> <span class="function-description">Sets whether or not to look in the classpath (<i>classpath:/docs</i>) for static content. </span></td>
         <td><ul>
             <li>useRes <br/>Optional: If true the <i>classpath:/docs</i> will used to resolve requests for static content. If no args passed, this function returns the current setting. </li>
         </ul></td>
     </tr>
 
-    <tr><th> after(name, url, method, options, order = 5, clozure)<br/> Creates a After filter.   See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a> </th>
+    <tr><td> <span class="function-name">after(name, url, method, options, order, clozure)</span><br/> <span class="function-description">Creates a After filter.   See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a> </span></td>
+        <td><ul>
+            <li>name <br/>Optional: Name of the filter </li>
+            <li>url <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
+            <li>method <br/>HTTP method: GET, PUT, POST, DELETE.</li>
+            <li>options <br/></li>
+            <li>order<br/>Optiona;: Filter Order of Execution. Filters with lowest order value will run first. Valid values are 1 - 10, default is 5. </li>
+            <li>clozure <br/> </li>
+        </ul></th>
+    </tr>
+
+    <tr><td> <span class="function-name">before(name, url, method, options, order, clozure)</span><br/><span class="function-description">Creates a <i>Before</i> filter. See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a></span> </td>
         <td><ul>
             <li>name <br/>Optional: Name of the filter </li>
             <li>url <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
             <li>method <br/>HTTP method: GET, PUT, POST, DELETE.</li>
             <li>options <br/></li>
             <li>order<br/> Filter Order. Filters with lowest order value will run first. Valid values are 1 - 10. </li>
-            <li>closure <br/>clozure(exchange, byte[] data) </li>
+            <li>closure <br/></li>
         </ul></td>
     </tr>
 
-    <tr><th> before(name, url, method, options, order = 5, clozure)<br/> Creates a <i>Before</i> filter. See <a href="https://github.com/javaConductor/gserv/wiki/gServ-Filter-API">Filter docs on WIKI.</a> </th>
+    <tr><td> <span class="function-name">basicAuthentication(method, path, realm, challengeFn)</span><br/> <span class="function-description">Handle HTTP Basic Auth. Get user/pswd from request and pass them to the
+        user-defined challengeFn(). If the function returns true, authentication is successful. Otherwise, HTTP 403 is returned  </span></td>
         <td><ul>
-            <li>name <br/>Optional: Name of the filter </li>
-            <li>url <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
             <li>method <br/>HTTP method: GET, PUT, POST, DELETE.</li>
-            <li>options <br/></li>
-            <li>order<br/> Filter Order. Filters with lowest order value will run first. Valid values are 1 - 10. </li>
-            <li>closure <br/>Path.  Only when this path is matched will the filter bee considered for execution.</li>
+            <li>path <br/>Path.  Only when this path and the method are matched will the filter bee considered for execution.</li>
+            <li>realm <br/>Security Realm</li>
+            <li>challengeFn <br/> User-defined challenge function: challengeFn(u, p): boolean  </li>
+        </ul></td>
+    </tr>
+
+    <tr><td> <span class="function-name">file(mimeType, filename)</span><br/><span class="function-description">Returns closure that, when called,  will write the file to the response. this call closes the connection.</span></td>
+        <td><ul>
+            <li>mimeType <br/>Optional: HTTP Content-Type response header value. If missing, <i>URLConnection.guessContentTypeFromName(filename)</i> will be used to determine Content-Type</li>
+            <li>filename <br/> File to be returned. </li>
         </ul></td>
     </tr>
 
