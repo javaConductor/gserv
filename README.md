@@ -10,7 +10,6 @@
             <br/><h3>Features:</h3>
             <ul class="docs-content">
                 <li>Container Free
-                <li>No other dependencies
                 <li>Serve static files
                 <li>Serve Groovy script as REST resources
                 <li>Plugin API
