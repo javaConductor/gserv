@@ -28,6 +28,7 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpsServer
 import groovy.jmx.builder.JmxBuilder
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterByteArrayOutputStream
@@ -50,7 +51,7 @@ class GServInstance {
     protected def _executor
     protected def _filters
     protected def _templateEngineName;
-    protected def _cfg;
+    protected GServConfig _cfg;
     def mbean
     static def requestId = 1L;
 
@@ -107,7 +108,6 @@ class GServInstance {
         );
 
         ///// Underlying Server Impl -
-//        def server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(_cfg.bindAddress() , actualPort as Integer), 0);
         def server = com.sun.net.httpserver.HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
         def context = server.createContext("/", _handler);
 
@@ -192,7 +192,7 @@ class GServInstance {
         (bindAddress && !bindAddress.toString().contains("0:0:0:0")) ? "bound to ${bindAddress.toString().substring(1)} " : ""
     }
 
-    def config() {
+    GServConfig config() {
         return _cfg;
     }
 

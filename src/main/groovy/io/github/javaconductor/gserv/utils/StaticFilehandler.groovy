@@ -111,20 +111,18 @@ class StaticFileHandler {
 
         if (filePath.startsWith("/")) filePath = filePath.substring(1)
         //// check the default first (may change)
-        //URL u = ClassLoader.getSystemResource("/docs/$filePath")
-        //URL u = Class.getClassLoader().getResource("/docs/$filePath")
         URL u = Class.getResource("/docs/$filePath")
-        u?.content
+        u?.openStream()//content
     }
 
     /**
      * Get file from the FileSystem
      *
      * @param staticRoots directories to search
-     * @param filePath The file to find
+     * @param filePath String - The file to find
      * @return inputStream to File
      */
-    def getFsFile(staticRoots, filePath) {
+    def getFsFile(staticRoots, String filePath) {
 
         if (filePath.startsWith("/")) filePath = filePath.substring(1)
         //// Maybe its in one of the other static roots (if any)

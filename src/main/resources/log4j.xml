@@ -34,8 +34,12 @@
         </layout>
     </appender>
 
+    <logger name="io.github.javaconductor.gserv">
+        <level value="trace"/>
+    </logger>
+
     <root>
-        <priority value="warn"/>
+        <priority value="error"/>
         <appender-ref ref="util"/>
     </root>
 

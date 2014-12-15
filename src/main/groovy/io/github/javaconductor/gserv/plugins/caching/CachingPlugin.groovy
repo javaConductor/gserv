@@ -65,7 +65,12 @@ class CachingPlugin extends AbstractPlugin {
             def weakHandler = etagFn
             /// we must create a beforeFilter to create am ETag value from the request before the output is generated.
 
-            def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 1) {
+          def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter",
+            "GET",
+            path,
+            [(FilterOptions.PassActionParams)  : false,
+             (FilterOptions.MatchedActionsOnly): true],
+            1) {
                 ->
 
                 def calcETag = weakHandler(exchange)
@@ -82,7 +87,7 @@ class CachingPlugin extends AbstractPlugin {
                 }
                 exchange
             }
-            // add it tot the config
+          // add it to the config
             addFilter(f)
         }
     }/// method

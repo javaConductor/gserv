@@ -42,9 +42,16 @@ import sun.misc.BASE64Decoder
  */
 trait ServerConfigFn {
 
-    def addAction(action) {
+  def name(nm) {
+    this.value "name", nm
+  }
+
+  def name() {
+    this.value("name")
+  }
+
+  def addAction(action) {
         this.value("actionList").add(action)
-        //println("addAction($action)")
     }
 
     def addResource(GServResource resource) {
@@ -152,7 +159,7 @@ trait ServerConfigFn {
      * @param url
      * @param method
      * @param options
-     * @param clozure fn(exchange, byte[] data)
+     * @param closure fn(exchange, byte[] data)
      * @return this
      */
     def before(name, url, method, options, order = 5, clozure) {
@@ -170,12 +177,10 @@ trait ServerConfigFn {
         methods.each { method ->
             before("basicAuth($method->$path)", path, method, options, 2) { ->
                 log.trace("basicAuth before()");
-//                exchange.requestHeaders.keySet().each {
-//                    println "h: $it -> ${exchange.requestHeaders[it]}";
-//                }
+
                 def userPswd = getBasicAuthUserPswd(exchange);
                 log.trace("basicAuth before(): userPswd:$userPswd");
-                if (!userPswd) {
+              if (!userPswd || userPswd.length < 2) {
                     exchange.responseHeaders.add("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
                 } else {
@@ -207,7 +212,8 @@ trait ServerConfigFn {
     private boolean _authenticated(user, pswd, challengeFn) {
         return (challengeFn(user, pswd));
     }
-    /**
+
+  /**
      * Creates a closure that returns file 'filename'
      *
      * @param filename

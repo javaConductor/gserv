@@ -84,6 +84,7 @@ class ResourceLoader {
         // Add imports for script.
         def importCustomizer = new ImportCustomizer()
         importCustomizer.addStaticStars 'io.github.javaconductor.gserv.GServ'
+        importCustomizer.addImports 'io.github.javaconductor.gserv.GServ'
 
         def configuration = new CompilerConfiguration()
         configuration.classpathList = classpath

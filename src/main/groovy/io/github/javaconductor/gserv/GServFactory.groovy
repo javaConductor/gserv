@@ -88,7 +88,7 @@ class GServFactory {
      * @param resourceScripts
      * @return list of configs (containing one config)
      */
-    def createConfigs(staticRoot, bindAddress, port, defaultResource, instanceScript, resourceScripts, classpath) {
+    def createConfigs(staticRoot, bindAddress, port, defaultResource, instanceScript, resourceScripts, classpath, displayName = "gServ Application") {
         GServConfig cfg
         ResourceLoader resourceLoader = new ResourceLoader()
         ScriptLoader scriptLoader = new ScriptLoader()
@@ -120,6 +120,10 @@ class GServFactory {
             def addr = InetAddress.getByName(bindAddress);
             def socketAddr = new InetSocketAddress(addr, port);
             cfg.bindAddress(socketAddr);
+        }
+
+        if (displayName) {
+            cfg.name(displayName)
         }
 
         [cfg

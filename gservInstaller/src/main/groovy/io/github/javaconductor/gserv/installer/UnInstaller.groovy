@@ -2,8 +2,6 @@ package io.github.javaconductor.gserv.installer
 
 import org.apache.commons.io.FileUtils
 
-import java.nio.file.Files
-
 /**
  * Created by lcollins on 10/31/2014.
  */

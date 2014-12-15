@@ -59,6 +59,7 @@ class GServRunner {
         cli.a(longOpt: 'bindAddress', 'If specified, the App will only respond to requests for the specified IP address. By default, responds to requests for all IP addresses on the machine.', args: 1, required: false)
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
+        cli.n(longOpt: 'appName', 'The name of the Application', args: 1, required: false)
     }
 
     /**
@@ -100,6 +101,7 @@ class GServRunner {
                 defaultResource = options.d;
                 resourceScripts = options.rs;
                 instanceScript = options.i;
+                def appName = options.n;
                 classpath = options.js;
                 configs = factory.createConfigs(
                         staticRoot,
@@ -108,7 +110,7 @@ class GServRunner {
                         defaultResource,
                         instanceScript,
                         resourceScripts,
-                        classpath);
+                        classpath, appName);
             } else {   // use ONLY the config file and ignore everything else on the cmdLine
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {

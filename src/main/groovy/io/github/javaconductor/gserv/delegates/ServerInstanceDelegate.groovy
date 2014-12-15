@@ -57,6 +57,7 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
     def linkBuilder = { value("linkBuilder") }
 
     def ServerInstanceDelegate() {
+      value("name", "gServ Application")
         value("actionList", [])
         value("filterList", [])
         value("staticRoots", [])

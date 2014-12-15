@@ -43,7 +43,6 @@ class CliClasspathSpec {
         }
     }
 
-
     @Test
     public final void testCliClasspathResourceScriptFailure() {
         def port = "11002"
@@ -53,11 +52,13 @@ class CliClasspathSpec {
                     "-r", dir + "/MathResource.groovy"
 //                    "-j", dir+"/CliMathService-1.0.jar"
         ]
-
+        def stopFn
         try {
-            new GServRunner().start(args);
+            stopFn = new GServRunner().start(args);
+            stopFn();
             ///Assert.fail("Should NOT have gotten this far!!!")
         } catch (Exception ex) {
+            stopFn()
             assert ex.class.name.endsWith("ResourceScriptException")
         }
     }
@@ -69,13 +70,13 @@ class CliClasspathSpec {
         def dir = baseDir + "cliClasspath"
         def args = ["-p", port,
                     "-r", dir + "/MathInstance.groovy"
-//                    "-j", dir+"/CliMathService-1.0.jar"
         ]
-
+        def stopFn
         try {
             new GServRunner().start(args);
         } catch (Exception ex) {
             assert ex.class.name.endsWith("InstanceScriptException")
+            //stopFn()
         }
     }
 }

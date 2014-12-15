@@ -98,21 +98,21 @@ class CORSConfig {
     def hasAccess(host, method) {
         switch (mode) {
             case (CORSMode.AllowAll):
-                log.trace("CORSConfig(AllowAll): allows: $host")
+                log.trace("CORSConfig(AllowAll): allows access to: $host")
                 return true
 
             case (CORSMode.BlackList):
                 log.trace("CORSConfig(BlackList): Looking for $host in $list")
                 def hcfg = findHostConfig(host)
                 def allow = (!hcfg) || !hcfg.hasMethod(method)
-                log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} $host")
+                log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} access to $host")
                 return allow
 
             case (CORSMode.WhiteList):
                 log.trace("CORSConfig(WhiteList): Looking for $host in $list")
                 def hcfg = findHostConfig(host)
                 def allow = hcfg?.hasMethod(method)
-                log.trace("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} $host")
+                log.trace("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} access to $host")
                 return allow;
         }// switch
     }// hasAccess

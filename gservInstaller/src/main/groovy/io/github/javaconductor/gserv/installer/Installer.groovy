@@ -2,7 +2,7 @@ package io.github.javaconductor.gserv.installer
 
 import org.apache.commons.io.IOUtils
 
-import java.nio.file.*
+import java.nio.file.Files
 
 class Installer {
     static def VERSION_FILENAME = "version.txt";

@@ -76,7 +76,7 @@ class GServConfigFile {
         def configs = cfg.apps.collect { app ->
 
             try {
-                newCfg = appToConfig(app)
+                newCfg = appToConfig(app, cfg.classpath)
                 if (app.https) {
 
                     newCfg.httpsConfig(cfg.httpsConfig())
@@ -96,7 +96,7 @@ class GServConfigFile {
     ClassLoader addClasspath(ClassLoader classLoader, List classpath) {
         def urls = classpath.collect { jar ->
             new File(jar).toURI().toURL()
-        }
+        }.toArray(new URL[classpath.size()])
         URLClassLoader.newInstance(urls, classLoader)
     }
 
@@ -116,9 +116,19 @@ class GServConfigFile {
         config;
     };////
 
-    def appToConfig(app) {
+    def appToConfig(app, classpath = []) {
+
         def config = factory.createGServConfig()
         app.with {
+            // declare plugins first so they are available for instance and resources
+            registerPlugins(plugins)
+            if (instanceScript) {
+                File f = new File(instanceScript)
+                if (!f.exists()) {
+                    throw new ConfigException("Instance script: $instanceScript not found.")
+                }
+                config = resourceLoader.loadInstance(f, classpath)
+            }
 
             try {
                 config = addResources(resourceScripts, config);
@@ -127,7 +137,9 @@ class GServConfigFile {
                 throw ex
             }
 
-            registerPlugins(plugins)
+            if (defaultResource) {
+                config.defaultResource defaultResource
+            }
             if (port) {
                 config.port(port)
             }
