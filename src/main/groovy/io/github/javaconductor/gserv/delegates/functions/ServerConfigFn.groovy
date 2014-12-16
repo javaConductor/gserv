@@ -129,7 +129,7 @@ trait ServerConfigFn {
      * @param clozure Filter behavior
      *
      */
-    def filter(name, url, method, options, clozure, order = 5) {
+  def filter(name, url, method, options, clozure, order) {
         method = method ?: '*'
         //println("serverInitClosure: filter($name) $method, url=$url")
         addFilter(ResourceActionFactory.createFilter(name, method, url, options, clozure))
@@ -145,7 +145,7 @@ trait ServerConfigFn {
      * @return
      *
      */
-    def after(name, url, method, options, order = 5, clozure) {
+  def after(name, url, method, options, order, clozure) {
         method = method ?: '*'
         //println("serverInitClosure: after($name) $method, url=$url, list=${this._filterList}")
         def theFilter = ResourceActionFactory.createAfterFilter(name, method, url, options, order, clozure)
@@ -162,7 +162,7 @@ trait ServerConfigFn {
      * @param closure fn(exchange, byte[] data)
      * @return this
      */
-    def before(name, url, method, options, order = 5, clozure) {
+  def before(name, url, method, options, order, clozure) {
         method = method ?: '*'
         def theFilter = ResourceActionFactory.createBeforeFilter(name, method, url, options, order, clozure)
         addFilter(theFilter)

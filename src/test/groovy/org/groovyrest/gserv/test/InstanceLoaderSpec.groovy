@@ -42,7 +42,7 @@ public class InstanceLoaderSpec extends Specification {
         GServConfig cfg = resourceLoader.loadInstance(new File(uri), [])
 
         then:
-        cfg.name() == "gserv App"
+        cfg.name() == "AppName"
         cfg.actions().size() == 1
     }
 }

@@ -47,12 +47,12 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
 //    def values() { _properties }
     def templateEngine = "default"
     def eventManager = EventManager.instance()
-    def patterns = {
+  def actions = { ->
 
         value("actionList")
 
     }
-    def filters = { value("filterList") }
+  def filters = { -> value("filterList") }
     def staticRoots = { value("staticRoots") }
     def linkBuilder = { value("linkBuilder") }
 

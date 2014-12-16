@@ -144,19 +144,19 @@ class GServ {
      * @return GServInstance
      */
     def http(Map options, Closure instanceDefinition, https = false) {
-        def _patterns = []
-        def _filters = []
-        def _staticRoots = []
-        def _authenticator
-
+        def patterns = []
+        def tmpFilters = []
+        def tmpStaticRoots = []
+        def tmpAuthenticator
+        def tmpName
         /// create the initial config
-        GServConfig cfg = factory.createGServConfig(_patterns)
+        GServConfig cfg = factory.createGServConfig(patterns)
                 .linkBuilder(new LinkBuilder(""))
                 .delegateManager(new DelegatesMgr())
-                .authenticator(_authenticator)
-                .addStaticRoots(_staticRoots)
-                .actions(_patterns)
-                .addFilters(_filters);
+                .authenticator(tmpAuthenticator)
+                .addStaticRoots(tmpStaticRoots)
+                .actions(patterns)
+                .addFilters(tmpFilters);
         /// each plugin is applied to the configuration
         cfg = serverPlugins.applyPlugins(cfg);
         if (options.https) {
@@ -175,10 +175,11 @@ class GServ {
         def lBuilder
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
-            _patterns = patterns()
+            tmpName = name()
+            patterns = actions()
             _useResourceDocs = useResourceDocs()
-            _filters = filters()
-            _staticRoots = staticRoots()
+            tmpFilters = filters()
+            tmpStaticRoots = staticRoots()
             templateEngineName = templateEngine ?: "default"
             lBuilder = linkBuilder()
         }
@@ -186,12 +187,12 @@ class GServ {
         cfg.with {
             /// add this info to the config
             addServerIP(options.serverIP)
-                    .addFilters(_filters)
-                    .addStaticRoots(_staticRoots)
-                    .addActions(_patterns)
+                    .addFilters(tmpFilters)
+                    .addStaticRoots(tmpStaticRoots)
+                    .addActions(patterns)
                     .useResourceDocs(_useResourceDocs)
                     .templateEngineName(templateEngineName)
-
+            name(tmpName)
             linkBuilder(lBuilder)
 
         }

@@ -24,7 +24,7 @@
               "name" : "singlePageMath2",
               "resourceScripts" : ["resources/Resource2.groovy"],
               "port" : 11112,
-              "bindAddress": 127.0.0.1,
+      "bindAddress": "127.0.0.1",
               "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
           }],
 

@@ -147,22 +147,23 @@ class Utils {
         }
     }
 
-    static def createKnownType(elementType) {
 
-        def numberType = [
-                name    : "Number",
-                validate: { s ->
-                    isNumber(s)
-                },
-                toType  : { s -> Double.parseDouble(s) }
-        ]
-        def integerType = [
-                name    : "Integer",
-                validate: { s ->
-                    isInteger(s)
-                },
-                toType  : { s -> Integer.parseInt(s) }
-        ]
+    static def numberType = [
+            name    : "Number",
+            validate: { s ->
+                isNumber(s)
+            },
+            toType  : { s -> Double.parseDouble(s) }
+    ]
+    static def integerType = [
+            name    : "Integer",
+            validate: { s ->
+                isInteger(s)
+            },
+            toType  : { s -> Integer.parseInt(s) }
+    ]
+
+    static def createKnownType(elementType) {
 
         switch (elementType) {
             case "Number":
@@ -173,6 +174,10 @@ class Utils {
                 return null
         }
 
+    }
+
+    static def valueAsType(elementType, value) {
+        return createType(elementType)?.toType(value) ?: value
     }
 
     static def createRegExType(regEx) {
@@ -424,3 +429,6 @@ class ActionPathElement {
         return text()
     }
 }
+
+
+

@@ -24,14 +24,13 @@
 
 package io.github.javaconductor.gserv
 
-import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.Utils
 import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import groovyx.gpars.actor.DynamicDispatchActor
+import io.github.javaconductor.gserv.utils.TypeUtils
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +39,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
  * Time: 10:13 PM
  */
 @Log4j
-class AsyncHandler extends DynamicDispatchActor {
+class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
     EventManager _evtMgr = EventManager.instance()
     private def _staticRoots
     private def _templateEngineName
@@ -102,6 +101,9 @@ class AsyncHandler extends DynamicDispatchActor {
             def p = pattern.path(i)
             def pathElement = pathElements[i];
             if (p.isVariable()) {
+                /// if variable has type, use type to convert string value
+                if (p.type() != null)
+                    pathElement = p.type().toType(pathElement)
                 args.add(pathElement)
             }
         }
