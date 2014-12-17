@@ -30,6 +30,7 @@ import io.github.javaconductor.gserv.events.Events
 import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import groovyx.gpars.actor.DynamicDispatchActor
+import io.github.javaconductor.gserv.requesthandler.ActionRunner
 import io.github.javaconductor.gserv.utils.TypeUtils
 
 /**
@@ -45,12 +46,14 @@ class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
     private def _templateEngineName
     private def _cfg
     private def _seq
+    ActionRunner r
 
     static long Seq = 0;
 
     def AsyncHandler(cfg) {
         this(cfg.staticRoots(), cfg.templateEngineName())
         _cfg = cfg
+        r = new ActionRunner(_cfg)
     }
 
     def AsyncHandler(staticRoots, templateEngineName) {
@@ -70,7 +73,7 @@ class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
             pattern = request.pattern
 //            println "$this recieved req #${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
             log.trace "$this received req #${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
-            process(exchange, pattern)
+            r.process(exchange, pattern)
         } catch (Throwable e) {
             _evtMgr.publish(Events.ResourceProcessingError,
                     [requestId: request.exchange.getAttribute(GServ.exchangeAttributes.requestId),
@@ -79,81 +82,6 @@ class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
             //          e.printStackTrace(System.err)
             log.error("AsyncHandler($_seq) req #${request.exchange.getAttribute(GServ.exchangeAttributes.requestId)}: Error processing request: ${e.message} ", e)
         }
-    }
-
-    def prepareDelegate(httpExchange, action) {
-//        _cfg.delegateMgr.createHttpMethodDelegate(httpExchange, _staticRoots, _templateEngineName)
-        _cfg.delegateMgr.createHttpMethodDelegate(httpExchange, action, _cfg)
-    }
-
-    def prepareArguments(uri, istream, pattern) {
-        def args = []
-        def method = pattern.method()
-        if (method == "PUT" || method == "POST") {
-            // add the data before the other args
-            // data is a byte[]
-            args.add(istream)
-        }
-
-        def pathElements = uri.path.split("/").findAll { !(!it) }
-        //// loop thru the Patterns getting the corresponding uri path elements
-        for (int i = 0; i != pattern.pathSize(); ++i) {
-            def p = pattern.path(i)
-            def pathElement = pathElements[i];
-            if (p.isVariable()) {
-                /// if variable has type, use type to convert string value
-                if (p.type() != null)
-                    pathElement = p.type().toType(pathElement)
-                args.add(pathElement)
-            }
-        }
-
-        def qmap = Utils.queryStringToMap(uri.query)
-        pattern.queryPattern().queryKeys().each { k ->
-            args.add(qmap[k])
-        }
-        //println "AsyncHandler.prepareArguments(): $args"
-        // log.debug "AsyncHandler.prepareArguments(): $args"
-        args
-    }
-
-    def prepareClosure(exchange, pattern) {
-        def cl = pattern.requestHandler()//_handler
-        HttpMethodDelegate dgt = prepareDelegate(exchange, pattern)
-        cl.delegate = dgt
-        cl.resolveStrategy = Closure.DELEGATE_FIRST
-        cl
-    }
-
-    def process(HttpExchange exchange, pattern) {
-        Closure cl = prepareClosure(exchange, pattern)
-        def args = prepareArguments(exchange.requestURI, exchange.requestBody, pattern)
-//        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
-        ({ clozure, argList ->
-            try {
-                EventManager.instance().publish(Events.ResourceProcessing, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path,
-                        msg      : "Resource Processing."])
-                //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
-                log.trace "Running AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
-                clozure(*argList)
-                log.trace "AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} - Finished."
-            } catch (Throwable e) {
-                EventManager.instance().publish(Events.ResourceProcessingError, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path, msg: e.message, e: e])
-                cl.delegate.error(500, e.message)
-                log.error "Error Running AsyncHandler(${this._seq}) for req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} : ${e.message}", e
-                exchange
-            }
-            finally {
-                EventManager.instance().publish(Events.ResourceProcessed, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path, msg: 'Resource processing done.'])
-            }
-        })(cl, args);
-
     }
 
     /**
