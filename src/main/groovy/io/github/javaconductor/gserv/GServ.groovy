@@ -144,18 +144,18 @@ class GServ {
      * @return GServInstance
      */
     def http(Map options, Closure instanceDefinition, https = false) {
-        def patterns = []
+        def tmpActions = []
         def tmpFilters = []
         def tmpStaticRoots = []
         def tmpAuthenticator
         def tmpName
         /// create the initial config
-        GServConfig cfg = factory.createGServConfig(patterns)
+        GServConfig cfg = factory.createGServConfig(tmpActions)
                 .linkBuilder(new LinkBuilder(""))
                 .delegateManager(new DelegatesMgr())
                 .authenticator(tmpAuthenticator)
                 .addStaticRoots(tmpStaticRoots)
-                .actions(patterns)
+                .actions(tmpActions)
                 .addFilters(tmpFilters);
         /// each plugin is applied to the configuration
         cfg = serverPlugins.applyPlugins(cfg);
@@ -170,13 +170,13 @@ class GServ {
         instanceDefinition.resolveStrategy = Closure.DELEGATE_FIRST
         // run the config closure
         instanceDefinition()
-        def _useResourceDocs
+        boolean _useResourceDocs
         def templateEngineName
         def lBuilder
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
             tmpName = name()
-            patterns = actions()
+            tmpActions = actions()
             _useResourceDocs = useResourceDocs()
             tmpFilters = filters()
             tmpStaticRoots = staticRoots()
@@ -184,18 +184,16 @@ class GServ {
             lBuilder = linkBuilder()
         }
 
-        cfg.with {
-            /// add this info to the config
-            addServerIP(options.serverIP)
-                    .addFilters(tmpFilters)
-                    .addStaticRoots(tmpStaticRoots)
-                    .addActions(patterns)
-                    .useResourceDocs(_useResourceDocs)
-                    .templateEngineName(templateEngineName)
-            name(tmpName)
-            linkBuilder(lBuilder)
-
-        }
+        /// add this info to the config
+        cfg.addServerIP(options.serverIP)
+        cfg.addFilters(tmpFilters)
+        cfg.addStaticRoots(tmpStaticRoots)
+        cfg.addActions(tmpActions)
+        cfg.useResourceDocs(_useResourceDocs)
+        cfg.templateEngineName(templateEngineName)
+        cfg.name(tmpName)
+        cfg.linkBuilder(lBuilder)
+        //}
         factory.createHttpInstance(cfg)
     }
 
@@ -220,7 +218,7 @@ class gServHandler implements HttpHandler {
     private def _staticRoots
     private def _templateEngineName
     private def _dispatcher, _handler
-    private def _cfg
+    private GServConfig _cfg
     private def _nuHandler, _nuDispatcher
     Calendar cal = new GregorianCalendar();
     Long reqId = 1;
@@ -246,7 +244,7 @@ class gServHandler implements HttpHandler {
         _nuDispatcher = {
             _factory.createDispatcher(actors, _actions, cfg.staticRoots(),
                     _templateEngineName,
-                    _cfg.bUseResourceDocs);
+                    _cfg.useResourceDocs());
         }
         _dispatcher = _nuDispatcher();
         _dispatcher.start()

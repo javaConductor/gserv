@@ -20,11 +20,11 @@ class ActionRunner {
         _cfg = cfg
     }
 
-    def prepareDelegate(HttpExchange httpExchange, action) {
+    private def prepareDelegate(HttpExchange httpExchange, action) {
         _cfg.delegateMgr.createHttpMethodDelegate(httpExchange, action, _cfg)
     }
 
-    def prepareArguments(uri, istream, action) {
+    private def prepareArguments(uri, istream, action) {
         def args = []
         def method = action.method()
         if (method == "PUT" || method == "POST") {
@@ -55,7 +55,7 @@ class ActionRunner {
         args
     }
 
-    def prepareClosure(exchange, action) {
+    private def prepareClosure(exchange, action) {
         def cl = action.requestHandler()//_handler
         HttpMethodDelegate dgt = prepareDelegate(exchange, action)
         cl.delegate = dgt

@@ -56,7 +56,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     private def _actorPool
     private GServConfig _config
 
-    def AsyncDispatcher(actorPool, actions, staticRoots, templateEngineName, useResourceDocs) {
+    def AsyncDispatcher(ActorPool actorPool, List actions, List staticRoots, String templateEngineName, boolean useResourceDocs) {
         this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 10)))
         _actions = actions
         _staticRoots = staticRoots
@@ -87,7 +87,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
         _config.useResourceDocs(bUseResourceDocs)
     }
 
-    def useResourceDocs() { _useResourceDocs }
+    boolean useResourceDocs() { _useResourceDocs }
 
     ////// Actor Pool /////////
     /**
@@ -96,18 +96,19 @@ class AsyncDispatcher extends DynamicDispatchActor {
      * @param pool
      * @return
      */
-    def actorPool(pool) {
+    void actorPool(pool) {
         _actorPool = pool
         this.setParallelGroup(new DefaultPGroup(_actorPool))
     }
 
-    def actorPool() {
+    ActorPool actorPool() {
         _actorPool
     }
 
     ////// TemplateEngineName /////////
-    def templateEngineName(templateName) {
+    AsyncDispatcher templateEngineName(templateName) {
         _templateEngineName = templateName
+        this
     }
 
     def templateEngineName() {
@@ -121,11 +122,12 @@ class AsyncDispatcher extends DynamicDispatchActor {
      * @param actions
      * @return
      */
-    def actions(actions) {
+    AsyncDispatcher actions(actions) {
         _actions = actions
+        this
     }
 
-    def actions() { _actions }
+    List actions() { _actions }
 
     ////// Static Roots /////////
 
@@ -134,12 +136,13 @@ class AsyncDispatcher extends DynamicDispatchActor {
  * @param staticRoots
  * @return
  */
-    def staticRoots(staticRoots) {
+    AsyncDispatcher staticRoots(List<String> staticRoots) {
         _staticRoots.addAll(staticRoots);
         _staticRoots = _staticRoots.unique();
+        this
     }
 
-    def staticRoots() {
+    List<String> staticRoots() {
         _staticRoots
     }
 

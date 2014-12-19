@@ -50,4 +50,8 @@ class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn 
         this.serverConfig = serverConfig
     }
 
+    def actions() {
+        value("actions")
+    }
+
 }

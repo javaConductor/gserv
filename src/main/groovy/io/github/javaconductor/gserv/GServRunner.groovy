@@ -104,13 +104,13 @@ class GServRunner {
                 def appName = options.n;
                 classpath = options.js;
                 configs = factory.createConfigs(
-                        staticRoot,
-                        bindAddress,
+                        staticRoot ?: "",
+                        bindAddress ?: "",
                         port,
-                        defaultResource,
-                        instanceScript,
-                        resourceScripts,
-                        classpath, appName);
+                        defaultResource ?: "",
+                        instanceScript ?: "",
+                        resourceScripts ?: [],
+                        classpath ?: [], appName ?: null);
             } else {   // use ONLY the config file and ignore everything else on the cmdLine
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {

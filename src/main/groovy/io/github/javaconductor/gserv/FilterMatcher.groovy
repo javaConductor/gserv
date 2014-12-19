@@ -29,7 +29,7 @@ package io.github.javaconductor.gserv
 class FilterMatcher extends Matcher {
 
     @Override
-    def matchAction(filterList, URI uri, String method) {
+    ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method) {
         //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
         def ret = filterList.find { p ->
             def rmethod = p.method()
@@ -47,7 +47,7 @@ class FilterMatcher extends Matcher {
      * @return true if uri matches pattern
      */
     @Override
-    def match(ResourceAction filter, uri) {
+    boolean match(ResourceAction filter, URI uri) {
         def parts = uri.path.split("/")
         parts = parts.findAll { p -> p }
         def a = filter.pathSize()

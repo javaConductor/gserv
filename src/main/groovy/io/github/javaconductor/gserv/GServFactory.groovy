@@ -29,6 +29,7 @@ import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
+import io.github.javaconductor.gserv.utils.ActorPool
 
 /**
  *
@@ -37,29 +38,29 @@ import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 @Log4j
 class GServFactory {
 
-    def createGServConfig() {
+    GServConfig createGServConfig() {
         new GServConfig()
     }
 
-    def createGServConfig(actions) {
+    GServConfig createGServConfig(actions) {
         new GServConfig().addActions(actions)
     }
 
-    def createGServConfig(GServConfig orig) {
+    GServConfig createGServConfig(GServConfig orig) {
         orig.clone()
     }
 
-    def createHttpInstance(cfg) {
+    GServInstance createHttpInstance(cfg) {
         log.debug("$cfg is ${(cfg.https()) ? 'HTTPS' : 'HTTP'}")
         cfg.https() ? new gServHttpsInstance(cfg)
                 : new GServInstance(cfg)
     }
 
-    def createDispatcher(actors, actions, staticRoots, templateEngineName, bUseResourceDocs) {
+    AsyncDispatcher createDispatcher(ActorPool actors, List actions, List staticRoots, String templateEngineName, boolean bUseResourceDocs) {
         new AsyncDispatcher(actors, actions, staticRoots, templateEngineName, bUseResourceDocs);
     }
 
-    def createDispatcher() {
+    AsyncDispatcher createDispatcher() {
         new AsyncDispatcher()
     }
 
@@ -68,8 +69,8 @@ class GServFactory {
      *
      * @param cfgFile
      * @return GServConfig instances that were created from the parsing.
-     */
-    def createConfigs(File cfgFile) {
+     \ */
+    List<GServConfig> createConfigs(File cfgFile) {
         try {
             return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
         } catch (Exception ex) {
@@ -79,7 +80,7 @@ class GServFactory {
     }//createConfigs
 
     /**
-     * Created a gserv Config
+     * Creates a gserv Config
      *
      * @param staticRoot
      * @param port
@@ -88,25 +89,43 @@ class GServFactory {
      * @param resourceScripts
      * @return list of configs (containing one config)
      */
-    def createConfigs(staticRoot, bindAddress, port, defaultResource, instanceScript, resourceScripts, classpath, displayName = "gServ Application") {
+    List<GServConfig> createConfigs(String staticRoot, String bindAddress, int port, String defaultResource, String instanceScript, List<String> resourceScripts, List<String> classpath, displayName = "gServ Application") {
         GServConfig cfg
+        def resources = []
         ResourceLoader resourceLoader = new ResourceLoader()
         ScriptLoader scriptLoader = new ScriptLoader()
 
-        if (instanceScript) {
-            cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
+        try {
+            if (instanceScript) {
+                cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
+            }
+            cfg = cfg ?: createGServConfig()
+            if (resourceScripts) {
+                resources = scriptLoader.loadResources(resourceScripts, classpath)
+            }
+        } catch (Throwable ex) {
+            log.error("Could not load resource script: ${ex.message}")
+            println ex.message
+            throw ex
         }
 
+        createConfigs(staticRoot, bindAddress, port, defaultResource, cfg, resources, classpath, displayName)
+
+    }//createConfigs
+    /**
+     * Creates a gserv Config
+     *
+     * @param staticRoot
+     * @param port
+     * @param defaultResource
+     * @param cfg GServConfig
+     * @param resources List<GServResource>
+     * @return list of configs (containing one config)
+     */
+    def createConfigs(String staticRoot, String bindAddress, int port, String defaultResource, GServConfig cfg, List<GServResource> resources, List<String> classpath, displayName = "gServ Application") {
         cfg = cfg ?: createGServConfig()
-        if (resourceScripts) {
-            try {
-                def resources = scriptLoader.loadResources(resourceScripts, classpath)
+        if (resources) {
                 cfg.addResources(resources)
-            } catch (Throwable ex) {
-                log.error("Could not load resource script: ${ex.message}")
-                println ex.message
-                throw ex
-            }
         }
         if (staticRoot) {
             cfg.addStaticRoots([staticRoot])

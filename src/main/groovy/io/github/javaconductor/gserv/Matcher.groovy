@@ -29,17 +29,17 @@ import com.sun.net.httpserver.HttpExchange
 class Matcher {
 
     //returns the pattern that matches the uri
-    def matchAction(actionList, HttpExchange exchange) {
+    ResourceAction matchAction(List<ResourceAction> actionList, HttpExchange exchange) {
         def uri = exchange.getRequestURI()
         def method = exchange.requestMethod
         return matchAction(actionList, uri, method)
     }
 
-    def matchAction(actionList, URI uri, String method) {
+    ResourceAction matchAction(List<ResourceAction> actionList, URI uri, String method) {
         //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
-        def ret = actionList.find { p ->
+        def ret = actionList.find { action ->
             //println "Check route: $p"
-            (p.method() == method && match(p, uri))
+            (action.method() == method && match(action, uri))
         }
         //if (ret) println "Matched action: $ret"
         return ret;
@@ -52,7 +52,7 @@ class Matcher {
      * @param uri
      * @return
      */
-    def match(ResourceAction action, uri) {
+    boolean match(ResourceAction action, URI uri) {
         def parts = uri.path.split("/")
         parts = parts.findAll { p -> p }
         def a = action.pathSize()

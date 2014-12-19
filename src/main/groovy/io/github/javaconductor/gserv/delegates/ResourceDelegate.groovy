@@ -41,6 +41,7 @@ class ResourceDelegate extends DelegateFunctions implements ResourceFn {
     def templateEngine = "default"
     def eventManager = EventManager.instance()
     def patterns = { value("actionList") }
+    def actions = { value("actionList") }
     def linkBuilder = { value("linkBuilder") }
 
     def ResourceDelegate(path) {

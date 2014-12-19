@@ -38,19 +38,11 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
 @Log4j
 @Mixin([StaticFileHandler])
 class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
-    Map _properties = [:]
-//
-//    def value(String key, Object value) { _properties.put(key, value) }
-//
-//    def value(String key) { _properties[key] }
-//
-//    def values() { _properties }
+//    Map _properties = [:]
     def templateEngine = "default"
     def eventManager = EventManager.instance()
-  def actions = { ->
-
+    def actions = { ->
         value("actionList")
-
     }
   def filters = { -> value("filterList") }
     def staticRoots = { value("staticRoots") }

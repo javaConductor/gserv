@@ -24,10 +24,12 @@
 
 package io.github.javaconductor.gserv.configuration
 
+import com.sun.net.httpserver.HttpExchange
 import io.github.javaconductor.gserv.*
 import io.github.javaconductor.gserv.delegates.DefaultDelegates
 import io.github.javaconductor.gserv.delegates.DelegatesMgr
 import io.github.javaconductor.gserv.GServResource
+import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 import groovy.transform.AutoClone
@@ -75,7 +77,7 @@ class GServConfig {
      *
      * @return the BindAddress for Instances using this gServ Config
      */
-    def bindAddress() {
+    InetSocketAddress bindAddress() {
         return _bindAddress;// ?: new Inet4Address('0.0.0.0', null)
     }
 
@@ -84,22 +86,24 @@ class GServConfig {
      * @param addr
      * @return 'this' - Fluent Interface
      */
-    def bindAddress(InetSocketAddress addr) {
+    GServConfig bindAddress(InetSocketAddress addr) {
         /// always use 0.0.0.0 for the default
         _bindAddress = addr;//?: new InetSocketAddress()  ('0.0.0.0', null);
         return this;
     }
 
-    def name() {
+    String name() {
         _name
     }
 
-    def name(nm) {
+    GServConfig name(nm) {
         _name = nm
+        this
     }
 
-    def httpsConfig(HttpsConfig httpsConfig) {
+    GServConfig httpsConfig(HttpsConfig httpsConfig) {
         _https = httpsConfig
+        this
     }
 
     def httpsConfig() {
@@ -110,35 +114,35 @@ class GServConfig {
         !!_https
     }
 
-    def authenticator(authenticator) {
+    GServConfig authenticator(authenticator) {
         this._authenticator = authenticator;
         this
     }
 
     def authenticator() { _authenticator }
 
-    def delegateManager(delegateMgr) {
+    GServConfig delegateManager(delegateMgr) {
         this.delegateMgr = delegateMgr;
         this
     }
 
     def delegateManager() { this.delegateMgr }
 
-    def linkBuilder(linkBuilder) {
+    GServConfig linkBuilder(linkBuilder) {
         this.linkBuilder = linkBuilder;
         this
     }
 
-    def linkBuilder() {
+    LinkBuilder linkBuilder() {
         this.linkBuilder = this.linkBuilder ?: new LinkBuilder();
         this.linkBuilder
     }
 
-    def matchAction(exchange) {
+    ResourceAction matchAction(HttpExchange exchange) {
         matcher.matchAction(_actions, exchange)
     }
 
-    def requestMatched(exchange) {
+    boolean requestMatched(exchange) {
         !!(matchAction(exchange) || _staticFileHandler.resolveStaticResource(
                 exchange.requestURI.path,
                 _staticRoots,
@@ -151,7 +155,7 @@ class GServConfig {
      * @param ten Template Engine Name
      *
      */
-    def templateEngineName(ten) {
+    GServConfig templateEngineName(ten) {
         _templateEngineName = ten;
         this
     }
@@ -163,7 +167,7 @@ class GServConfig {
      * @param b if true, resource docs will be scanned for static content requests
      *
      */
-    def useResourceDocs(b) {
+    GServConfig useResourceDocs(boolean b) {
         bUseResourceDocs = b;
         this
     }
@@ -178,7 +182,7 @@ class GServConfig {
      * @param dtm Map( delegateType -> delegate )
      *
      */
-    def delegateTypeMap(dtm) {
+    GServConfig delegateTypeMap(Map dtm) {
         delegateTypeMap = dtm;
         this
     }
@@ -186,7 +190,7 @@ class GServConfig {
     /**
      *
      */
-    def port(int p) {
+    GServConfig port(int p) {
         this._defaultPort = p;
         this
     }
@@ -194,16 +198,16 @@ class GServConfig {
     /**
      *
      */
-    def port() {
+    int port() {
         this._defaultPort
     }
 
-    def addResource(GServResource resource) {
+    GServConfig addResource(GServResource resource) {
         resource.actions.each this.&addAction
         this
     }
 
-    def addResources(resources) {
+    GServConfig addResources(List<GServResource> resources) {
         resources.each this.&addResource
         this
     }
@@ -214,11 +218,12 @@ class GServConfig {
      * @param List < ResourceAction >  List of Actions
      * @return GServConfig
      */
-    def addActions(rlist) {
+    GServConfig addActions(List<ResourceAction> rlist) {
         actions(rlist);
+        this
     }
 
-    def actions(rlist) {
+    GServConfig actions(List<ResourceAction> rlist) {
         this._actions.addAll(rlist);
         this
     }
@@ -229,16 +234,16 @@ class GServConfig {
      * @param List < ResourceAction >  List of Actions
      * @return GServConfig
      */
-    def addAction(actions) {
-        this._actions.add(actions);
+    GServConfig addAction(ResourceAction action) {
+        this._actions.add(action);
         this
     }
 
-    def actions() {
+    List<ResourceAction> actions() {
         this._actions;
     }
 
-    def addServerIP(serverIp) {
+    GServConfig addServerIP(String serverIp) {
         this.serverIPs.add(serverIp);
         this
     }
@@ -249,12 +254,12 @@ class GServConfig {
      * @param List < String >  List of directories
      * @return List < String >
      */
-    def addStaticRoots(roots) {
+    GServConfig addStaticRoots(List<String> roots) {
         this._staticRoots.addAll(roots);
         this
     }
 
-    def staticRoots() {
+    List<String> staticRoots() {
         _staticRoots
     }
 
@@ -263,7 +268,7 @@ class GServConfig {
      * @param filters List<io.github.javaconductor.gserv.filters.Filter>
      * @return List < io.github.javaconductor.gserv.filters.Filter >
      */
-    def addFilter(filter) {
+    GServConfig addFilter(Filter filter) {
         this._filters.add(filter);
         this
     }
@@ -272,22 +277,23 @@ class GServConfig {
      * @param filters List<io.github.javaconductor.gserv.filters.Filter>
      * @return List < io.github.javaconductor.gserv.filters.Filter >
      */
-    def addFilters(filters) {
+    GServConfig addFilters(List<Filter> filters) {
         this._filters.addAll(filters);
         this;
     }
 
-    def filters() { _filters }
+    List<Filter> filters() { _filters }
 
-    def defaultResource(def defResource) {
+    GServConfig defaultResource(String defResource) {
         _defaultResource = defResource
+        this
     }
 
-    def defaultResource() {
+    String defaultResource() {
         _defaultResource
     }
 
-    def applyHttpsConfig(cfgObj) {
+    GServConfig applyHttpsConfig(cfgObj) {
         if (cfgObj.password) {
             def httpsCfg = new HttpsConfig()
             httpsCfg.password = cfgObj.password
