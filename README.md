@@ -28,7 +28,7 @@
         <h3>Basic Concepts</h3>
         <table width="90%" class="docs-content">
             <tr><th>Term</th>             <th>Meaning</th></tr>
-            <tr><td>Resources</td>      <td>Resources define resource handlers - one for each HTTP method. </td></tr>
+            <tr><td>Resources</td>      <td>Resources define actions - one for each HTTP method. </td></tr>
             <tr><td>Server Config</td><td>The config encapsulates any resources, end-points, filters, and plugins. </td></tr>
             <tr><td>Server Instance</td><td>This is the actual server that will listen to the specified port and handle
                 requests based on its configuration.</td></tr>
