@@ -71,9 +71,9 @@ class RequestContextWrapper extends AbstractRequestContext {
         setAttribute(GServ.contextAttributes.isWrapper, true)
     }
 
-    def defaultClose = { _this ->
-        writeIt(_responseBody.toByteArray())
-    }
+//    def defaultClose = { _this ->
+//        writeIt(_responseBody.toByteArray())
+//    }
 
     def originalOutputStream() { _originalOutputStream }
 
@@ -85,7 +85,6 @@ class RequestContextWrapper extends AbstractRequestContext {
         writeIt(_responseBody.toByteArray())
     }
 
-    @Override
     void sendResponseHeaders(int statusCode, long dataLength) throws IOException {
         /// must NOT send anything YET
         _code = statusCode
@@ -97,17 +96,14 @@ class RequestContextWrapper extends AbstractRequestContext {
         return _code
     }
 
-    @Override
     String dump() {
         attributes.toString()
     }
 
-    @Override
     Object nativeObject() {
         _context.nativeObject()
     }
 
-    @Override
     def setStreams(InputStream is, OutputStream os) {
         _context.setStreams(is ,os)
     }
