@@ -23,10 +23,25 @@
  */
 
 package io.github.javaconductor.gserv
+
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+
 /**
  * Matches urls against registered filters.
  */
 class FilterMatcher extends Matcher {
+
+    @Override
+    ResourceAction matchAction(List<ResourceAction> filterList, RequestContext requestContext) {
+        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
+        def ret = filterList.find { p ->
+            def rmethod = p.method()
+            def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
+            def b = (methodOk && match(p, requestContext.requestURI))
+            b
+        }
+        return ret;
+    }
 
     @Override
     ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method) {

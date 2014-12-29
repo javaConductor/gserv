@@ -28,7 +28,7 @@ import io.github.javaconductor.gserv.ResourceActionFactory
 
 /**
  *
- * @author lcollins
+ * @author javaConductor
  */
 trait ResourceFn {
 
@@ -83,7 +83,7 @@ trait ResourceFn {
      * @return
      */
     def get(actionName, url, clozure) {
-        log.trace("serverInitClosure: get ${actionName ?: ''} base=${(value("path"))} url=$url")
+        log.trace("serverInitClosure: get ${actionName ?: ''} base=${(value("path")) ?: 'none'} url=$url")
         def rte = _addUrlToPatternList("GET", url, clozure)
         if (actionName)
             value("linkBuilder").addLink(actionName, rte)
@@ -138,9 +138,9 @@ trait ResourceFn {
         }
         log.trace "resourceInitClosure: _addUrlToPatternList url=$absUrl".toString();
 
-        def rte = ResourceActionFactory.createAction(method, absUrl, clozure)
-        value("actionList").add(rte)
-        rte
+        def action = ResourceActionFactory.createAction(method, absUrl, clozure)
+        value("actionList").add(action)
+        action
     }
 
 }

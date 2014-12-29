@@ -30,11 +30,13 @@
 
 package io.github.javaconductor.gserv.delegates.functions
 
-import com.sun.net.httpserver.HttpExchange
+import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+
 
 /**
  *
- * @author lcollins
+ * @author javaConductor
  */
 trait FilterFn {
 
@@ -46,9 +48,9 @@ trait FilterFn {
     void error(int code, String message) {
         message = message ?: "Error!"
         //println "requestHandlerDelegate.error($code, $message)"
-        exchange.sendResponseHeaders(code, message.bytes.size())
-        exchange.getResponseBody().write(message.bytes)
-        exchange.getResponseBody().close()
+        requestContext.sendResponseHeaders(code, message.bytes.size())
+        requestContext.getResponseBody().write(message.bytes)
+        requestContext.getResponseBody().close()
     }
 
     /**
@@ -57,35 +59,37 @@ trait FilterFn {
      */
     void redirect(url) {
         def message = "Resource has moved to: $url"
-        exchange.getHeaders().add("Location", url)
-        exchange.sendResponseHeaders(302, message.bytes.size())
-        exchange.getResponseBody().write(message)
-        exchange.getResponseBody().close()
+        requestContext.getHeaders().add("Location", url)
+        requestContext.sendResponseHeaders(302, message.bytes.size())
+        requestContext.getResponseBody().write(message)
+        requestContext.getResponseBody().close()
     }
 
-
-    def matchedAction(exchange) {
-        value("serverConfig").matchAction(exchange)
+    def matchedAction(requestContext) {
+        value("serverConfig").matchAction(requestContext)
     }
 
-    def requestMatched(exchange) {
-        value("serverConfig").matchAction(exchange) || resolveStaticResource(
-                exchange.requestURI.path,
+    def requestMatched(requestContext) {
+        value("serverConfig").matchAction(requestContext) || resolveStaticResource(
+                requestContext.requestURI.path,
                 value("serverConfig").staticRoots,
                 value("serverConfig").useResourceDocs())
     }
 
-
     def _nextFilterCalled = false
 
     def nextFilter() {
-        nextFilter(exchange)
+        nextFilter(requestContext)
     }
 
-    def nextFilter(HttpExchange e) {
+    def nextFilter(RequestContext e) {
+        def currentRequestId = e.getAttribute(GServ.contextAttributes.requestId)
         if (_nextFilterCalled)
             throw new IllegalStateException("nextFilter() has already been called.")
-        value("chain").doFilter(e)
+        e.nativeObject()?.setAttribute(GServ.contextAttributes.requestContext, e)
+        log.trace "FilterDelegate: Request($currentRequestId) :Filter.nextFilter calling chain."
+        value("chain").doFilter( e.nativeObject() )
+        log.trace "FilterDelegate: Request($currentRequestId) :Filter.nextFilter called chain."
         _nextFilterCalled = true
     }
 }

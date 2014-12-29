@@ -23,8 +23,8 @@ package test.integration.cliClasspath
  * THE SOFTWARE.
  */
 
-import io.github.javaconductor.gserv.*
 import com.soulsys.gserv.test.cli.math.CliMathService
+import io.github.javaconductor.gserv.GServ
 
 def service = new CliMathService()
 [

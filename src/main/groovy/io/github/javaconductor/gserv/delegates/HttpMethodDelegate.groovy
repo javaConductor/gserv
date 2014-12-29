@@ -26,19 +26,19 @@ package io.github.javaconductor.gserv.delegates
 
 import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
 import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.templating.TemplateManager
 
 /**
  * This is the delegate for any HTTP Method handler closure
  */
-//@Mixin(ResourceHandlerFunctions)
 class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
-    def exchange
+    RequestContext requestContext
     def serverConfig
     def $this
     def eventManager = EventManager.instance()
 
-    def HttpMethodDelegate(xchange, action, serverConfig) {
+    def HttpMethodDelegate(requestContext, action, serverConfig) {
         value("tmgr", new TemplateManager());
         value("linkBuilder", serverConfig.linkBuilder());
         value("staticRoots", serverConfig.staticRoots());
@@ -46,7 +46,7 @@ class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn 
         //value("to", new InputStreamTypeConverter().converters);
         // $this inside the closure will be the currently processing action
         $this = action
-        exchange = xchange
+        this.requestContext = requestContext
         this.serverConfig = serverConfig
     }
 

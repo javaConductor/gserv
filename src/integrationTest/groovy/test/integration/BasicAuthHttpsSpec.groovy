@@ -22,7 +22,7 @@ class BasicAuthHttpsSpec {
         def args = ["-p", "11000",
                     "-i", dir + "/BasicAuthHttps.groovy"]
         def stopFn = new GServRunner().start(args);
-        def testCnt = 1
+        def testCnt = 2
         def uAndP = Encoder.base64("secret:thing".bytes)
 
         try {

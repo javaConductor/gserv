@@ -1,8 +1,8 @@
 package io.github.javaconductor.gserv.requesthandler
 
-import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.ResourceAction
 import io.github.javaconductor.gserv.Utils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
@@ -20,8 +20,8 @@ class ActionRunner {
         _cfg = cfg
     }
 
-    private def prepareDelegate(HttpExchange httpExchange, action) {
-        _cfg.delegateMgr.createHttpMethodDelegate(httpExchange, action, _cfg)
+    private def prepareDelegate(RequestContext context, action) {
+        _cfg.delegateMgr.createHttpMethodDelegate(context, action, _cfg)
     }
 
     private def prepareArguments(uri, istream, action) {
@@ -55,40 +55,40 @@ class ActionRunner {
         args
     }
 
-    private def prepareClosure(exchange, action) {
+    private def prepareClosure(context, action) {
         def cl = action.requestHandler()//_handler
-        HttpMethodDelegate dgt = prepareDelegate(exchange, action)
+        HttpMethodDelegate dgt = prepareDelegate(context, action)
         cl.delegate = dgt
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         cl
     }
 
-    def process(HttpExchange exchange, action) {
-        Closure cl = prepareClosure(exchange, action)
-        def args = prepareArguments(exchange.requestURI, exchange.requestBody, action)
+    def process(RequestContext context, ResourceAction action) {
+        Closure cl = prepareClosure(context, action)
+        def args = prepareArguments(context.requestURI, context.requestBody, action)
 //        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
         ({ clozure, argList ->
             try {
                 EventManager.instance().publish(Events.ResourceProcessing, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path,
+                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        uri      : context.requestURI.path,
                         msg      : "Resource Processing."])
                 //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
-                log.trace "ActionRunner: Running req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path}"
+                log.trace "ActionRunner: Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path}"
                 clozure(*argList)
-                log.trace "ActionRunner: req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} - Finished."
+                log.trace "ActionRunner: req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} - Finished."
             } catch (Throwable e) {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path, msg: e.message, e: e])
+                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        uri      : context.requestURI.path, msg: e.message, e: e])
                 cl.delegate.error(500, e.message)
-                log.error "ActionRunner: Error Running req#${exchange.getAttribute(GServ.exchangeAttributes.requestId)} ${exchange.requestURI.path} : ${e.message}", e
-                exchange
+                log.error "ActionRunner: Error Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} : ${e.message}", e
+                context
             }
             finally {
                 EventManager.instance().publish(Events.ResourceProcessed, [
-                        requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
-                        uri      : exchange.requestURI.path, msg: 'Resource processing done.'])
+                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        uri      : context.requestURI.path, msg: 'Resource processing done.'])
             }
         })(cl, args);
 

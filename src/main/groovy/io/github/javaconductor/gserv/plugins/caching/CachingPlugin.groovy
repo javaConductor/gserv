@@ -73,45 +73,46 @@ class CachingPlugin extends AbstractPlugin {
             1) {
                 ->
 
-                def calcETag = weakHandler(exchange)
+                def calcETag = weakHandler(requestContext)
                 //check the hdr
-                def etagValue = exchange.requestHeaders["If-None-Match"]
+                def etagValue = requestContext.requestHeaders["If-None-Match"]
                 if (etagValue == calcETag) {
                     def msg = "Unchanged."
                     error(304, msg)
                 } else {
                     // etag it
-                    etagIt(exchange, calcETag, options)
+                    etagIt(requestContext, calcETag, options)
                     //exchange.responseHeaders["ETag"] = calcETag
                     nextFilter()
                 }
-                exchange
+              requestContext
             }
           // add it to the config
             addFilter(f)
         }
     }/// method
 
-    def etagIt(exchange, etag, options) {
-        exchange.responseHeaders["Cache-Control"] = "public, max-age=3600;"
-        exchange.responseHeaders["ETag"] = etag
+    def etagIt(requestContext, etag, options) {
+        requestContext.responseHeaders["Cache-Control"] = "public, max-age=3600;"
+        requestContext.responseHeaders["ETag"] = etag
     }
 
     private def createStrongDelegateFunction() {
 
         return { path, etagFn ->
             def strongHandler = etagFn
-            /// we must create a afterFilter to create am ETag value from the output once it is generated.
-            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 9) { e, data ->
+            /// we must create a afterFilter to create an ETag value from the output once it is generated.
+            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 9
+            ) { context, data ->
                 //check the hdr
-                def calcETag = strongHandler(e, data)
-                def etagValue = e.requestHeaders["If-None-Match"]
+                def calcETag = strongHandler(context, data)
+                def etagValue = context.requestHeaders["If-None-Match"]
                 if (etagValue && etagValue == calcETag) {
                     def msg = "Unchanged."
                     error(304, msg)
                 } else {
                     // etag it
-                    etagIt(e, calcETag, options)
+                    etagIt(context, calcETag, options)
                 }
                 data
             }

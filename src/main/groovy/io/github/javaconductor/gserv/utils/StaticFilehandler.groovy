@@ -54,7 +54,7 @@ class StaticFileHandler {
 
         { ->
             EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
+                    requestId: exchange.getAttribute(GServ.contextAttributes.requestId),
                     mimeType : mimeType,
                     msg      : "Sending static file.",
                     path     : "$filename"])

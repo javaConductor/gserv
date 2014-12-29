@@ -29,10 +29,12 @@ import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.FilterMatcher
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.GServFactory
 import io.github.javaconductor.gserv.Utils
 import io.github.javaconductor.gserv.delegates.FilterDelegate
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
  * User: javaConductor
@@ -43,7 +45,7 @@ import io.github.javaconductor.gserv.events.Events
 @Log4j
 class FilterProxy extends Filter {
 
-    private def _filterList
+    private List<io.github.javaconductor.gserv.filters.Filter> _filterList
     private def _templateEngineName
     def m = new FilterMatcher();
     private def _serverConfig
@@ -64,24 +66,39 @@ class FilterProxy extends Filter {
      */
     @Override
     void doFilter(HttpExchange httpExchange, com.sun.net.httpserver.Filter.Chain chain) throws IOException {
-        /// Check the request against the filter's  route.
-        if (!httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS))
-            httpExchange.setAttribute(GServ.exchangeAttributes.receivedMS, "" + new Date().time)
 
-        def theFilter = m.matchAction(_filterList, httpExchange)
+        /// here we do the get the ResourceContect from the Exchange
+        RequestContext requestContext = httpExchange.getAttribute(GServ.contextAttributes.requestContext)
+
+        // if none create it
+        if ( !requestContext ){
+            requestContext = new GServFactory().createRequestContext(httpExchange)
+            httpExchange.setAttribute(GServ.contextAttributes.requestContext, requestContext)
+            requestContext.setAttribute(GServ.contextAttributes.receivedMS, "" + new Date().time)
+            synchronized (requestId){
+                requestContext.setAttribute(GServ.contextAttributes.requestId, requestId++)
+            }
+        }
+
+        def currentRequestId =  requestContext.getAttribute(GServ.contextAttributes.requestId)
+        println requestContext.properties
+
+        def theFilter = m.matchAction ( _filterList, requestContext )
         if (theFilter) {
             eventMgr.publish(Events.RequestMatchedFilter, [
                     filter       : theFilter.name ?: "-",
-                    requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                    requestTimeMs: requestContext.getAttribute(GServ.contextAttributes.receivedMS),
                     action        : theFilter.toString(),
-                    path         : httpExchange.requestURI.path,
-                    method       : httpExchange.requestMethod
+                    path         : requestContext.requestURI.path,
+                    method       : requestContext.requestMethod
             ]
             );
             //  if route is required  for this filter and not matched  return immediately
             if (theFilter.options()[FilterOptions.MatchedActionsOnly]) {
-                if (!_serverConfig.requestMatched(httpExchange)) {
+                if (!_serverConfig.requestMatched(requestContext)) {
+                    log.trace "FilterProxy: Request($currentRequestId) : Not matched. Calling chain." 
                     chain.doFilter(httpExchange);
+                    log.trace "FilterProxy: Request($currentRequestId) :Not matched. Called chain:" 
                     return
                 }
             }
@@ -91,18 +108,21 @@ class FilterProxy extends Filter {
                     //////////////////////////////////////////////////////////////////////
                     /// We will set the delegate for the closure before we put in the list
                     //////////////////////////////////////////////////////////////////////
+
                     def fn = theFilter.requestHandler()
                     //TODO the After filter will have a potentially OLD exchange injected but the current one passed in
-                    fn.delegate = prepareDelegate(theFilter, httpExchange, chain)
+                    fn.delegate = prepareDelegate(theFilter, requestContext, chain)
 
                     /// add after closure to PostProcessList
-                    def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList) ?: []
-                    log.trace "FilterProxy: Scheduling after filter ${theFilter.name} for req @${httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS)} "
+                    def ppList = requestContext.getAttribute(GServ.contextAttributes.postProcessList) ?: []
+                    log.trace "FilterProxy: Scheduling after filter ${theFilter.name} for req @${requestContext.getAttribute(GServ.contextAttributes.receivedMS)} "
                     ppList << fn
                     //println "adding $fn to ppList"
-                    httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, ppList)
-                    chain.doFilter(httpExchange)
-                    httpExchange
+                    requestContext.setAttribute( GServ.contextAttributes.postProcessList, ppList )
+                    log.trace "FilterProxy: Request($currentRequestId) :After Filter. Calling chain."
+                    chain.doFilter( httpExchange )
+                    log.trace "FilterProxy: Request($currentRequestId) :After Filter. Called chain."
+                    requestContext
                     break
 
                 case FilterType.Before:
@@ -110,37 +130,40 @@ class FilterProxy extends Filter {
                     try {
                         // run the filter
                         // replace with new one
-                        httpExchange = filter(httpExchange, chain, theFilter) ?: httpExchange
+                        requestContext = filter(requestContext, chain, theFilter) ?: requestContext
                     } catch (Throwable ex) {
-                        ex.printStackTrace(System.err)
+                        log.trace( "Filter $theFilter threw exception: ${ex.message}.", ex )
+                        log.error( "Filter $theFilter threw exception: ${ex.message}." )
                         eventMgr.publish(Events.FilterError, [
                                 filter       : (theFilter.name ?: "-"),
-                                requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
+                                requestTimeMs: requestContext.getAttribute(GServ.contextAttributes.receivedMS),
                                 message      : ex.message,
-                                path         : httpExchange.requestURI.path,
-                                method       : httpExchange.requestMethod])
+                                path         : requestContext.requestURI.path,
+                                method       : requestContext.requestMethod])
                     } finally {
                         eventMgr.publish(Events.FilterComplete, [filter       : theFilter.name ?: "-",
-                                                                 requestTimeMs: httpExchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                                                                 path         : httpExchange.requestURI.path,
-                                                                 method       : httpExchange.requestMethod])
+                                                                 requestTimeMs: requestContext.getAttribute(GServ.contextAttributes.receivedMS),
+                                                                 path         : requestContext.requestURI.path,
+                                                                 method       : requestContext.requestMethod])
                     }
-                    httpExchange
+                    requestContext
                     break;
             }//switch
         } else {
+                    log.trace "FilterProxy: Request($currentRequestId) :Filter Not Matched. Calling chain."
             chain.doFilter(httpExchange)
+                    log.trace "FilterProxy: Request($currentRequestId) :Filter Not Matched. Called chain."
             httpExchange
         }
-    }
+    }//fn
 
     @Override
     String description() {
         return "FilterProxy. Proxies requests from com.sun.net.http.Filter to matched gServ Filter"
     }
 
-    private def prepareDelegate(filter, httpExchange, chain, templateEngineName = _templateEngineName) {
-        new FilterDelegate(filter, httpExchange, chain, _serverConfig, templateEngineName)
+    private def prepareDelegate(filter, requestContext, chain, templateEngineName = _templateEngineName) {
+        new FilterDelegate(filter, requestContext, chain, _serverConfig, templateEngineName)
     }
 
     /**
@@ -151,8 +174,8 @@ class FilterProxy extends Filter {
      * @param theFilter
      * @return
      */
-    private def prepareArguments(exchange, chain, theFilter) {
-        def uri = exchange.requestURI
+    private def prepareArguments(context, chain, theFilter) {
+        def uri = context.requestURI
         def args = []
         def method = theFilter.method()
         if (FilterType.Normal == theFilter.filterType && chain)
@@ -160,7 +183,7 @@ class FilterProxy extends Filter {
         if (method == "PUT" || method == "POST") {
             // add the data before the other args
             // data is a byte[]
-            args.add(exchange.getRequestBody())
+            args.add(context.getRequestBody())
         }
 
         def pathElements = uri.path.split("/").findAll { !(!it) }
@@ -183,29 +206,29 @@ class FilterProxy extends Filter {
     /**
      * This function executes the FilterBehaviorClosure
      *
-     * @param exchange
+     * @param context
      * @param chain
      * @param theFilter
      * @return
      */
-    def filter(HttpExchange exchange, chain, theFilter) {
+    def filter(RequestContext context, chain, theFilter) {
         Closure cl = theFilter.requestHandler()//_handler
         def options = theFilter.options()
-        FilterDelegate dgt = prepareDelegate(theFilter, exchange, chain)
+        FilterDelegate dgt = prepareDelegate(theFilter, context, chain)
         def errorHandlingWrapper = { clozure, List argList ->
             try {
                 eventMgr.publish(Events.FilterProcessing, [filter       : theFilter.name ?: "-",
-                                                           requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                                                           action        : theFilter.toString(), path: exchange.requestURI.path, args: argList])
+                                                           requestTimeMs: context.getAttribute(GServ.contextAttributes.receivedMS),
+                                                           action        : theFilter.toString(), path: context.requestURI.path, args: argList])
                 return clozure(*argList)
             } catch (Throwable e) {
                 log.error("FilterProxy error: ${e.message}", e)
                 e.printStackTrace(System.err)
                 eventMgr.publish(Events.FilterError, [filter       : theFilter.name ?: "-",
-                                                      requestTimeMs: exchange.getAttribute(GServ.exchangeAttributes.receivedMS),
-                                                      action        : theFilter.toString(), path: exchange.requestURI.path, args: argList, error: e.message])
+                                                      requestTimeMs: context.getAttribute(GServ.contextAttributes.receivedMS),
+                                                      action        : theFilter.toString(), path: context.requestURI.path, args: argList, error: e.message])
                 dgt.error(500, e.message)
-                exchange
+                context
             }
             finally {
                 // println "FilterProxy.filter(): closureWrapper: DONE!"
@@ -214,10 +237,9 @@ class FilterProxy extends Filter {
         //TODO Should be a cleaner way to do this
         cl.delegate = dgt
         cl.resolveStrategy = Closure.DELEGATE_FIRST
-        List args = prepareArguments(exchange, chain, theFilter)
         /// Pass the route variables to the behavior if option is set
         /// Else there will be no args
-        args = options[FilterOptions.PassRouteParams] ? args : [];
+        List  args = options[FilterOptions.PassRouteParams] ? prepareArguments(context, chain, theFilter) : [];
         /// Execute the behavior for this filter
         def ret = errorHandlingWrapper(cl, args)
         ret

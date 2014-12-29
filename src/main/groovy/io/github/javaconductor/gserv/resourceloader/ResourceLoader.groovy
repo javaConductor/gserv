@@ -46,8 +46,10 @@ class ResourceLoader {
      * @return List < gServResource >
      */
     def loadResources(File resourceScriptFile, classPath) {
-        if (!(resourceScriptFile?.exists()))
-            return [];
+        assert true, "resourceScriptFile required"
+        if ( !resourceScriptFile.exists()){
+            throw new ResourceScriptException("Bad resource script file: $resourceScriptFile not found.")
+        }
 
         classPath = classPath ?: []
         GroovyShell groovyShell = createGroovyShell(classPath)
@@ -56,10 +58,12 @@ class ResourceLoader {
             resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
             resourceCache[resourceScriptFile.absolutePath] = resources
         } catch (MultipleCompilationErrorsException ex) {
-            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} "+ ex.message )
             throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
         } catch (Throwable ex) {
-            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} "+ ex.message )
             throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
         }
         resources
@@ -75,7 +79,6 @@ class ResourceLoader {
             return null;
         classpath = classpath ?: []
         GroovyShell groovyShell = createGroovyShell(classpath)
-//   GroovyShell groovyShell = new GroovyShell (classLoader)
         GServInstance instance = groovyShell.evaluate(instanceScriptFile)
         instance ? instance.config() : null
     }

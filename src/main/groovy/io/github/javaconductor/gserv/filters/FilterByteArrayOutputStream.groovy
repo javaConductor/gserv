@@ -53,4 +53,6 @@ class FilterByteArrayOutputStream extends ByteArrayOutputStream {
     void close() throws IOException {
         _closeFn(this)
     }
+
+
 }

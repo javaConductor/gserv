@@ -46,53 +46,53 @@ class CorsPlugin extends AbstractPlugin {
 
     def allowAllHandler = { CORSConfig corsConfig ->
 //        println "CorsPlugin.allowAllHandler(): ${exchange.requestMethod}(${exchange.requestURI})"
-        switch (exchange.requestMethod) {
+        switch (requestContext.requestMethod) {
 
             case "OPTIONS":
                 // add header Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Max-Age
-                exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
-                exchange.responseHeaders.add("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
-                exchange.responseHeaders.add("Access-Control-Allow-Headers", "*")
-                exchange.responseHeaders.add("Allow", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
+                requestContext.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                requestContext.responseHeaders.add("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
+                requestContext.responseHeaders.add("Access-Control-Allow-Headers", "*")
+                requestContext.responseHeaders.add("Allow", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
 
                 def entry //= getHostEntry( exchange.requestURI.host )
                 def maxAge = entry?.maxAge ?: (corsConfig?.maxAge ?: 3600)
-                exchange.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
+                requestContext.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
 
                 /// send 200 with header
                 def resp = new JsonBuilder([cors: [respones: 'OK']]).toPrettyString();
 
-                exchange.sendResponseHeaders(200, resp.bytes.length)
-                exchange.responseBody.write(resp.bytes);
-                exchange.responseBody.close()
-                exchange
+                requestContext.sendResponseHeaders(200, resp.bytes.length)
+                requestContext.responseBody.write(resp.bytes);
+                requestContext.responseBody.close()
+                requestContext
                 break;
 
             default:
                 // look for origin header
-                def origin = exchange.requestHeaders.get("Origin")
+                def origin = requestContext.requestHeaders.get("Origin")
                 // if found add the "Access-Control-Allow-Origin: *" header to response
                 if (origin) {
 //                    println "CorsPlugin filter: Allowing Origin: $origin"
-                    exchange.responseHeaders.add("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
-                    exchange.responseHeaders.add("Access-Control-Allow-Origin", "*")
+                    requestContext.responseHeaders.add("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE,HEAD")
+                    requestContext.responseHeaders.add("Access-Control-Allow-Origin", "*")
                 } else {
                     //                  println "CorsPlugin filter: No Origin Header."
                 }
 //                println "CorsPlugin Filter: Calling chain"
                 nextFilter()
-                exchange
+                requestContext
                 break;
         }
     }
 
     def listHandler = { CORSConfig corsConfig ->
-        log.trace "CorsPlugin.listHandler(): ${exchange.requestMethod} - ${exchange.requestURI} List: ${corsConfig.list}"
-        switch (exchange.requestMethod) {
+        log.trace "CorsPlugin.listHandler(): ${requestContext.requestMethod} - ${requestContext.requestURI} List: ${corsConfig.list}"
+        switch (requestContext.requestMethod) {
             case "OPTIONS":
                 /// Check the List to see if this host has access according to the CORS Config
                 // get the Origin
-                String origin = exchange.requestHeaders.get("Origin")
+                String origin = requestContext.requestHeaders.get("Origin")
                 if (!origin) {
                     log.trace("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
                     nextFilter()
@@ -102,8 +102,8 @@ class CorsPlugin extends AbstractPlugin {
                 log.trace("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
                 log.trace("CorsPlugin.listHandler():HOST: $host")
 
-                def accessReqMethod = exchange.requestHeaders.get("Access-Control-Request-Method")
-                def accessReqHeaders = exchange.requestHeaders.get("Access-Control-Request-Headers")
+                def accessReqMethod = requestContext.requestHeaders.get("Access-Control-Request-Method")
+                def accessReqHeaders = requestContext.requestHeaders.get("Access-Control-Request-Headers")
 
                 // if found add the "Access-Control-Allow-Origin: $origin" header to response
                 def ok = corsConfig.hasAccess(host, accessReqMethod, accessReqHeaders)
@@ -112,29 +112,29 @@ class CorsPlugin extends AbstractPlugin {
                 if (ok) {
                     def cfgForHost = corsConfig.findOriginConfig(host)
                     // send back the allow headers
-                    exchange.responseHeaders.add("Access-Control-Allow-Origin", origin)
-                    exchange.responseHeaders.add("Access-Control-Allow-Methods", cfgForHost.methods.join(","))
-                    exchange.responseHeaders.add("Access-Control-Allow-Headers", accessReqHeaders)
+                    requestContext.responseHeaders.add("Access-Control-Allow-Origin", origin)
+                    requestContext.responseHeaders.add("Access-Control-Allow-Methods", cfgForHost.methods.join(","))
+                    requestContext.responseHeaders.add("Access-Control-Allow-Headers", accessReqHeaders)
 
                     def maxAge = cfgForHost?.maxAge ?: (corsConfig?.maxAge ?: 3600)
-                    exchange.responseHeaders.add("Access-Control-Max-Age", maxAge)
+                    requestContext.responseHeaders.add("Access-Control-Max-Age", maxAge)
 
                     /// send response
-                    exchange.sendResponseHeaders(200, 0)
-                    exchange.responseBody.close()
+                    requestContext.sendResponseHeaders(200, 0)
+                    requestContext.responseBody.close()
 
                 } else { // not ok
                     /// send 403 Forbidden
-                    exchange.sendResponseHeaders(403, 0)
-                    exchange.responseBody.close()
+                    requestContext.sendResponseHeaders(403, 0)
+                    requestContext.responseBody.close()
                 }
-                exchange
+                requestContext
                 break;
 
             default:
                 def statusCode = 403
                 // look for origin header
-                def originList = exchange.requestHeaders.get("Origin");
+                def originList = requestContext.requestHeaders.get("Origin");
                 if (!originList) {
                     log.trace("CorsPlugin.listHandler():No ORIGIN header for OPTIONS method.")
                     nextFilter()
@@ -144,23 +144,23 @@ class CorsPlugin extends AbstractPlugin {
                 def host = originToHost(origin)
                 log.trace("CorsPlugin.listHandler():ORIGIN header for OPTIONS method: $origin")
                 log.trace("CorsPlugin.listHandler():HOST: $host")
-                def ok = corsConfig.hasAccess(host, exchange.requestMethod)
-                log.trace "CorsPlugin.listHandler(): $origin can do ${exchange.requestMethod} = ${ok}"
+                def ok = corsConfig.hasAccess(host, requestContext.requestMethod)
+                log.trace "CorsPlugin.listHandler(): $origin can do ${requestContext.requestMethod} = ${ok}"
                 if (ok) {
                     def cfgForHost = corsConfig.findHostConfig(host)
-                    exchange.responseHeaders.add("Access-Control-Allow-Origin", (String) origin)
+                    requestContext.responseHeaders.add("Access-Control-Allow-Origin", (String) origin)
                     def maxAge = cfgForHost?.maxAge ?: (corsConfig?.maxAge ?: 3600)
-                    exchange.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
-                    log.trace("CorsPlugin.listHandler():Response HEADERS: ${exchange.responseHeaders}")
+                    requestContext.responseHeaders.add("Access-Control-Max-Age", "" + maxAge)
+                    log.trace("CorsPlugin.listHandler():Response HEADERS: ${requestContext.responseHeaders}")
                     nextFilter()
                     return
                 } else {
                     /// send 403 Forbidden
-                    exchange.sendResponseHeaders(statusCode, 0)
-                    exchange.responseBody.close()
+                    requestContext.sendResponseHeaders(statusCode, 0)
+                    requestContext.responseBody.close()
                     return
                 }
-                exchange;
+                requestContext;
                 break;
         }
     }

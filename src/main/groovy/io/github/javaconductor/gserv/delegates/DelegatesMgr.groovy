@@ -70,8 +70,8 @@ class DelegatesMgr {
      * @param serverConfig
      * @return
      */
-    def createHttpMethodDelegate(httpExchange, action, serverConfig) {
-        createDelegate(DelegateTypes.HttpMethod, [httpExchange, action, serverConfig])
+    def createHttpMethodDelegate(requestContext, action, serverConfig) {
+        createDelegate(DelegateTypes.HttpMethod, [requestContext, action, serverConfig])
     }
 
     /**

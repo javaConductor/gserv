@@ -15,11 +15,13 @@ class DefaultResourceSpec {
 
     @Test
     public final void testDefaultResource() {
-        def port = "11001"
+        def port = "11004"
         def http = new HTTPBuilder("http://localhost:$port/")
         def dir = baseDir + "defaultResource"
+        def f = new File(dir)
+        f.absolutePath
         def args = ["-p", port,
-                    "-s", dir,
+                    "-s",   f.absolutePath,
                     "-d", "index.html"
         ]
         def stopFn = new GServRunner().start(args);
@@ -33,15 +35,8 @@ class DefaultResourceSpec {
                 //stop the server
                 stopFn()
             }
-            // called only for a 404 (not found) status code:
-            response.'404' = { resp ->
-                assert false, "Not found."
-                println 'Not found'
-                //stop the server
-                stopFn()
-            }
-            response.'500' = { resp ->
-                assert false, "Internal Error."
+            response.failure = {resp ->
+                assert false, "HTTP Error: Status: ${resp.statusLine}"
                 println '500 Error'
                 //stop the server
                 stopFn()
@@ -52,7 +47,7 @@ class DefaultResourceSpec {
     @Test
     public final void testDefaultResourceOnAddress() {
         def port = "11009"
-        def http = new HTTPBuilder("http://192.168.2.102:$port/")
+        def http = new HTTPBuilder("http://10.0.0.5:$port/")
         def dir = baseDir + "defaultResource"
         def args = [
                 "-p", port,

@@ -32,7 +32,7 @@ package io.github.javaconductor.gserv.delegates
 /**
  *  Base class for DelegateFunctions
  *
- * @author lcollins
+ * @author javaConductor
  */
 class DelegateFunctions {
     Map _properties = [:]

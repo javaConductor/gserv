@@ -24,14 +24,14 @@
 
 package io.github.javaconductor.gserv
 
-import com.sun.net.httpserver.HttpExchange
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 class Matcher {
 
     //returns the pattern that matches the uri
-    ResourceAction matchAction(List<ResourceAction> actionList, HttpExchange exchange) {
-        def uri = exchange.getRequestURI()
-        def method = exchange.requestMethod
+    ResourceAction matchAction(List<ResourceAction> actionList, RequestContext context) {
+        def uri = context.getRequestURI()
+        def method = context.requestMethod
         return matchAction(actionList, uri, method)
     }
 

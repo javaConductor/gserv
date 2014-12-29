@@ -5,6 +5,8 @@ import io.github.javaconductor.gserv.GServRunner
 import io.github.javaconductor.gserv.utils.Encoder
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.internal.builders.JUnit4Builder
+import org.junit.runners.JUnit4
 
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.Method.GET
@@ -12,15 +14,16 @@ import static groovyx.net.http.Method.GET
 /**
  * Created by javaConductor on 10/5/2014.
  */
+
 class BasicAuthSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @Ignore
-    public final void testToUpper() {
+    @Test
+    public final void testBasicAuthentication() {
 
-        def http = new HTTPBuilder('http://localhost:11000/')
+        def http = new HTTPBuilder('http://localhost:51000/')
         def dir = baseDir + "basicauth"
-        def args = ["-p", "11000",
+        def args = ["-p", "51000",
                     "-i", dir + "/BasicAuth.groovy"]
         def stopFn = new GServRunner().start(args);
         def testCnt = 2
@@ -38,9 +41,13 @@ class BasicAuthSpec {
                     if (testCnt == 0)
                         stopFn()
                 }
-                // called only for a 404 (not found) status code:
-                response.'404' = { resp ->
-                    println 'Not found'
+                response.failure = { resp ->
+                    --testCnt
+                    
+                    //stop the server
+                    if (testCnt == 0)
+                        stopFn()
+                        assert "Failed!", false 
                 }
             }
         } finally {
@@ -61,21 +68,16 @@ class BasicAuthSpec {
                     if (testCnt == 0)
                         stopFn()
                 }
-                // called only for a 404 (not found) status code:
-                response.'404' = { resp ->
-                    println 'Not found'
-                }
-                response.'403' = { resp ->
-                    println 'Not found'
+                response.failure = { resp ->
+                    --testCnt
+                    //stop the server
+                    if (testCnt == 0)
+                        stopFn()
                 }
             }
-        } finally {
-//            assert e.message == "Unauthorized"
-            --testCnt
-            if (testCnt == 0)
-                stopFn()
         }
-
+        catch (Throwable e){
+            assert "${e.message}", false
+        }
     }
-
 }

@@ -91,26 +91,14 @@ class EventLoggerPlugin extends AbstractPlugin {
     List<ResourceAction> filters() {
         def f = ResourceActionFactory.createBeforeFilter("EventLogFilter", '*', "/", [(FilterOptions.PassActionParams): false]) {
             ->
-/*
-            if (exchange.requestURI.path.startsWith(logSincePrefix)) {
-                Date d = formatUTC(exchange.requestURI.path.substring(11))
-                def events = eventsSince(d)
-                events = prepareEvents(events)
-                writeJson(events)
-            } else if (exchange.requestURI.path.startsWith(logLastPrefix)) {
-                def evtCount = Integer.parseInt(exchange.requestURI.path.substring(10))
-                def events = lastEvents(evtCount)
-                events = prepareEvents(events)
-                writeJson(events)
-            } else*/
-            if (exchange.requestURI.path.equals(logUrl)) {
+            if (requestContext.requestURI.path.equals(logUrl)) {
                 def events = lastEvents(1000)
                 events = prepareEvents(events)
                 writeJson(events)
             } else {
                 nextFilter()
             }
-            exchange
+            requestContext
         }
         [f]
     }

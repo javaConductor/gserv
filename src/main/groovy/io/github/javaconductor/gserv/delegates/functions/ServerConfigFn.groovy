@@ -38,12 +38,13 @@ import sun.misc.BASE64Decoder
 
 /**
  *
- * @author lcollins
+ * @author javaConductor
  */
 trait ServerConfigFn {
 
   def name(nm) {
     this.value "name", nm
+    this
   }
 
   def name() {
@@ -52,22 +53,27 @@ trait ServerConfigFn {
 
   def addAction(action) {
         this.value("actionList").add(action)
+        this
     }
 
     def addResource(GServResource resource) {
         resource.actions.each(this.&addAction)
+        this
     }
 
     def addFilter(f) {
         value("filterList").add(f)
+        this
     }
 
     def addStaticRoot(r) {
         value("staticRoots").add(r)
+        this
     }
 
     def addLink(name, action) {
         value("linkBuilder").add(name, action)
+        this
     }
 
     /**
@@ -82,10 +88,12 @@ trait ServerConfigFn {
         }
         addResource(r)
         addLinkBuilder r.linkBuilder
+        this
     }
 
     private addLinkBuilder(LinkBuilder lb) {
         value("linkBuilder", value("linkBuilder") + lb)
+        this
     }
 
     /**
@@ -141,7 +149,7 @@ trait ServerConfigFn {
      * @param url
      * @param method
      * @param options
-     * @param clozure fn(exchange, byte[] data)
+     * @param clozure fn(requestContext, byte[] data)
      * @return
      *
      */
@@ -159,7 +167,7 @@ trait ServerConfigFn {
      * @param url
      * @param method
      * @param options
-     * @param closure fn(exchange, byte[] data)
+     * @param closure fn(requestContext, byte[] data)
      * @return this
      */
   def before(name, url, method, options, order, clozure) {
@@ -178,18 +186,18 @@ trait ServerConfigFn {
             before("basicAuth($method->$path)", path, method, options, 2) { ->
                 log.trace("basicAuth before()");
 
-                def userPswd = getBasicAuthUserPswd(exchange);
+                def userPswd = getBasicAuthUserPswd(requestContext);
                 log.trace("basicAuth before(): userPswd:$userPswd");
               if (!userPswd || userPswd.length < 2) {
-                    exchange.responseHeaders.add("WWW-Authenticate", "Basic realm=$realm")
+                  requestContext.responseHeaders.add("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
                 } else {
                     def bAuthenticated = _authenticated(userPswd[0], userPswd[1], challengeFn);
                     if (bAuthenticated) {
                         nextFilter();
-                        return (exchange);
+                        return (requestContext);
                     } else {
-                        error(403, "Bad credentials for path ${exchange.requestURI.path}.");
+                        error(403, "Bad credentials for path ${requestContext.requestURI.path}.");
                     }
                 }
             }
@@ -197,8 +205,8 @@ trait ServerConfigFn {
         this
     }//basicAuthentication
 
-    def getBasicAuthUserPswd(exchange) {
-        def basic = exchange.requestHeaders.get("Authorization");
+    def getBasicAuthUserPswd(requestContext) {
+        def basic = requestContext.requestHeaders.get("Authorization");
         //println "basic: $basic"
         if (!basic)
             return null;
@@ -239,7 +247,7 @@ trait ServerConfigFn {
 
         { ->
             EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
+                    requestId: requestContext.getAttribute(GServ.contextAttributes.requestId),
                     mimeType : mimeType,
                     msg      : "Sending static file.",
                     path     : "$filename"])
@@ -247,16 +255,16 @@ trait ServerConfigFn {
             InputStream is = getFile(value('staticRoots'), filename)
             if (is) {
                 def sz = is.available();
-                exchange.responseHeaders.add("Content-Type", mimeType)
-                exchange.sendResponseHeaders(200, sz)
-                IOUtils.copy(is, exchange.responseBody)
+                requestContext.responseHeaders.add("Content-Type", mimeType)
+                requestContext.sendResponseHeaders(200, sz)
+                IOUtils.copy(is, requestContext.responseBody)
             } else {
                 def msg = "No such file: $filename"
                 def ab = msg.getBytes()
-                exchange.sendResponseHeaders(404, ab.size())
-                exchange.responseBody.write(ab);
+                requestContext.sendResponseHeaders(404, ab.size())
+                requestContext.responseBody.write(ab);
             }
-            exchange.responseBody.close()
+            requestContext.responseBody.close()
         }
     }
 

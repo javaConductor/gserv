@@ -54,9 +54,9 @@ class GServResource {
         definitionClosure.delegate = dgt
         definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
         definitionClosure()
-        def patterns = definitionClosure.delegate.patterns()
+        def actions = definitionClosure.delegate.actions()
         def linkBldr = definitionClosure.delegate.linkBuilder()
-        return new GServResource(basePath, patterns, linkBldr)
+        return new GServResource(basePath, actions, linkBldr)
     }
 
     static def Resource(basePath, ResourceObject target) {

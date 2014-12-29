@@ -31,7 +31,7 @@ import io.github.javaconductor.gserv.exceptions.TemplateException
 
 /**
  *
- * @author lcollins
+ * @author javaConductor
  */
 
 trait ResourceHandlerFn {
@@ -114,17 +114,6 @@ trait ResourceHandlerFn {
     }
 
     /**
-     * Writes a byteArray and closes the output stream
-     *
-     * @param data The string
-     *
-     */
-    void write(byte[] data) {
-        exchange.sendResponseHeaders(200, data.size())
-        exchange.getResponseBody().write(data)
-        exchange.getResponseBody().close()
-    }
-    /**
      * Writes a string and closes the output stream
      *
      * @param data The string
@@ -142,10 +131,19 @@ trait ResourceHandlerFn {
      */
     void write(String contentTyp, byte[] data) {
         header("Content-Type", contentTyp)
-        //contentType(contentTyp)
-        exchange.sendResponseHeaders(200, data.size())
-        exchange.getResponseBody().write(data)
-        exchange.getResponseBody().close()
+        write(data)
+    }
+    /**
+     * Writes a byteArray and closes the output stream
+     *
+     * @param data The string
+     *
+     */
+    void write(byte[] data) {
+        requestContext.sendResponseHeaders(200, data.size())
+        requestContext.getResponseBody().write(data)
+        requestContext.getResponseBody().close()
+        requestContext.close()
     }
 
     /**
@@ -165,7 +163,7 @@ trait ResourceHandlerFn {
      * @param headerValue
      */
     void header(String headerName, String headerValue) {
-        exchange.getResponseHeaders().add(headerName, headerValue);
+        requestContext.getResponseHeaders().add(headerName, headerValue);
     }
 
     /**
@@ -206,9 +204,10 @@ trait ResourceHandlerFn {
     void error(int code, String message) {
         message = message ?: "Error!"
         //println "requestHandlerDelegate.error($code, $message)"
-        exchange.sendResponseHeaders(code, message.bytes.size())
-        exchange.getResponseBody().write(message.bytes)
-        exchange.getResponseBody().close()
+        requestContext.sendResponseHeaders(code, message.bytes.size())
+        requestContext.getResponseBody().write(message.bytes)
+        requestContext.getResponseBody().close()
+        requestContext.close()
     }
 
     /**
@@ -217,10 +216,11 @@ trait ResourceHandlerFn {
      */
     void redirect(url) {
         def message = "Resource has moved to: $url"
-        exchange.getHeaders().add("Location", url)
-        exchange.sendResponseHeaders(302, message.bytes.size())
-        exchange.getResponseBody().write(message)
-        exchange.getResponseBody().close()
+        requestContext.getHeaders().add("Location", url)
+        requestContext.sendResponseHeaders(302, message.bytes.size())
+        requestContext.getResponseBody().write(message)
+        requestContext.getResponseBody().close()
+        requestContext.close()
     }
 
     /**

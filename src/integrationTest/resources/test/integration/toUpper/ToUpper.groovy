@@ -23,10 +23,8 @@ package test.integration.toUpper
  * THE SOFTWARE.
  */
 
-import io.github.javaconductor.gserv.*
-
 [
-        GServ.Resource("/upper") {
+        Resource("/upper") {
             get("/:word") { word ->
                 write(word.toUpperCase().bytes)
             }

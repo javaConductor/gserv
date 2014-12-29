@@ -119,15 +119,15 @@ class GServRunner {
                 configs = factory.createConfigs(configFile)
             }
         } catch (ResourceScriptException ex) {
-            log.error("Could not start app.", ex)
+            log.trace("Could not start app.", ex)
             //System.exit(GServ.returnCodes.ResourceCompilationError)
             throw ex;
         } catch (InstanceScriptException ex) {
-            log.error("Could not start app.", ex)
+            log.trace("Could not start app.", ex)
             //System.exit(GServ.returnCodes.InstanceCompilationError)
             throw ex;
         } catch (Throwable ex) {
-            log.error("Could not start app.", ex)
+            log.trace("Could not start app.", ex)
             //System.exit(GServ.returnCodes.GeneralError)
             throw ex;
         }

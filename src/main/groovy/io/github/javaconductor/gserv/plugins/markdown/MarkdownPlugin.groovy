@@ -29,7 +29,7 @@ import io.github.javaconductor.gserv.ResourceActionFactory
 import io.github.javaconductor.gserv.delegates.DelegateTypes
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
-import io.github.javaconductor.gserv.wrapper.ExchangeWrapper
+import io.github.javaconductor.gserv.requesthandler.wrapper.ExchangeWrapper
 import groovy.util.logging.Log4j
 import org.apache.commons.io.IOUtils
 import org.pegdown.PegDownProcessor

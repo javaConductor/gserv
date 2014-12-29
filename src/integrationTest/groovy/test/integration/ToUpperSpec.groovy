@@ -16,9 +16,9 @@ class ToUpperSpec {
     @Test
     public final void testToUpper() {
 
-        def http = new HTTPBuilder('http://localhost:10000/upper/lowercaseword')
+        def http = new HTTPBuilder('http://localhost:10010/upper/lowercaseword')
         def dir = baseDir + "toUpper"
-        def args = ["-p", "10000",
+        def args = ["-p", "10010",
                     "-r", dir + "/ToUpper.groovy"]
         def stopFn = new GServRunner().start(args);
         http.request(GET, TEXT) { req ->

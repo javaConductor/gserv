@@ -60,8 +60,6 @@ class ScriptLoader {
                     def instances = []
                     try {
                         instances = resourceLoader.loadResources(f, classpath)
-                    } catch (ResourceScriptException ex) {
-                        throw new InstanceScriptException(ex.message)
                     } catch (Throwable ex) {
                         throw ex
                     }

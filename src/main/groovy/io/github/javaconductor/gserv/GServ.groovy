@@ -28,11 +28,12 @@ import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.plugins.IPlugin
+import io.github.javaconductor.gserv.requesthandler.AsyncHandler
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.ActorPool
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
-import groovy.util.logging.Log
 import groovy.util.logging.Log4j
 import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
@@ -44,14 +45,15 @@ import io.github.javaconductor.gserv.delegates.*
 @Log4j
 class GServ {
     def factory = new GServFactory();
-    static def exchangeAttributes = [
+    static def contextAttributes = [
             "receivedMS"     : 'g$$when',
             "serverConfig"   : 'g$$serverConfig',
             "currentAction"   : 'g$$route',
             "requestId"      : 'g$$requestId',
             "isWrapper"      : 'g$$wrapper',
             "matchedAction"   : 'g$$matchedAction',
-            "postProcessList": 'g$$postProcessList'
+            "postProcessList": 'g$$postProcessList',
+            "requestContext": 'g$$requestContext'
     ]
     static def returnCodes = [
             Normal                  : 0,
@@ -185,14 +187,15 @@ class GServ {
         }
 
         /// add this info to the config
+
         cfg.addServerIP(options.serverIP)
-        cfg.addFilters(tmpFilters)
-        cfg.addStaticRoots(tmpStaticRoots)
-        cfg.addActions(tmpActions)
-        cfg.useResourceDocs(_useResourceDocs)
-        cfg.templateEngineName(templateEngineName)
-        cfg.name(tmpName)
-        cfg.linkBuilder(lBuilder)
+        .addFilters(tmpFilters)
+        .addStaticRoots(tmpStaticRoots)
+        .addActions(tmpActions)
+        .useResourceDocs(_useResourceDocs)
+        .templateEngineName(templateEngineName)
+        .name(tmpName)
+        .linkBuilder(lBuilder)
         //}
         factory.createHttpInstance(cfg)
     }
@@ -242,9 +245,7 @@ class gServHandler implements HttpHandler {
 
         def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false)), _nuHandler);
         _nuDispatcher = {
-            _factory.createDispatcher(actors, _actions, cfg.staticRoots(),
-                    _templateEngineName,
-                    _cfg.useResourceDocs());
+            _factory.createDispatcher(actors, _cfg );
         }
         _dispatcher = _nuDispatcher();
         _dispatcher.start()
@@ -257,38 +258,46 @@ class gServHandler implements HttpHandler {
      * @param httpExchange
      */
     void handle(HttpExchange httpExchange) {
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})")
+        RequestContext context =
+                httpExchange.getAttribute(GServ.contextAttributes.requestContext) ?:
+                _factory.createRequestContext( httpExchange )
         try {
-            httpExchange.setAttribute(GServ.exchangeAttributes.serverConfig, _cfg)
+            context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
+//            httpExchange.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
             EventManager.instance().publish(Events.RequestRecieved, [
-                    requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                    method   : httpExchange.requestMethod,
-                    uri      : httpExchange.requestURI,
-                    headers  : httpExchange.requestHeaders])
+                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    method   : context.requestMethod,
+                    uri      : context.requestURI,
+                    headers  : context.requestHeaders])
             def start = cal.getTimeInMillis();
-            _handle(httpExchange)
+            _handle(context)
             EventManager.instance().publish(Events.RequestDispatched, [
-                    requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-                    method   : httpExchange.requestMethod,
-                    uri      : httpExchange.requestURI,
-                    headers  : httpExchange.requestHeaders])
+                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    method   : context.requestMethod,
+                    uri      : context.requestURI,
+                    headers  : context.requestHeaders])
         } catch (Throwable e) {
-            def msg = "Error req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}${e.message} "
+            def msg = "Error req #${context.getAttribute(GServ.contextAttributes.requestId)}${e.message} "
             log.error(msg, e)
             EventManager.instance().publish(Events.RequestProcessingError, [
-                    requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
+                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
                     error    : "${msg}",
-                    method   : httpExchange.requestMethod,
-                    uri      : httpExchange.requestURI,
-                    headers  : httpExchange.requestHeaders])
-            httpExchange.sendResponseHeaders(500, msg.bytes.size())
-            httpExchange.responseBody.write(msg.bytes)
-            httpExchange.responseBody.close()
+                    method   : context.requestMethod,
+                    uri      : context.requestURI,
+                    headers  : context.requestHeaders])
+            context.sendResponseHeaders(500, msg.bytes.size())
+            context.responseBody.write(msg.bytes)
+            context.responseBody.close()
         }
     }
 
-    private void _handle(HttpExchange httpExchange) {
+    private void _handle(RequestContext context) {
+        log.trace("ServerHandler._handle(${context})")
         //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
-        _dispatcher << [exchange: httpExchange]
+        _dispatcher << [requestContext: context]
+        log.trace("ServerHandler._handle(${context}) Sent to dispatcher.")
+
     }
 }
 

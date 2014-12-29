@@ -24,7 +24,8 @@
 
 package io.github.javaconductor.gserv
 
-import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpContext
+import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpsServer
 import groovy.jmx.builder.JmxBuilder
 import groovy.util.logging.Log4j
@@ -33,7 +34,9 @@ import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterByteArrayOutputStream
 import io.github.javaconductor.gserv.jmx.GServJMX
-import io.github.javaconductor.gserv.wrapper.ExchangeWrapper
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.requesthandler.wrapper.ExchangeWrapper
+import io.github.javaconductor.gserv.requesthandler.wrapper.RequestContextWrapper
 
 import javax.management.MBeanServer
 import javax.management.ObjectName
@@ -67,7 +70,6 @@ class GServInstance {
         _filters = cfg.filters();
         _templateEngineName = cfg.templateEngineName();
     }
-
 
     def exportMBean(actualPort, jmxBean) {
 
@@ -108,8 +110,8 @@ class GServInstance {
         );
 
         ///// Underlying Server Impl -
-        def server = com.sun.net.httpserver.HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
-        def context = server.createContext("/", _handler);
+        HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
+        HttpContext context = server.createContext("/", _handler);
 
         ////////////////////////////////
         /// create and add the InitFilter
@@ -117,23 +119,26 @@ class GServInstance {
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
             synchronized (requestId) {
                 log.trace("initFilter: new request #$requestId")
-                exchange.setAttribute(GServ.exchangeAttributes.requestId, requestId)
+                requestContext.setAttribute(GServ.contextAttributes.requestId, requestId)
                 ++requestId
             }
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
-            URI uri = applyDefaultResourceToURI(config().defaultResource(), exchange.requestURI);
+            URI uri = applyDefaultResourceToURI(config().defaultResource(), requestContext.requestURI);
+
 
             /// add wrap code here
             // Wrap the exchange
             //println "Wrapping the Exchange - filter: ${theFilter.name}"
-            // wrap the Exchange
-            HttpExchange httpExchange = new ExchangeWrapper(exchange, uri)
-            httpExchange.setAttribute(GServ.exchangeAttributes.postProcessList, [])
+            // wrap the Context
+
+            RequestContext rc = new RequestContextWrapper(requestContext)
+            rc.requestURI = uri
+            rc.setAttribute(GServ.contextAttributes.postProcessList, [])
             def baos = new FilterByteArrayOutputStream({ _this ->
-                log.trace "Running ppList for ${httpExchange.requestURI.path} - req #${httpExchange.getAttribute(GServ.exchangeAttributes.requestId)}"
+                log.trace "Running ppList for ${uri.path} - req #${rc.getAttribute(GServ.contextAttributes.requestId)}"
                 /// run the PostProcess List
-                def ppList = httpExchange.getAttribute(GServ.exchangeAttributes.postProcessList).toList()
+                def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
 
                 def s = _this
                 /// get bytes from BAOS
@@ -142,21 +147,17 @@ class GServInstance {
                 ppList.each { fn ->
                     try {
                         log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
-                        bytes = fn(httpExchange, bytes) ?: bytes
+                        bytes = fn(rc, bytes) ?: bytes
                     } catch (Throwable ex) {
                         log.error("FilterError: ${ex.message}")
                         ex.printStackTrace(System.err)
-//                            eventMgr.publish(Events.FilterError, [filter   : theFilter.name ?: "-",
-//                                                                  requestId: httpExchange.getAttribute(GServ.exchangeAttributes.requestId),
-//                                                                  path     : httpExchange.requestURI.path,
-//                                                                  method   : httpExchange.requestMethod])
                     }
                 }
-                httpExchange.writeIt(bytes)
+                rc.writeIt(bytes)
             })
-            httpExchange.setStreams(httpExchange.requestBody, baos)
-            nextFilter(httpExchange)
-            httpExchange
+            rc.setStreams(rc.requestBody, baos)
+            nextFilter(rc)
+            rc
         }
 
         _filters = _filters ?: []
@@ -298,11 +299,11 @@ class gServHttpsInstance extends GServInstance {
         ////////////////////////////////
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
             synchronized (requestId) {
-                exchange.setAttribute(GServ.exchangeAttributes.requestId, requestId)
+                requestContext.setAttribute(GServ.contextAttributes.requestId, requestId)
                 ++requestId
             }
             nextFilter()
-            exchange
+            requestContext
         }
 
         _filters = _filters ?: []

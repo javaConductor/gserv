@@ -26,7 +26,7 @@
  *
  */
 /**
- * @author lcollins
+ * @author javaConductor
  *
  */
 package io.github.javaconductor.gserv;

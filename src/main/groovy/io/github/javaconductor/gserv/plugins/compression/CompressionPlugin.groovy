@@ -32,7 +32,7 @@ import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
-import com.sun.net.httpserver.HttpExchange
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 import java.util.zip.DeflaterInputStream
 import java.util.zip.DeflaterOutputStream
@@ -62,8 +62,8 @@ class CompressionPlugin extends AbstractPlugin {
      */
     def CompressionTypes = ["GZIP": "gzip", "DEFLATE": "deflate"]
 
-    private def handleAfter(exchange, data) {
-        def outEncodings = exchange.getRequestHeaders().get("Accept-Encoding")
+    private def handleAfter(RequestContext context, data) {
+        def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
         def outStream
         def outEncoding
         if (outEncodings)
@@ -74,19 +74,19 @@ class CompressionPlugin extends AbstractPlugin {
         def bytes = data
         /// if Should GZIP this
         if (outEncoding)
-            if (shouldCompress(exchange.responseCode)) {
+            if (shouldCompress(context.responseCode)) {
                 bytes = compressBytes(bytes, outEncoding)
                 /// add headers to real Exchange
-                exchange.responseHeaders.add("Content-Encoding", outEncoding)
+                context.responseHeaders.add("Content-Encoding", outEncoding)
             }
         bytes
     }
 
-    private def handleBefore(exchange) {
-        def inputStream = exchange.requestBody
+    private def handleBefore(context) {
+        def inputStream = context.requestBody
 
         /// wrap the input if needed
-        def inEncoding = exchange.requestHeaders["Content-Encoding"]
+        def inEncoding = context.requestHeaders["Content-Encoding"]
         def instream
         if (inEncoding)
             switch (inEncoding) {
@@ -104,18 +104,18 @@ class CompressionPlugin extends AbstractPlugin {
 
         if (instream) {
             EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
+                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
                     name     : "Compression-Before-Filter",
                     message  : "Processing Compression Filter - Replacing input stream."])
-            exchange.setStreams(instream, exchange.responseBody)
+            context.setStreams(instream, context.responseBody)
         } else {
             EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: exchange.getAttribute(GServ.exchangeAttributes.requestId),
+                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
                     name     : "Compression-Before-Filter",
                     message  : "Processing Compression Filter - NOT Replacing input stream."])
             //println("compressionPlugin: no compression here.")
         }
-        exchange
+        context
     }
 
     private def createFilter(method) {
@@ -131,7 +131,7 @@ class CompressionPlugin extends AbstractPlugin {
                     data = handleAfter(e, data) ?: data
 //                    println "CompressionPlugin: before GET doFilter()"
                     EventManager.instance().publish(Events.FilterProcessing, [
-                            requestId: e.getAttribute(GServ.exchangeAttributes.requestId),
+                            requestId: e.getAttribute(GServ.contextAttributes.requestId),
                             name     : "Compression-$method-After-Filter",
                             message  : "Filter is done! Compression Filter passing control down the chain. "])
                     data
@@ -140,15 +140,17 @@ class CompressionPlugin extends AbstractPlugin {
 
             case "PUT":
             case "POST":
-                [ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 1) {
+                [ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter",
+                        method, '/**',
+                        [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 1) {
                     ->
-                    HttpExchange e = handleBefore(exchange) ?: exchange
-                    nextFilter(e)
+                    RequestContext ctxt = handleBefore(requestContext) ?: requestContext
+                    nextFilter(ctxt)
                     log.trace "CompressionPlugin: before $method doFilter()"
-                    e
+                    ctxt
                 },
-                 ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { exchange, data ->
-                     handleAfter(exchange, data) ?: data
+                 ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { requestContext, data ->
+                     handleAfter(requestContext, data) ?: data
                  }]
                 break;
         }

@@ -37,10 +37,8 @@ import io.github.javaconductor.gserv.utils.LinkBuilder
 class ResourceDelegate extends DelegateFunctions implements ResourceFn {
 //    Map _properties = [:]
 
-
     def templateEngine = "default"
     def eventManager = EventManager.instance()
-    def patterns = { value("actionList") }
     def actions = { value("actionList") }
     def linkBuilder = { value("linkBuilder") }
 

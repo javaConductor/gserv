@@ -24,10 +24,14 @@
 
 package io.github.javaconductor.gserv
 
+import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
+import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
+import io.github.javaconductor.gserv.requesthandler.DefaultRequestContext
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.utils.ActorPool
 
@@ -56,13 +60,18 @@ class GServFactory {
                 : new GServInstance(cfg)
     }
 
-    AsyncDispatcher createDispatcher(ActorPool actors, List actions, List staticRoots, String templateEngineName, boolean bUseResourceDocs) {
+    AsyncDispatcher createDispatcher(ActorPool actors,
+                                     List actions,
+                                     List staticRoots,
+                                     String templateEngineName,
+                                     boolean bUseResourceDocs) {
         new AsyncDispatcher(actors, actions, staticRoots, templateEngineName, bUseResourceDocs);
     }
 
-    AsyncDispatcher createDispatcher() {
-        new AsyncDispatcher()
+    AsyncDispatcher createDispatcher(ActorPool actors, GServConfig cfg) {
+        new AsyncDispatcher(actors, cfg);
     }
+
 
     /**
      * Parses a gserv Config file
@@ -89,7 +98,10 @@ class GServFactory {
      * @param resourceScripts
      * @return list of configs (containing one config)
      */
-    List<GServConfig> createConfigs(String staticRoot, String bindAddress, int port, String defaultResource, String instanceScript, List<String> resourceScripts, List<String> classpath, displayName = "gServ Application") {
+    List<GServConfig> createConfigs(String staticRoot, String bindAddress,
+                                    int port, String defaultResource, String instanceScript,
+                                    List<String> resourceScripts, List<String> classpath,
+                                    displayName = "gServ Application") {
         GServConfig cfg
         def resources = []
         ResourceLoader resourceLoader = new ResourceLoader()
@@ -150,4 +162,9 @@ class GServFactory {
         ];
 
     }//createConfigs
+
+    RequestContext createRequestContext(HttpExchange httpExchange) {
+        new DefaultRequestContext(httpExchange);
+    }
+
 }
