@@ -28,12 +28,11 @@ class DefaultRequestContext extends AbstractRequestContext {
         _exchange.sendResponseHeaders(responseCode,size)
     }
 
-@Override
+    @Override
     def setStreams(InputStream is, OutputStream os){
-    requestBody = is
-    responseBody  =os
-
-}
+        requestBody = is
+        responseBody = os
+    }
 
     @Override
     def close() {
@@ -48,4 +47,5 @@ class DefaultRequestContext extends AbstractRequestContext {
     Object nativeObject(){
         _exchange
     }
+
 }
