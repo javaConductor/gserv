@@ -23,13 +23,13 @@
             </ul>
                 <h3>Requirements:</h3>
                 <ul><li>Java JDK 1.6+</ul>
-
     <div class="docs-content">
         <h3>Basic Concepts</h3>
         <table width="90%" class="docs-content">
             <tr><th>Term</th>             <th>Meaning</th></tr>
-            <tr><td>Resources</td>      <td>Resources define actions - one for each HTTP method. </td></tr>
-            <tr><td>Server Config</td><td>The config encapsulates any resources, end-points, filters, and plugins. </td></tr>
+            <tr><td>Action</td>      <td>HTTP request handler for a particular path/query/method combination.  </td></tr>
+            <tr><td>Resources</td>      <td>Resources define actions for a particular root path (eg. /books) and its sub-resources (eg. /books/bestSellers). </td></tr>
+            <tr><td>Server Config</td><td>The config encapsulates any resources, actions, filters, and plugins. </td></tr>
             <tr><td>Server Instance</td><td>This is the actual server that will listen to the specified port and handle
                 requests based on its configuration.</td></tr>
         </table>
