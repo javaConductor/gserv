@@ -160,7 +160,20 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
+
+task standaloneJar(type: Jar, dependsOn: Jar) {
+    classifier = 'groovydoc'
+    from groovydoc.destinationDir
+}
+
+task frameworkJar(type: Jar, dependsOn: Jar) {
+    classifier = 'groovydoc'
+    from groovydoc.destinationDir
+}
+
 artifacts {
+    archives standaloneJar
+    archives frameworkJar
     archives sourcesJar
     archives groovydocJar
 }

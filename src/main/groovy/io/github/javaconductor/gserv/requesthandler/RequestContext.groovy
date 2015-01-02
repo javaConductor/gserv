@@ -45,9 +45,14 @@ interface RequestContext {
 
     Object getAttribute(String key)
     void setAttribute(String key, Object value)
-    void sendResponseHeaders( int responseCode, long size)
+
     def close()
+
+    def setStreams(InputStream is, OutputStream os)
+
+    void sendResponseHeaders(int responseCode, long size)
+/*
     String dump()
     Object nativeObject()
-    def setStreams(InputStream is, OutputStream os)
+    */
 }

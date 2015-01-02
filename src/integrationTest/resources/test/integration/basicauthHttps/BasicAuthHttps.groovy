@@ -5,16 +5,7 @@ package test.integration.basicauthHttps
 import io.github.javaconductor.gserv.GServ
 
 def gserv = new GServ();
-/*
- "https":{
-        "keyManagerAlgorithm": "SunX509",
-        "trustManagerAlgorithm": "SunX509",
-        "keystoreFilePath": "/Users/lcollins/gserv.keystore",
-        "keyStoreImplementation": "JKS",
-        "password": "remoteip",
-        "sslProtocol" : "TLS"
-    },
- */
+
 gserv.https((Map) [
         https: [
                 keyManagerAlgorithm   : "SunX509",
@@ -25,9 +16,7 @@ gserv.https((Map) [
                 sslProtocol           : "TLS"
         ]
 ]) { ->
-/*
-    def basicAuthentication(methods, path, realm, challengeFn)
- */
+
     basicAuthentication(['GET', "POST", "PUT"], "/*", "testRealm") { user, pswd ->
         def ok = (user == "secret" && pswd == "thing")
         println "u=$user p=$pswd : ${ok ? "OK" : "FAILED"}";

@@ -125,10 +125,11 @@ abstract class AbstractRequestContext implements RequestContext {
     void setAttribute(String key, Object value) {
         attributes[key] = value
     }
-
     abstract void sendResponseHeaders( int responseCode, long size)
+/*
     abstract def close()
     abstract String dump()
     abstract Object nativeObject();
     abstract  def setStreams(InputStream is, OutputStream os);
+    */
     }

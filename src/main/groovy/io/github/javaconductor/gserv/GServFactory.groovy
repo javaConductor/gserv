@@ -30,7 +30,7 @@ import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
-import io.github.javaconductor.gserv.requesthandler.DefaultRequestContext
+import io.github.javaconductor.gserv.requesthandler.Jdk16RequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.utils.ActorPool
@@ -72,7 +72,6 @@ class GServFactory {
         new AsyncDispatcher(actors, cfg);
     }
 
-
     /**
      * Parses a gserv Config file
      *
@@ -84,6 +83,22 @@ class GServFactory {
             return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
         } catch (Exception ex) {
             log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
+            throw ex;
+        }
+    }//createConfigs
+
+
+    /**
+     * Loads a gserv config file from a Groovy script file
+     *
+     * @param cfgScriptFile
+     * @return GServConfig .
+     \  */
+    GServConfig createConfig(File cfgScriptFile) {
+        try {
+            new ResourceLoader().loadInstance(cfgScriptFile, [])
+        } catch (Exception ex) {
+            log.error("Could not create application from gservconfig script: ${cfgScriptFile.absolutePath}: ${ex.message}")
             throw ex;
         }
     }//createConfigs
@@ -164,7 +179,7 @@ class GServFactory {
     }//createConfigs
 
     RequestContext createRequestContext(HttpExchange httpExchange) {
-        new DefaultRequestContext(httpExchange);
+        new Jdk16RequestContext(httpExchange);
     }
 
 }
