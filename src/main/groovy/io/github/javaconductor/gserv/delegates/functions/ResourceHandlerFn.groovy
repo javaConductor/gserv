@@ -46,7 +46,7 @@ trait ResourceHandlerFn {
      * @return String
      */
     def link(name, data) {
-        linkBuilder.addLink(name, data)
+        linkBuilder.link(name, data)
     }
 
     /**
@@ -140,7 +140,7 @@ trait ResourceHandlerFn {
      *
      */
     void write(byte[] data) {
-        requestContext.sendResponseHeaders(200, data.size())
+        requestContext.sendResponseHeaders(200, data.size() as long)
         requestContext.getResponseBody().write(data)
         requestContext.getResponseBody().close()
         requestContext.close()
@@ -163,7 +163,7 @@ trait ResourceHandlerFn {
      * @param headerValue
      */
     void header(String headerName, String headerValue) {
-        requestContext.getResponseHeaders().add(headerName, headerValue);
+        requestContext.getResponseHeaders().put(headerName, headerValue);
     }
 
     /**
@@ -204,7 +204,7 @@ trait ResourceHandlerFn {
     void error(int code, String message) {
         message = message ?: "Error!"
         //println "requestHandlerDelegate.error($code, $message)"
-        requestContext.sendResponseHeaders(code, message.bytes.size())
+        requestContext.sendResponseHeaders(code, message.bytes.size() as long)
         requestContext.getResponseBody().write(message.bytes)
         requestContext.getResponseBody().close()
         requestContext.close()
@@ -217,7 +217,7 @@ trait ResourceHandlerFn {
     void redirect(url) {
         def message = "Resource has moved to: $url"
         requestContext.getHeaders().add("Location", url)
-        requestContext.sendResponseHeaders(302, message.bytes.size())
+        requestContext.sendResponseHeaders(302, message.bytes.size() as long)
         requestContext.getResponseBody().write(message)
         requestContext.getResponseBody().close()
         requestContext.close()

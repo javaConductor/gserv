@@ -24,7 +24,7 @@ class ActionRunner {
         _cfg.delegateMgr.createHttpMethodDelegate(context, action, _cfg)
     }
 
-    private def prepareArguments(uri, istream, action) {
+    private def prepareArguments(URI uri, InputStream istream, ResourceAction action) {
         def args = []
         def method = action.method()
         if (method == "PUT" || method == "POST") {
@@ -55,7 +55,7 @@ class ActionRunner {
         args
     }
 
-    private def prepareClosure(context, action) {
+    private def prepareClosure(RequestContext context, ResourceAction action) {
         def cl = action.requestHandler()//_handler
         HttpMethodDelegate dgt = prepareDelegate(context, action)
         cl.delegate = dgt

@@ -49,7 +49,7 @@ class RequestContextWrapper extends AbstractRequestContext {
     String _requestMethod;
     def _wasClosed = false
 
-    def RequestContextWrapper(RequestContext context, URI uri = null) {
+    def RequestContextWrapper(RequestContext context) {
         if (!context)
             throw new IllegalArgumentException("context must NOT be null. Should be valid RequestContext impl.")
 
@@ -67,24 +67,24 @@ class RequestContextWrapper extends AbstractRequestContext {
         this.remoteAddress = _context.remoteAddress
         this.localAddress = _context.localAddress
 
-        this.responseBody =  _responseBody = new FilterByteArrayOutputStream(defaultClose)
+        this.responseBody = _responseBody = new ByteArrayOutputStream()
         setAttribute(GServ.contextAttributes.isWrapper, true)
     }
 
-    def defaultClose = { _this ->
-        writeIt(_responseBody.toByteArray())
-    }
+//    def defaultClose = { _this ->
+//        writeIt(_responseBody.toByteArray())
+//    }
 
     def originalOutputStream() { _originalOutputStream }
 
     def originalInputStream() { _originalInputStream }
+
     @Override
     def close() {
         _wasClosed = true
-//        _context.close()
+        writeIt(_responseBody.toByteArray())
     }
 
-    @Override
     void sendResponseHeaders(int statusCode, long dataLength) throws IOException {
         /// must NOT send anything YET
         _code = statusCode
@@ -96,17 +96,14 @@ class RequestContextWrapper extends AbstractRequestContext {
         return _code
     }
 
-    @Override
     String dump() {
         attributes.toString()
     }
 
-    @Override
     Object nativeObject() {
         _context.nativeObject()
     }
 
-    @Override
     def setStreams(InputStream is, OutputStream os) {
         _context.setStreams(is ,os)
     }
