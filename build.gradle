@@ -102,6 +102,7 @@ task integration(type: Test) {
 }
 
 groovydoc {
+
 }
 
 uploadArchives {
@@ -160,15 +161,33 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
-
-task standaloneJar(type: Jar, dependsOn: Jar) {
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
+task standaloneJar(type: Jar) {
+    classifier = 'jar'
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
+    archiveName = "gserv-${version}.jar"
 }
 
-task frameworkJar(type: Jar, dependsOn: Jar) {
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
+task frameworkJar(type: Jar) {
+    classifier = 'jar'
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    archiveName = "gservFramework-${version}.jar"
+    exclude('groovy/*')
+    exclude('org/codehaus/groovy/*')
 }
 
 artifacts {
@@ -177,9 +196,3 @@ artifacts {
     archives sourcesJar
     archives groovydocJar
 }
-
-/// we need to define the other artifacts:
-// 1) The gservFramework jar without the Groovy Runtime
-
-// 2) Standalone jat w/ Groovy Jars
-

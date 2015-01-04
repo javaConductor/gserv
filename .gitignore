@@ -5,3 +5,4 @@ gServ.log
 .gradle/
 .nb-gradle/
 gserv.iml
+gradle.properties
