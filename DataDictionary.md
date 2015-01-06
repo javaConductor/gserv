@@ -3,7 +3,7 @@
 ### Path
 The URL path with or without embedded variables.
 
-### Route
+### Action
 A path, HTTP method and the associated HTTPMethodHandler.
 Routes are defined by the: get(), put(), post(), and delete() functions available in any serverConfig or resource definition.
 
