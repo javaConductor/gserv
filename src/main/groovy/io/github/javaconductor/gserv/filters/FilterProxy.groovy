@@ -81,7 +81,11 @@ class FilterProxy extends Filter {
         }
 
         def currentRequestId =  requestContext.getAttribute(GServ.contextAttributes.requestId)
-        println requestContext.properties
+        //println requestContext.properties
+
+//        log.trace "FilterProxy: Request($currentRequestId) : instream ${httpExchange.requestBody} outstream ${httpExchange.responseBody}"
+
+
 
         def theFilter = m.matchAction ( _filterList, requestContext )
         if (theFilter) {
@@ -96,9 +100,9 @@ class FilterProxy extends Filter {
             //  if route is required  for this filter and not matched  return immediately
             if (theFilter.options()[FilterOptions.MatchedActionsOnly]) {
                 if (!_serverConfig.requestMatched(requestContext)) {
-                    log.trace "FilterProxy: Request($currentRequestId) : Not matched. Calling chain." 
+                    log.trace "FilterProxy: Request($currentRequestId) : Not matched. Calling chain."
                     chain.doFilter(httpExchange);
-                    log.trace "FilterProxy: Request($currentRequestId) :Not matched. Called chain:" 
+                    log.trace "FilterProxy: Request($currentRequestId) :Not matched. Called chain:"
                     return
                 }
             }
@@ -129,8 +133,10 @@ class FilterProxy extends Filter {
                 case FilterType.Normal:
                     try {
                         // run the filter
-                        // replace with new one
+                        // replace with new context if returned
                         requestContext = filter(requestContext, chain, theFilter) ?: requestContext
+                        httpExchange.setAttribute(GServ.contextAttributes.requestContext, requestContext)
+
                     } catch (Throwable ex) {
                         log.trace( "Filter $theFilter threw exception: ${ex.message}.", ex )
                         log.error( "Filter $theFilter threw exception: ${ex.message}." )
@@ -146,15 +152,16 @@ class FilterProxy extends Filter {
                                                                  path         : requestContext.requestURI.path,
                                                                  method       : requestContext.requestMethod])
                     }
-                    requestContext
+            //        requestContext
                     break;
             }//switch
         } else {
                     log.trace "FilterProxy: Request($currentRequestId) :Filter Not Matched. Calling chain."
             chain.doFilter(httpExchange)
                     log.trace "FilterProxy: Request($currentRequestId) :Filter Not Matched. Called chain."
-            httpExchange
+        //    requestContext
         }
+
     }//fn
 
     @Override

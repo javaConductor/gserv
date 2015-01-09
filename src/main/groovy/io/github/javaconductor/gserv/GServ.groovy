@@ -259,29 +259,32 @@ class gServHandler implements HttpHandler {
      */
     void handle(HttpExchange httpExchange) {
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path})")
+//        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
         RequestContext context =
                 httpExchange.getAttribute(GServ.contextAttributes.requestContext) ?:
                 _factory.createRequestContext( httpExchange )
+        assert context
+        context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
+        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
         try {
-            context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
 //            httpExchange.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
             EventManager.instance().publish(Events.RequestRecieved, [
-                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: currentReqId,
                     method   : context.requestMethod,
                     uri      : context.requestURI,
                     headers  : context.requestHeaders])
             def start = cal.getTimeInMillis();
             _handle(context)
             EventManager.instance().publish(Events.RequestDispatched, [
-                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: currentReqId,
                     method   : context.requestMethod,
                     uri      : context.requestURI,
                     headers  : context.requestHeaders])
         } catch (Throwable e) {
-            def msg = "Error req #${context.getAttribute(GServ.contextAttributes.requestId)}${e.message} "
+            def msg = "Error req #${currentReqId} ${e.message} "
             log.error(msg, e)
             EventManager.instance().publish(Events.RequestProcessingError, [
-                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: currentReqId,
                     error    : "${msg}",
                     method   : context.requestMethod,
                     uri      : context.requestURI,
@@ -295,7 +298,12 @@ class gServHandler implements HttpHandler {
     private void _handle(RequestContext context) {
         log.trace("ServerHandler._handle(${context})")
         //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
-        _dispatcher << [requestContext: context]
+        try {
+            _dispatcher << [requestContext: context]
+        } catch (IllegalStateException e) {
+            _dispatcher = _nuDispatcher()
+            _handle(context)
+        }
         log.trace("ServerHandler._handle(${context}) Sent to dispatcher.")
 
     }

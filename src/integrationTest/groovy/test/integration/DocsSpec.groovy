@@ -3,6 +3,7 @@ package test.integration
 import groovyx.net.http.HTTPBuilder
 import io.github.javaconductor.gserv.GServRunner
 import org.junit.Ignore
+import org.junit.Test
 
 /**
  * Created by javaConductor on 10/5/2014.

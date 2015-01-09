@@ -341,18 +341,17 @@ class ActionPathQuery {
     // we need to string - in order
     // which are the keys to the queryValues that are mapped
 
-    private def _queryString = ""
-    private def _matchQueryKeys = []/// list of the keys that have data
-    private def _queryMap = [:]/// Map
-    private def _dataQueryKeys = []
+    private String _queryString = ""
+    private List _matchQueryKeys = []/// list of the keys that have data
+    private Map _queryMap = [:]/// Map
+    private List _dataQueryKeys = []
 
-    def ActionPathQuery(qString) {
+    def ActionPathQuery(String qString) {
         if (!qString) {
             return
         }
         _queryString = URLDecoder.decode(qString, "UTF-8")
         def queries = _queryString.split("&")
-        //println "queries -> " + queries.toString()
         _matchQueryKeys = queries.inject([]) { acc, qry ->
             def kv = qry.split("=")
             /// only record the ones that are used for matching:
@@ -385,19 +384,19 @@ class ActionPathQuery {
         _queryMap
     }
 
-    def queryMatchMap() {
+    Map<String, String>  queryMatchMap() {
         queryKeys().inject([:]) { dataMap, dk -> dataMap + ["$dk": _queryMap[dk]] }
     }
 
-    def queryDataMap() {
+    Map queryDataMap() {
         (queryKeys() + dataKeys()).inject([:]) { dataMap, dk -> dataMap + ["$dk": _queryMap[dk]] }
     }
 
-    def queryKeys() {
+    List queryKeys() {
         _matchQueryKeys
     }
 
-    def dataKeys() {
+    List dataKeys() {
         _dataQueryKeys
     }
 
@@ -409,7 +408,7 @@ class ActionPathQuery {
 class ActionPathElement {
     private def _pathSegment, _isVar, _elementType
 
-    def ActionPathElement(pathElement, isVar, elementType = null) {
+    def ActionPathElement(String pathElement, boolean isVar, elementType = null) {
         _pathSegment = pathElement
         _isVar = isVar
         _elementType = elementType
@@ -419,16 +418,13 @@ class ActionPathElement {
         _elementType
     }
 
-    def text() { _pathSegment }
+    String text() { _pathSegment }
 
-    def isVariable() { _isVar }
+    boolean isVariable() { _isVar }
 
-    def variableName() { _isVar ? _pathSegment.toString().substring(1) : "" }
+    String variableName() { _isVar ? _pathSegment.toString().substring(1) : "" }
 
     String toString() {
         return text()
     }
 }
-
-
-

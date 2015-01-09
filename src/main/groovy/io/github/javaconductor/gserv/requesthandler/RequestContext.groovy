@@ -47,6 +47,7 @@ interface RequestContext {
     void setAttribute(String key, Object value)
 
     def close()
+    def isClosed()
 
     def setStreams(InputStream is, OutputStream os)
 

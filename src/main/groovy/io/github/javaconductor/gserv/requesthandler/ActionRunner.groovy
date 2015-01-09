@@ -64,24 +64,31 @@ class ActionRunner {
     }
 
     def process(RequestContext context, ResourceAction action) {
+
+        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        //log.trace "ActionRunner.process() req#${currentReqId} requestContext has ${context.requestBody.bytes.size()} bytes to read."
+        log.trace "ActionRunner.process() req#${currentReqId}."
+
         Closure cl = prepareClosure(context, action)
         def args = prepareArguments(context.requestURI, context.requestBody, action)
 //        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
         ({ clozure, argList ->
             try {
                 EventManager.instance().publish(Events.ResourceProcessing, [
-                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        requestId: currentReqId,
                         uri      : context.requestURI.path,
                         msg      : "Resource Processing."])
                 //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
-                log.trace "ActionRunner: Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path}"
+                log.trace "ActionRunner: Running req#${currentReqId} ${context.requestURI.path}"
                 clozure(*argList)
                 log.trace "ActionRunner: req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} - Finished."
             } catch (Throwable e) {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
                         requestId: context.getAttribute(GServ.contextAttributes.requestId),
                         uri      : context.requestURI.path, msg: e.message, e: e])
-                cl.delegate.error(500, e.message)
+                if(!context.isClosed()) {
+                    cl.delegate.error(500, e.message)
+                }
                 log.error "ActionRunner: Error Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} : ${e.message}", e
                 context
             }

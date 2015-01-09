@@ -75,6 +75,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     ActorPool actorPool() {
         _actorPool
     }
+
     void onMessage(Map request) {
         log.trace "AsyncDispatcher.onMessage $request: Processing"
         process(request.requestContext)
@@ -84,14 +85,13 @@ class AsyncDispatcher extends DynamicDispatchActor {
     def evtMgr = EventManager.instance()
 
     def process(RequestContext context) {
-        log.trace "AsyncDispatcher.process() "+context
-        log.trace "AsyncDispatcher.process() "+ context.getAttribute(GServ.contextAttributes.requestId)
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
-        log.trace "Processing request(${currentReqId})"
+        //log.trace "AsyncDispatcher.process($currentReqId) "
+        log.debug "AsyncDispatcher.process($currentReqId)  "
         ResourceAction action = _matcher.matchAction(_config.actions(), context)
         if (action) {
             context.setAttribute(GServ.contextAttributes.matchedAction, action)
-            evtMgr.publish(Events.RequestMatchedDynamic, [requestId: context.getAttribute(GServ.contextAttributes.requestId),
+            evtMgr.publish(Events.RequestMatchedDynamic, [requestId: currentReqId,
                                                           actionPath: action.toString(), method: context.getRequestMethod()])
             context.setAttribute(GServ.contextAttributes.currentAction, action)
             def actr
@@ -99,11 +99,13 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 //// here we use the next actor
                 actr = (_actorPool.next())
                 log.trace "Processing request(${currentReqId}) dispatching to $action"
+                //log.trace "Processing request(${currentReqId}) requestContext has ${ context.requestBody } bytes to read."
+
                 actr << [requestContext: context, action: action]
             } catch (IllegalStateException e) {
                 log.trace "Error Processing request(${currentReqId}) dispatching to $action: ${e.message}", e
                 evtMgr.publish(Events.RequestProcessingError, [
-                        requestId   : context.getAttribute(GServ.contextAttributes.requestId),
+                        requestId   : currentReqId,
                         actionPath   : action.toString(),
                         errorMessage: e.message,
                         method      : context.requestMethod])
@@ -116,7 +118,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                     process(context)
                 } else {
                     evtMgr.publish(Events.RequestProcessingError, [
-                            requestId   : context.getAttribute(GServ.contextAttributes.requestId),
+                            requestId   : currentReqId,
                             actionPath   : action.toString(),
                             errorMessage: e.message,
                             method      : context.requestMethod])
@@ -135,7 +137,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 def mimeType = MimeTypes.getMimeType(fileExtensionFromPath(context.requestURI.path))
                 //header("Content-Type", mimeType)
                 context.getResponseHeaders().put("Content-Type", mimeType)
-                evtMgr.publish(Events.RequestMatchedStatic, [requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                evtMgr.publish(Events.RequestMatchedStatic, [requestId: currentReqId,
                                                              actionPath: context.requestURI.path, method: context.getRequestMethod()])
 //                println "AsyncDispatcher.process(): Found static resource: ${httpExchange.requestURI.path}: seems to be ${istream.available()} bytes."
                 context.sendResponseHeaders(200, istream.available())

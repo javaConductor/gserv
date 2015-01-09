@@ -255,7 +255,7 @@ trait ServerConfigFn {
             InputStream is = getFile(value('staticRoots'), filename)
             if (is) {
                 def sz = is.available();
-                requestContext.responseHeaders.add("Content-Type", mimeType)
+                requestContext.responseHeaders.put("Content-Type", mimeType)
                 requestContext.sendResponseHeaders(200, sz)
                 IOUtils.copy(is, requestContext.responseBody)
             } else {
@@ -264,7 +264,8 @@ trait ServerConfigFn {
                 requestContext.sendResponseHeaders(404, ab.size())
                 requestContext.responseBody.write(ab);
             }
-            requestContext.responseBody.close()
+            requestContext.responseBody.close();
+            requestContext.close()
         }
     }
 

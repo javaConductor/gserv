@@ -96,26 +96,8 @@ class GServInstance {
         this.mbean
     }
 
-    /**
-     * This method will start the server on 'port'.
-     *
-     * @param port
-     * @return Function to close the server
-     */
-    def start(port = null) {
-        def actualPort = (port ?: _cfg.port())
 
-        exportMBean(actualPort,
-                new GServJMX()
-        );
-
-        ///// Underlying Server Impl -
-        HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
-        HttpContext context = server.createContext("/", _handler);
-
-        ////////////////////////////////
-        /// create and add the InitFilter
-        ////////////////////////////////
+    def createInitFilter(){
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
             synchronized (requestId) {
                 log.trace("initFilter: new request #$requestId")
@@ -124,14 +106,10 @@ class GServInstance {
             }
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
-            URI uri = applyDefaultResourceToURI(config().defaultResource(), requestContext.requestURI);
+            URI uri = applyDefaultResourceToURI(config().defaultResource(),
+                    requestContext.requestURI);
 
-
-            /// add wrap code here
-            // Wrap the exchange
-            //println "Wrapping the Exchange - filter: ${theFilter.name}"
             // wrap the Context
-
             RequestContext rc = new RequestContextWrapper(requestContext)
             rc.requestURI = uri
             rc.setAttribute(GServ.contextAttributes.postProcessList, [])
@@ -159,7 +137,29 @@ class GServInstance {
             nextFilter(rc)
             rc
         }
+        initFilter
+    }
+    /**
+     * This method will start the server on 'port'.
+     *
+     * @param port
+     * @return Function to close the server
+     */
+    def start(port = null) {
+        def actualPort = (port ?: _cfg.port())
 
+        exportMBean(actualPort,
+                new GServJMX()
+        );
+
+        ///// Underlying Server Impl -
+        HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
+        HttpContext context = server.createContext("/", _handler);
+
+        ////////////////////////////////
+        /// create and add the InitFilter
+        ////////////////////////////////
+        def initFilter = createInitFilter()
         _filters = _filters ?: []
         _filters.add(initFilter);
 
@@ -297,14 +297,7 @@ class gServHttpsInstance extends GServInstance {
         ////////////////////////////////
         /// create and add the InitFilter
         ////////////////////////////////
-        def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
-            synchronized (requestId) {
-                requestContext.setAttribute(GServ.contextAttributes.requestId, requestId)
-                ++requestId
-            }
-            nextFilter()
-            requestContext
-        }
+        def initFilter = createInitFilter()
 
         _filters = _filters ?: []
         _filters.add(initFilter);

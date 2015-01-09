@@ -163,7 +163,7 @@ trait ResourceHandlerFn {
      * @param headerValue
      */
     void header(String headerName, String headerValue) {
-        requestContext.getResponseHeaders().put(headerName, headerValue);
+        this.requestContext.getResponseHeaders().put(headerName, [headerValue]);
     }
 
     /**

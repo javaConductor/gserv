@@ -77,7 +77,7 @@ class StaticFileHandler {
 
 /**
  *  Returns an inputStream to a file with path 'filePath'. Path is evaluated against
- *  the staticRoots, and possibly the Application's resources
+ *  the staticRoots, and possibly the Application's classpath resources
  *
  *
  * @param filePath
@@ -85,7 +85,7 @@ class StaticFileHandler {
  * @param useResourceDocs
  * @return InputStream
  */
-    def resolveStaticResource(filePath, staticRoots, useResourceDocs) {
+    InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean  useResourceDocs) {
         /// if useResourceDocs then look in the resources
         (useResourceDocs) ? getFile(staticRoots, filePath) : getFsFile(staticRoots, filePath)
     }
@@ -97,7 +97,7 @@ class StaticFileHandler {
      * @param filePath
      * @return inputStream to File
      */
-    def getFile(staticRoots, filePath) {
+    def getFile(List<String> staticRoots, String filePath) {
         (getDoc(filePath)) ?: getFsFile(staticRoots, filePath)
     }
 
@@ -107,7 +107,7 @@ class StaticFileHandler {
      * @param filePath
      * @return inputStream to File
      */
-    def getDoc(filePath) {
+    def getDoc(String filePath) {
 
         if (filePath.startsWith("/")) filePath = filePath.substring(1)
         //// check the default first (may change)
@@ -122,7 +122,7 @@ class StaticFileHandler {
      * @param filePath String - The file to find
      * @return inputStream to File
      */
-    def getFsFile(staticRoots, String filePath) {
+    def getFsFile(List<String> staticRoots, String filePath) {
 
         if (filePath.startsWith("/")) filePath = filePath.substring(1)
         //// Maybe its in one of the other static roots (if any)

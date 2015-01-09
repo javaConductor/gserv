@@ -51,6 +51,7 @@ trait FilterFn {
         requestContext.sendResponseHeaders(code, message.bytes.size())
         requestContext.getResponseBody().write(message.bytes)
         requestContext.getResponseBody().close()
+        requestContext.close()
     }
 
     /**
@@ -63,6 +64,7 @@ trait FilterFn {
         requestContext.sendResponseHeaders(302, message.bytes.size())
         requestContext.getResponseBody().write(message)
         requestContext.getResponseBody().close()
+        requestContext.close()
     }
 
     def matchedAction(requestContext) {

@@ -58,19 +58,22 @@ class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
  * @return void
  */
     def onMessage(request) {
-        def context = request.requestContext
+        RequestContext context = request.requestContext
+        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        //log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
         def action
         try {
             action = request.action
 //            println "$this recieved req #${exchange.getAttribute(GServ.contextAttributes.requestId)} ${exchange.requestURI.path}"
-            log.trace "$this received req #${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path}"
+            log.trace "$this received req #$currentReqId ${context.requestURI.path}"
+            //log.trace "$this received req #$currentReqId bytes from input: ${context.requestBody.bytes.size()} "
             r.process(context, action)
         } catch (Throwable e) {
             _evtMgr.publish(Events.ResourceProcessingError,
-                    [requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    [requestId: currentReqId,
                      path     : action.toString(),
                      error    : e.message])
-            log.error("AsyncHandler($_seq) req #${context.getAttribute(GServ.contextAttributes.requestId)}: Error processing request: ${e.message} ", e)
+            log.error("AsyncHandler($_seq) req #$currentReqId: Error processing request: ${e.message} ", e)
         }
     }
 

@@ -28,6 +28,7 @@ import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ServerConfigFn
 import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 

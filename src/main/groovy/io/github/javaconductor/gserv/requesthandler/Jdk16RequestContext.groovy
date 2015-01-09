@@ -1,14 +1,17 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import com.sun.net.httpserver.HttpExchange
+import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.GServ
 
 /**
  * Created by lcollins on 12/26/2014.
  */
+@Log4j
 class Jdk16RequestContext extends AbstractRequestContext {
 
     HttpExchange _exchange
-
+    boolean _closed = false
     Jdk16RequestContext(HttpExchange exchange){
         assert exchange
         this.requestBody = exchange.requestBody
@@ -24,8 +27,15 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _exchange = exchange
     }
 
+    def isClosed(){
+        _closed
+    }
     void sendResponseHeaders(int responseCode, long size) {
-        _exchange.sendResponseHeaders(responseCode,size)
+        if ( !_closed )
+            _exchange.sendResponseHeaders(responseCode,size)
+        else {
+            log.warn("sendResponseHeaders() called twice.")
+        }
     }
 
     def setStreams(InputStream is, OutputStream os){
@@ -35,7 +45,11 @@ class Jdk16RequestContext extends AbstractRequestContext {
 
     @Override
     def close() {
-        _exchange.close()
+        if (!_closed){
+            _exchange.close()
+            _exchange.setAttribute(GServ.contextAttributes.requestContext, null)
+        }
+        _closed = true
     }
 
     String dump() {
