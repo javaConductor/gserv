@@ -62,17 +62,18 @@ class StaticFileHandler {
             InputStream is = getFile(_staticRoots, filename)
             if (is) {
                 def sz = is.available();
-                exchange.responseHeaders.add("Content-Type", mimeType)
-                exchange.sendResponseHeaders(200, sz)
-                IOUtils.copy(is, exchange.responseBody)
+                requestContext.responseHeaders.add("Content-Type", mimeType)
+                requestContext.sendResponseHeaders(200, sz)
+                IOUtils.copy(is, requestContext.responseBody)
             } else {
                 def msg = "No such file: $filename"
                 def ab = msg.getBytes()
-                exchange.sendResponseHeaders(404, ab.size())
-                exchange.responseBody.write(ab);
+                requestContext.sendResponseHeaders(404, ab.size())
+                requestContext.responseBody.write(ab);
             }
-            exchange.responseBody.close()
-        }
+            requestContext.responseBody.close()
+            requestContext.close()
+        }//fn
     }
 
 /**

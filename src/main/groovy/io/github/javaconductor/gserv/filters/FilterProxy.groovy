@@ -27,7 +27,6 @@ package io.github.javaconductor.gserv.filters
 import com.sun.net.httpserver.Filter
 import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.FilterMatcher
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.GServFactory
 import io.github.javaconductor.gserv.Utils
@@ -66,12 +65,10 @@ class FilterProxy extends Filter {
      */
     @Override
     void doFilter(HttpExchange httpExchange, com.sun.net.httpserver.Filter.Chain chain) throws IOException {
-
-        /// here we do the get the ResourceContect from the Exchange
         RequestContext requestContext = httpExchange.getAttribute(GServ.contextAttributes.requestContext)
-
-        // if none create it
-        if ( !requestContext ){
+        // if none or its an old one create it
+        if (!requestContext || requestContext.isClosed()){
+            /// here we do the get the ResourceContext from the Exchange
             requestContext = new GServFactory().createRequestContext(httpExchange)
             httpExchange.setAttribute(GServ.contextAttributes.requestContext, requestContext)
             requestContext.setAttribute(GServ.contextAttributes.receivedMS, "" + new Date().time)
@@ -80,12 +77,11 @@ class FilterProxy extends Filter {
             }
         }
 
+        log.trace("FilterProxy: DO Filter: ${httpExchange.requestURI.path} context: ${requestContext}")
         def currentRequestId =  requestContext.getAttribute(GServ.contextAttributes.requestId)
         //println requestContext.properties
 
 //        log.trace "FilterProxy: Request($currentRequestId) : instream ${httpExchange.requestBody} outstream ${httpExchange.responseBody}"
-
-
 
         def theFilter = m.matchAction ( _filterList, requestContext )
         if (theFilter) {
@@ -102,7 +98,7 @@ class FilterProxy extends Filter {
                 if (!_serverConfig.requestMatched(requestContext)) {
                     log.trace "FilterProxy: Request($currentRequestId) : Not matched. Calling chain."
                     chain.doFilter(httpExchange);
-                    log.trace "FilterProxy: Request($currentRequestId) :Not matched. Called chain:"
+                    log.trace "FilterProxy: Request($currentRequestId) : Not matched. Called chain:"
                     return
                 }
             }
@@ -138,8 +134,8 @@ class FilterProxy extends Filter {
                         httpExchange.setAttribute(GServ.contextAttributes.requestContext, requestContext)
 
                     } catch (Throwable ex) {
-                        log.trace( "Filter $theFilter threw exception: ${ex.message}.", ex )
-                        log.error( "Filter $theFilter threw exception: ${ex.message}." )
+                        log.trace( "FilterProxy: $theFilter threw exception: ${ex.message}.", ex )
+                        log.error( "FilterProxy: $theFilter threw exception: ${ex.message}." )
                         eventMgr.publish(Events.FilterError, [
                                 filter       : (theFilter.name ?: "-"),
                                 requestTimeMs: requestContext.getAttribute(GServ.contextAttributes.receivedMS),

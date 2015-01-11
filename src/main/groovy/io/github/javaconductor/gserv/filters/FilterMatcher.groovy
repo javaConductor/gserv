@@ -22,8 +22,10 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv
+package io.github.javaconductor.gserv.filters
 
+import io.github.javaconductor.gserv.Matcher
+import io.github.javaconductor.gserv.ResourceAction
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
@@ -35,6 +37,17 @@ class FilterMatcher extends Matcher {
     ResourceAction matchAction(List<ResourceAction> filterList, RequestContext requestContext) {
         //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
         def ret = filterList.find { p ->
+            def rmethod = p.method()
+            def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
+            def b = (methodOk && match(p, requestContext.requestURI))
+            b
+        }
+        return ret;
+    }
+
+    List<Filter> matchFilters(List<Filter> filterList, RequestContext requestContext) {
+        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
+        def ret = filterList.findAll { p ->
             def rmethod = p.method()
             def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
             def b = (methodOk && match(p, requestContext.requestURI))

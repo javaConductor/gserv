@@ -55,7 +55,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     private GServConfig _config
 
     def AsyncDispatcher(ActorPool actorPool, GServConfig config) {
-        this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 10)))
+        this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 1)))
         _actorPool = actorPool
         _config = config;
     }
@@ -136,7 +136,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 //TODO test this well!!
                 def mimeType = MimeTypes.getMimeType(fileExtensionFromPath(context.requestURI.path))
                 //header("Content-Type", mimeType)
-                context.getResponseHeaders().put("Content-Type", mimeType)
+                context.getResponseHeaders().put("Content-Type", [mimeType])
                 evtMgr.publish(Events.RequestMatchedStatic, [requestId: currentReqId,
                                                              actionPath: context.requestURI.path, method: context.getRequestMethod()])
 //                println "AsyncDispatcher.process(): Found static resource: ${httpExchange.requestURI.path}: seems to be ${istream.available()} bytes."

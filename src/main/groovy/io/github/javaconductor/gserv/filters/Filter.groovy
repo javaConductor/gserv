@@ -38,6 +38,12 @@ class Filter extends ResourceAction {
     def Filter(name, method, urlPatterns, qryPattern, opts, beforeClosure) {
         super(name, method, urlPatterns, qryPattern, opts, beforeClosure);
     }
+
+    @Override
+    String toString() {
+        name +"->"+  super.toString()
+    }
+
 }
 /**
  * Supported Filter Types

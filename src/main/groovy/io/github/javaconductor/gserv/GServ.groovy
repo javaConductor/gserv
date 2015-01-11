@@ -27,6 +27,9 @@ package io.github.javaconductor.gserv
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.filters.FilterMatcher
+import io.github.javaconductor.gserv.filters.FilterOptions
+import io.github.javaconductor.gserv.filters.FilterRunner
 import io.github.javaconductor.gserv.plugins.IPlugin
 import io.github.javaconductor.gserv.requesthandler.AsyncHandler
 import io.github.javaconductor.gserv.requesthandler.RequestContext
@@ -225,7 +228,8 @@ class gServHandler implements HttpHandler {
     private def _nuHandler, _nuDispatcher
     Calendar cal = new GregorianCalendar();
     Long reqId = 1;
-
+    FilterMatcher m = new FilterMatcher()
+    FilterRunner filterRunner
     /**
      * Create a handler with a specific configuration
      *
@@ -234,6 +238,7 @@ class gServHandler implements HttpHandler {
      */
     def gServHandler(GServConfig cfg) {
         _cfg = cfg;
+        filterRunner = new FilterRunner(_cfg)
         this._actions = cfg.actions()
         this._staticRoots = cfg.staticRoots()
         this._templateEngineName = cfg.templateEngineName()
@@ -251,6 +256,7 @@ class gServHandler implements HttpHandler {
         _dispatcher.start()
     }
 
+    static long requestId = 0L
     /**
      * This method is called for each request
      * This is called after the Filters and done.
@@ -258,13 +264,28 @@ class gServHandler implements HttpHandler {
      * @param httpExchange
      */
     void handle(HttpExchange httpExchange) {
+        RequestContext context = new GServFactory().createRequestContext(httpExchange)
+        synchronized (requestId){
+            context.setAttribute(GServ.contextAttributes.requestId, requestId++)
+            log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId")
+        }
+//        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #")
+
+        context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
+        boolean matched = _cfg.requestMatched(context)
+        def filters = m.matchFilters(_cfg.filters(),context)
+        filters = filters.findAll {theFilter ->
+            (!theFilter.options()[FilterOptions.MatchedActionsOnly]) ||
+                    (theFilter.options()[FilterOptions.MatchedActionsOnly] && matched)
+                }
+
+        context = filterRunner.runFilters(filters, context)
+
+        if (context.isClosed())
+            return;
+
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path})")
 //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
-        RequestContext context =
-                httpExchange.getAttribute(GServ.contextAttributes.requestContext) ?:
-                _factory.createRequestContext( httpExchange )
-        assert context
-        context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
         try {
 //            httpExchange.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
@@ -292,6 +313,7 @@ class gServHandler implements HttpHandler {
             context.sendResponseHeaders(500, msg.bytes.size())
             context.responseBody.write(msg.bytes)
             context.responseBody.close()
+            context.close()
         }
     }
 

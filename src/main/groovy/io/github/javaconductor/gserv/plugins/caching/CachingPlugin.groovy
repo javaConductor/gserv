@@ -85,10 +85,11 @@ class CachingPlugin extends AbstractPlugin {
                     //exchange.responseHeaders["ETag"] = calcETag
                     nextFilter()
                 }
-              requestContext
+              return requestContext
             }
           // add it to the config
             addFilter(f)
+            requestContext
         }
     }/// method
 

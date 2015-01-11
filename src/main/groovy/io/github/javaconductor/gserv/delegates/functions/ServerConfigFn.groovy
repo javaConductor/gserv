@@ -24,16 +24,16 @@
 
 package io.github.javaconductor.gserv.delegates.functions
 
-import org.apache.commons.io.IOUtils
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.GServResource
-import io.github.javaconductor.gserv.ResourceObject
 import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.ResourceObject
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
+import org.apache.commons.io.IOUtils
 import sun.misc.BASE64Decoder
 
 /**
@@ -42,16 +42,16 @@ import sun.misc.BASE64Decoder
  */
 trait ServerConfigFn {
 
-  def name(nm) {
-    this.value "name", nm
-    this
-  }
+    def name(nm) {
+        this.value "name", nm
+        this
+    }
 
-  def name() {
-    this.value("name")
-  }
+    def name() {
+        this.value("name")
+    }
 
-  def addAction(action) {
+    def addAction(action) {
         this.value("actionList").add(action)
         this
     }
@@ -137,7 +137,7 @@ trait ServerConfigFn {
      * @param clozure Filter behavior
      *
      */
-  def filter(name, url, method, options, clozure, order) {
+    def filter(name, url, method, options, clozure, order) {
         method = method ?: '*'
         //println("serverInitClosure: filter($name) $method, url=$url")
         addFilter(ResourceActionFactory.createFilter(name, method, url, options, clozure))
@@ -153,7 +153,7 @@ trait ServerConfigFn {
      * @return
      *
      */
-  def after(name, url, method, options, order, clozure) {
+    def after(name, url, method, options, order, clozure) {
         method = method ?: '*'
         //println("serverInitClosure: after($name) $method, url=$url, list=${this._filterList}")
         def theFilter = ResourceActionFactory.createAfterFilter(name, method, url, options, order, clozure)
@@ -170,7 +170,7 @@ trait ServerConfigFn {
      * @param closure fn(requestContext, byte[] data)
      * @return this
      */
-  def before(name, url, method, options, order, clozure) {
+    def before(name, url, method, options, order, clozure) {
         method = method ?: '*'
         def theFilter = ResourceActionFactory.createBeforeFilter(name, method, url, options, order, clozure)
         addFilter(theFilter)
@@ -188,22 +188,20 @@ trait ServerConfigFn {
 
                 def userPswd = getBasicAuthUserPswd(requestContext);
                 log.trace("basicAuth before(): userPswd:$userPswd");
-              if (!userPswd || userPswd.length < 2) {
-                  requestContext.responseHeaders.add("WWW-Authenticate", "Basic realm=$realm")
+                if (!userPswd || userPswd.length < 2) {
+                    (requestContext).responseHeaders.put("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
                 } else {
                     def bAuthenticated = _authenticated(userPswd[0], userPswd[1], challengeFn);
-                    if (bAuthenticated) {
-                        nextFilter();
-                        return (requestContext);
-                    } else {
+                    if (!bAuthenticated) {
                         error(403, "Bad credentials for path ${requestContext.requestURI.path}.");
                     }
                 }
+                return (requestContext);
             }
         }
-        this
-    }//basicAuthentication
+    }
+//basicAuthentication
 
     def getBasicAuthUserPswd(requestContext) {
         def basic = requestContext.requestHeaders.get("Authorization");
@@ -221,7 +219,7 @@ trait ServerConfigFn {
         return (challengeFn(user, pswd));
     }
 
-  /**
+    /**
      * Creates a closure that returns file 'filename'
      *
      * @param filename
@@ -266,6 +264,7 @@ trait ServerConfigFn {
             }
             requestContext.responseBody.close();
             requestContext.close()
+            requestContext
         }
     }
 

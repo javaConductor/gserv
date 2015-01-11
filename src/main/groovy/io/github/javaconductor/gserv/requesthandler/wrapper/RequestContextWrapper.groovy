@@ -51,6 +51,9 @@ class RequestContextWrapper extends AbstractRequestContext {
         if (!context)
             throw new IllegalArgumentException("context must NOT be null. Should be valid RequestContext impl.")
 
+        if (context instanceof RequestContextWrapper)
+            throw new IllegalArgumentException("context must NOT be Wrapper.")
+
         _context = context
         this.requestURI = _context.requestURI
         this.principal = _context.principal
@@ -68,7 +71,7 @@ class RequestContextWrapper extends AbstractRequestContext {
         def currentReqId = getAttribute(GServ.contextAttributes.requestId)
 
         this.responseBody = _responseBody = new ByteArrayOutputStream()
-        log.trace("RequestContext(#$currentReqId) ${_context.responseBody} -->> ${this.responseBody}")
+        log.trace("RequestContext(#$currentReqId) -> $_context ")
 
         setAttribute(GServ.contextAttributes.isWrapper, true)
     }

@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv
 
 import com.sun.net.httpserver.HttpContext
+import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpsServer
 import groovy.jmx.builder.JmxBuilder
@@ -96,14 +97,10 @@ class GServInstance {
         this.mbean
     }
 
-
     def createInitFilter(){
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
-            synchronized (requestId) {
-                log.trace("initFilter: new request #$requestId")
-                requestContext.setAttribute(GServ.contextAttributes.requestId, requestId)
-                ++requestId
-            }
+            def requestId = requestContext.getAttribute(GServ.contextAttributes.requestId)
+            log.trace("initFilter(#${requestId} context: $requestContext")
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
             URI uri = applyDefaultResourceToURI(config().defaultResource(),
@@ -114,7 +111,7 @@ class GServInstance {
             rc.requestURI = uri
             rc.setAttribute(GServ.contextAttributes.postProcessList, [])
             def baos = new FilterByteArrayOutputStream({ _this ->
-                log.trace "Running ppList for ${uri.path} - req #${rc.getAttribute(GServ.contextAttributes.requestId)}"
+                log.trace "Running ppList for ${uri.path} - req #${requestId}"
                 /// run the PostProcess List
                 def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
 
@@ -131,7 +128,8 @@ class GServInstance {
                         ex.printStackTrace(System.err)
                     }
                 }
-                rc.writeIt(bytes)
+                rc.responseBody.write(bytes)
+                rc.close()
             })
             rc.setStreams(rc.requestBody, baos)
             nextFilter(rc)
@@ -163,13 +161,7 @@ class GServInstance {
         _filters = _filters ?: []
         _filters.add(initFilter);
 
-        // if we have filters then create the proxies
-        if (_filters) {
-            _filters.sort({ a, b -> a.order - b.order }).each {
-                // each FilterProxy represents ONE GServ Filter -- this may change
-                context.filters.add(new io.github.javaconductor.gserv.filters.FilterProxy([it], _cfg))
-            }
-        }
+        _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
         context.authenticator = _authenticator;
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"
@@ -302,13 +294,7 @@ class gServHttpsInstance extends GServInstance {
         _filters = _filters ?: []
         _filters.add(initFilter);
 
-        // if we have filters then create the proxies
-        if (_filters) {
-            _filters.sort({ a, b -> a.order - b.order }).each {
-                // each FilterProxy represents ONE GServ Filter -- this may change
-                context.filters.add(new io.github.javaconductor.gserv.filters.FilterProxy([it], _cfg))
-            }
-        }
+        _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
         context.authenticator = _authenticator;
         server.executor = _executor;
         def appName = _cfg.name() ?: "gserv"

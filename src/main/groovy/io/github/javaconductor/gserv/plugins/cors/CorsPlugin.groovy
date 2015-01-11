@@ -45,7 +45,6 @@ class CORSMode {
 class CorsPlugin extends AbstractPlugin {
 
     def allowAllHandler = { CORSConfig corsConfig ->
-//        println "CorsPlugin.allowAllHandler(): ${exchange.requestMethod}(${exchange.requestURI})"
         switch (requestContext.requestMethod) {
 
             case "OPTIONS":
@@ -166,7 +165,7 @@ class CorsPlugin extends AbstractPlugin {
     }
 
     /**
-     * @return a closure - fn(chain)
+     * @return a closure - fn()
      * the closure MUSt be a valid Before-Filter closure
      * @param corsConfig
      */

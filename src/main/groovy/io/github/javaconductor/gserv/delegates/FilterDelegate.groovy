@@ -24,13 +24,15 @@
 
 package io.github.javaconductor.gserv.delegates
 
-import com.sun.net.httpserver.Filter.Chain
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.functions.FilterFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
 import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.filters.Filter
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
  *
@@ -45,11 +47,10 @@ import io.github.javaconductor.gserv.events.EventManager
 class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
     //def exchange
     def $this
-    def eventManager = EventManager.instance()
     def requestContext
-    def FilterDelegate(filter, requestContext, Chain chain, serverConfig, templateEngineName) {
+    def FilterDelegate(Filter filter, RequestContext requestContext, GServConfig serverConfig, String templateEngineName) {
         assert requestContext
-        value("chain", chain);
+//        value("chain", chain);
         value("linkBuilder", serverConfig.linkBuilder());
         value("staticRoots", serverConfig.staticRoots());
         value("templateEngineName", serverConfig.templateEngineName());

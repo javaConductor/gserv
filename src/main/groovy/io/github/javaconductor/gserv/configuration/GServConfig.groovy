@@ -142,9 +142,9 @@ class GServConfig {
         matcher.matchAction(_actions, context)
     }
 
-    boolean requestMatched(exchange) {
-        !!(matchAction(exchange) || _staticFileHandler.resolveStaticResource(
-                exchange.requestURI.path,
+    boolean requestMatched(RequestContext context ) {
+        !!(matchAction(context) || _staticFileHandler.resolveStaticResource(
+                context.requestURI.path,
                 _staticRoots,
                 bUseResourceDocs))
     }

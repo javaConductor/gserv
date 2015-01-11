@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.test
 
-import io.github.javaconductor.gserv.FilterMatcher
+import io.github.javaconductor.gserv.filters.FilterMatcher
 import io.github.javaconductor.gserv.Matcher
 import io.github.javaconductor.gserv.ResourceAction
 import io.github.javaconductor.gserv.ResourceActionFactory

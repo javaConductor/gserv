@@ -47,7 +47,7 @@ class GServRunner {
     CliBuilder cli = new CliBuilder(
             usage: 'gserv [options]',
             header: '\nAvailable options (use -h for help):\n',
-            footer: '\ngServ © 2014 Lee Collins.  All rights reserved.'
+            footer: '\ngServ © 2014-2015 Lee Collins.  All rights reserved.'
     );
 
     def GServRunner() {

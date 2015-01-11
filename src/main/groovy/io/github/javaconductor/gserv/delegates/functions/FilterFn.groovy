@@ -85,14 +85,8 @@ trait FilterFn {
     }
 
     def nextFilter(RequestContext e) {
-        def currentRequestId = e.getAttribute(GServ.contextAttributes.requestId)
         if (_nextFilterCalled)
             throw new IllegalStateException("nextFilter() has already been called.")
-        e.nativeObject()?.setAttribute(GServ.contextAttributes.requestContext, e)
-        log.trace "FilterDelegate: Request($currentRequestId) :Filter.nextFilter calling chain."
-        //TODO in the tester context i do not have a nativeObject
-        value("chain").doFilter( e.nativeObject() )
-        log.trace "FilterDelegate: Request($currentRequestId) :Filter.nextFilter called chain."
         _nextFilterCalled = true
     }
 }
