@@ -31,7 +31,7 @@ apply plugin: 'signing'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
-version = "0.9.1"
+version = "0.9.3"
 
 jar {
     from {
