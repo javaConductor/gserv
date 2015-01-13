@@ -20,11 +20,16 @@ class FilterRunner {
     }
 
     RequestContext runFilters(List<Filter> filters, RequestContext c) {
+
         RequestContext context = c
         for ( Filter f: filters){
+            log.trace("FilterRunner() running $f on $context")
             context = runFilter(f,context) ?: context
-            if ( context.isClosed())
+            if (context.isClosed()) {
+                log.trace("FilterRunner() filter $f closed context")
                 return context
+            }
+            log.trace("FilterRunner() running $f on $context")
         }
         context
     }

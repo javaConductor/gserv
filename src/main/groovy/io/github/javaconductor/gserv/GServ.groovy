@@ -266,11 +266,11 @@ class gServHandler implements HttpHandler {
     void handle(HttpExchange httpExchange) {
         RequestContext context = new GServFactory().createRequestContext(httpExchange)
         synchronized (requestId){
-            context.setAttribute(GServ.contextAttributes.requestId, requestId++)
+            context.setAttribute(GServ.contextAttributes.requestId, ++requestId)
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId")
         }
-//        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #")
 
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
         context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
         boolean matched = _cfg.requestMatched(context)
         def filters = m.matchFilters(_cfg.filters(),context)
@@ -279,7 +279,10 @@ class gServHandler implements HttpHandler {
                     (theFilter.options()[FilterOptions.MatchedActionsOnly] && matched)
                 }
 
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Running filters -> $filters")
         context = filterRunner.runFilters(filters, context)
+        def t = "${(context.isClosed() ? ' Context CLOSED!' : '')}"
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: After filters $t ")
 
         if (context.isClosed())
             return;
@@ -288,7 +291,6 @@ class gServHandler implements HttpHandler {
 //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
         try {
-//            httpExchange.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
             EventManager.instance().publish(Events.RequestRecieved, [
                     requestId: currentReqId,
                     method   : context.requestMethod,

@@ -58,8 +58,9 @@ class GServConfig {
     private def _name = 'gserv App';
     private def _actions = [];
     def _staticRoots = [], _filters = [], _authenticator,
-        _templateEngineName, bUseResourceDocs, _defaultPort
+            _templateEngineName, _defaultPort
     def delegateTypeMap
+    boolean bUseResourceDocs
     def delegateMgr
     def linkBuilder
     def _defaultResource

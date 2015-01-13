@@ -23,8 +23,6 @@ package test.integration.configtest
  * THE SOFTWARE.
  */
 
-import io.github.javaconductor.gserv.*
-
 [
         GServ.Resource("/upper") {
             get("/:word") { word ->

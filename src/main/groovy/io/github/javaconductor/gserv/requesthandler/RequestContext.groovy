@@ -52,6 +52,9 @@ interface RequestContext {
     def setStreams(InputStream is, OutputStream os)
 
     void sendResponseHeaders(int responseCode, long size)
+
+    def id()
+
 /*
     String dump()
     Object nativeObject()

@@ -1,5 +1,7 @@
 package io.github.javaconductor.gserv.requesthandler
 
+import io.github.javaconductor.gserv.GServ
+
 import java.security.Principal
 
 /**
@@ -126,6 +128,11 @@ abstract class AbstractRequestContext implements RequestContext {
         attributes[key] = value
     }
     abstract void sendResponseHeaders( int responseCode, long size)
+
+    def id() {
+        return attributes[GServ.contextAttributes.requestId]
+    }
+
 /*
     abstract def close()
     abstract String dump()

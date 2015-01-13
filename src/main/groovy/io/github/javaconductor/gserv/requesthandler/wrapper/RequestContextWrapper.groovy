@@ -29,6 +29,7 @@ import com.sun.net.httpserver.HttpContext
 import com.sun.net.httpserver.HttpPrincipal
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterByteArrayOutputStream
@@ -154,4 +155,13 @@ class RequestContextWrapper extends AbstractRequestContext {
                     message  : "Can't Write Bytes - already closed!"])
         }
     }// writeIt
+    @Override
+    String toString() {
+        "#${id()} -> $requestMethod:$requestURI"
+        return super.toString()
+    }
+
+    def id() {
+        return attributes[GServ.contextAttributes.requestId]
+    }
 }//

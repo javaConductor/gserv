@@ -25,7 +25,7 @@ class StaticDocAccessSpec {
         ]
       // start server
         def stopFn = new GServRunner().start(args);
-        Thread.sleep(300)
+        Thread.sleep(1300)
         
       // request
       def http = new HTTPBuilder("http://localhost:$port/images/pictures.jpg")

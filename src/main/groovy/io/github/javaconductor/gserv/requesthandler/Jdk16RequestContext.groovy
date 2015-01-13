@@ -59,4 +59,10 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _exchange
     }
 
+    @Override
+    String toString() {
+        "#${id()} -> $requestMethod:$requestURI"
+        return super.toString()
+    }
+
 }
