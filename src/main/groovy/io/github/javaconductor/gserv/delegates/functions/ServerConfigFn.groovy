@@ -192,7 +192,7 @@ trait ServerConfigFn {
                     (requestContext).responseHeaders.put("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
                 } else {
-                    def bAuthenticated = _authenticated(userPswd[0], userPswd[1], challengeFn);
+                    def bAuthenticated = _authenticated(userPswd[0], userPswd[1], requestContext, challengeFn);
                     if (!bAuthenticated) {
                         error(403, "Bad credentials for path ${requestContext.requestURI.path}.");
                     }
@@ -215,8 +215,8 @@ trait ServerConfigFn {
         return authString.split(':')
     }
 
-    private boolean _authenticated(user, pswd, challengeFn) {
-        return (challengeFn(user, pswd));
+    private boolean _authenticated(user, pswd, requestContext, challengeFn) {
+        return (challengeFn(user, pswd, requestContext));
     }
 
     /**

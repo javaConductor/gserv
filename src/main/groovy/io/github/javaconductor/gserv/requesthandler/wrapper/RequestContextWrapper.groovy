@@ -164,4 +164,5 @@ class RequestContextWrapper extends AbstractRequestContext {
     def id() {
         return attributes[GServ.contextAttributes.requestId]
     }
+
 }//

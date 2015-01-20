@@ -55,7 +55,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     private GServConfig _config
 
     def AsyncDispatcher(ActorPool actorPool, GServConfig config) {
-        this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 1)))
+        this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 10)))
         _actorPool = actorPool
         _config = config;
     }

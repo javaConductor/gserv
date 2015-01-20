@@ -133,6 +133,17 @@ abstract class AbstractRequestContext implements RequestContext {
         return attributes[GServ.contextAttributes.requestId]
     }
 
+    @Override
+    Map report() {
+        return [requestId: id(),
+                path     : requestURI.path,
+                query    : requestURI.query,
+                method   : requestMethod,
+                remoteIP : remoteAddress.address.toString(),
+                closed   : isClosed()
+        ]
+    }
+
 /*
     abstract def close()
     abstract String dump()

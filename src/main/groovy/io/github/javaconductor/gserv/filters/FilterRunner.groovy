@@ -5,8 +5,6 @@ import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.Utils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.FilterDelegate
-import io.github.javaconductor.gserv.events.EventManager
-import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**

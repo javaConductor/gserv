@@ -256,7 +256,7 @@ class gServHandler implements HttpHandler {
         _dispatcher.start()
     }
 
-    static long requestId = 0L
+    static Long requestId = 0L
     /**
      * This method is called for each request
      * This is called after the Filters and done.
@@ -287,7 +287,7 @@ class gServHandler implements HttpHandler {
         if (context.isClosed())
             return;
 
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})")
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
 //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
         try {

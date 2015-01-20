@@ -19,7 +19,7 @@ class DefaultResourceSpec {
         def http = new HTTPBuilder("http://localhost:$port/")
         def dir = baseDir + "defaultResource"
         def f = new File(dir)
-        f.absolutePath
+        // f.absolutePath
         def args = ["-p", port,
                     "-s",   f.absolutePath,
                     "-d", "index.html"

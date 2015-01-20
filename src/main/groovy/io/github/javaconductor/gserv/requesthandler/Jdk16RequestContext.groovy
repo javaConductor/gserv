@@ -59,6 +59,18 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _exchange
     }
 
+//
+//    @Override
+//    Map report() {
+//        return [requestId: id(),
+//                path : requestURI.path,
+//                query : requestURI.query,
+//                method : requestMethod,
+//                remoteIP: remoteAddress.address.toString(),
+//                closed: isClosed()
+//        ]
+//    }
+
     @Override
     String toString() {
         "#${id()} -> $requestMethod:$requestURI"

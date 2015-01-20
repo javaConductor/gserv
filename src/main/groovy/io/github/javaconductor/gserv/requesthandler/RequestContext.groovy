@@ -55,6 +55,8 @@ interface RequestContext {
 
     def id()
 
+    Map report()
+
 /*
     String dump()
     Object nativeObject()
