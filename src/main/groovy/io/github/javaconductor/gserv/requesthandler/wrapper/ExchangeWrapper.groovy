@@ -53,7 +53,7 @@ class ExchangeWrapper extends HttpExchange {
 
     def ExchangeWrapper(Map requestInfo) {
         testMode = true
-        _exchange=this
+        _exchange = this
 
         if (!requestInfo.uri)
             throw new IllegalArgumentException("'path' element is required.")
@@ -63,24 +63,24 @@ class ExchangeWrapper extends HttpExchange {
             throw new IllegalArgumentException("'method' element is required.")
         _requestMethod = requestInfo.method
 
-        if(requestInfo.headers){
+        if (requestInfo.headers) {
             requestInfo.entrySet().each { h ->
-                _requestHdrs.add(h.key, h.value )
+                _requestHdrs.add(h.key, h.value)
             }
         }
 
-        if(requestInfo.inputData){
+        if (requestInfo.inputData) {
             testData = requestInfo.inputData
-            _requestBody =_originalInputStream =  new ByteArrayInputStream (testData)
-        }else{
-            _requestBody =  new ByteArrayInputStream (new byte[0])
+            _requestBody = _originalInputStream = new ByteArrayInputStream(testData)
+        } else {
+            _requestBody = new ByteArrayInputStream(new byte[0])
         }
 
         _responseBody = new ByteArrayOutputStream()
         setAttribute(GServ.contextAttributes.isWrapper, true)
     }
 
-        def ExchangeWrapper(HttpExchange exchange, URI uri = null) {
+    def ExchangeWrapper(HttpExchange exchange, URI uri = null) {
         if (!exchange)
             throw new IllegalArgumentException("exchange must NOT be null. Should be valid HttpExchange impl.")
 

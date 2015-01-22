@@ -24,9 +24,9 @@
 
 package io.github.javaconductor.gserv.utils
 
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.ActionPathElement
-import io.github.javaconductor.gserv.Utils
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.actions.ActionPathElement
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 
 /**
  * A LinkBuilder is used to create URLs to resources
@@ -108,14 +108,14 @@ class LinkBuilder {
         action.queryPattern().queryMap().eachWithIndex { it, i ->
             def k = it.key, v = it.value
 
-            if (Utils.isMatchingPattern(v)) {
+            if (PathMatchingUtils.isMatchingPattern(v)) {
                 def d = data[k]
                 if (!d) {
                     throw new IllegalArgumentException("${k} not found in data. data must contain values for all action variables. ")
                 }
                 link += ((i == 0 ? '?' : '&') + "$k=$d")
 
-            } else if (Utils.isValuePattern(v)) {
+            } else if (PathMatchingUtils.isValuePattern(v)) {
                 link += ((i == 0 ? '?' : '&') + "$k=$v")
             }
         }

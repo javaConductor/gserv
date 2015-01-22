@@ -38,9 +38,9 @@ class ParseUtils {
                     p = p.substring(name.length() + 1);
                     def reg = parseRegEx(p);
                     element = ":" + name + ":" + reg;
-                }else{// not reg-ex its a type
+                } else {// not reg-ex its a type
                     p = p.substring(name.length() + 1);
-                    def typeName  = p.takeWhile { it != '/' && it != '?' }
+                    def typeName = p.takeWhile { it != '/' && it != '?' }
                     element = ':' + name + ':' + typeName
                 }
             }// its a type
@@ -50,7 +50,6 @@ class ParseUtils {
         }
         return [element, path.substring(element.length())]
     }
-
 
 
     def parseSurrounded(String text, String startCh, String stopCh) {

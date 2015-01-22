@@ -1,8 +1,7 @@
 package test.integration
 
 import groovyx.net.http.HTTPBuilder
-import io.github.javaconductor.gserv.GServRunner
-import io.github.javaconductor.gserv.utils.Encoder
+import io.github.javaconductor.gserv.cli.GServRunner
 import org.junit.Test
 
 import static groovyx.net.http.ContentType.TEXT
@@ -23,7 +22,7 @@ class BasicAuthHttpsSpec {
                     "-i", dir + "/BasicAuthHttps.groovy"]
         def stopFn = new GServRunner().start(args);
         def testCnt = 2
-        def uAndP = Encoder.base64("secret:thing".bytes)
+        def uAndP = "secret:thing".bytes.encodeBase64()
 
         try {
             http.request(GET, TEXT) { req ->

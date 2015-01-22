@@ -24,12 +24,12 @@
 
 package io.github.javaconductor.gserv.plugins
 
-import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.actions.ResourceAction
 
 /**
  * Created by javaConductor on 3/22/14.
  */
-abstract class AbstractPlugin implements IPlugin {
+abstract class AbstractPlugin implements io.github.javaconductor.gserv.plugins.IPlugin {
     @Override
     abstract def init(Object options)
 

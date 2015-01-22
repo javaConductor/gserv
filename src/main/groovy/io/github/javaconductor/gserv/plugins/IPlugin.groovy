@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.plugins
 
-import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.actions.ResourceAction
 
 interface IPlugin {
 

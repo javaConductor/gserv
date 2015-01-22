@@ -1,8 +1,7 @@
 package test.integration
 
 import groovyx.net.http.HTTPBuilder
-import io.github.javaconductor.gserv.GServRunner
-import io.github.javaconductor.gserv.utils.Encoder
+import io.github.javaconductor.gserv.cli.GServRunner
 import org.junit.Ignore
 import org.junit.Test
 

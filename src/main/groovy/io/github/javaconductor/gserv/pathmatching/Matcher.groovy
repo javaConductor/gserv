@@ -22,8 +22,9 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv
+package io.github.javaconductor.gserv.pathmatching
 
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 class Matcher {
@@ -74,7 +75,7 @@ class Matcher {
         return matchActionQuery(
                 action.queryPattern()?.queryMap() ?: [:],
                 (action.queryPattern()?.queryMatchMap()?.keySet()?.toList() ?: []),
-                Utils.queryStringToMap(uri.query));
+                PathMatchingUtils.queryStringToMap(uri.query));
     }
 
     def matchActionPathSegment(actionPathPattern, uriValue) {
@@ -103,7 +104,7 @@ class Matcher {
     boolean matchActionQuery(Map qryMap, List<String> queryKeys, Map requestQueryMap) {
         queryKeys.every { key ->
             (
-                    (Utils.isValuePattern(qryMap[key]))
+                    (PathMatchingUtils.isValuePattern(qryMap[key]))
                             /// compare it if its a value
                             ? requestQueryMap[key] == qryMap[key]
                             /// just verify the value exists

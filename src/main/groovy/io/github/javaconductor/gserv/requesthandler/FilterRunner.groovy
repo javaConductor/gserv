@@ -1,11 +1,13 @@
-package io.github.javaconductor.gserv.filters
+package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.Utils
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.FilterDelegate
-import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.filters.Filter
+import io.github.javaconductor.gserv.filters.FilterOptions
+import io.github.javaconductor.gserv.filters.FilterType
 
 /**
  * Created by lcollins on 1/11/2015.
@@ -13,16 +15,17 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
 @Log4j
 class FilterRunner {
     def _serverConfig
-    def FilterRunner(GServConfig config){
+
+    def FilterRunner(GServConfig config) {
         _serverConfig = config
     }
 
     RequestContext runFilters(List<Filter> filters, RequestContext c) {
 
         RequestContext context = c
-        for ( Filter f: filters){
+        for (Filter f : filters) {
             log.trace("FilterRunner() running $f on $context")
-            context = runFilter(f,context) ?: context
+            context = runFilter(f, context) ?: context
             if (context.isClosed()) {
                 log.trace("FilterRunner() filter $f closed context")
                 return context
@@ -32,7 +35,7 @@ class FilterRunner {
         context
     }
 
-    RequestContext runFilter(Filter theFilter, RequestContext requestContext){
+    RequestContext runFilter(Filter theFilter, RequestContext requestContext) {
 
         switch (theFilter.filterType) {
             case FilterType.After:
@@ -41,14 +44,13 @@ class FilterRunner {
                 //////////////////////////////////////////////////////////////////////
 
                 def fn = theFilter.requestHandler()
-                //TODO the After filter will have a potentially OLD exchange injected but the current one passed in
                 fn.delegate = prepareDelegate(theFilter, requestContext)
 
                 /// add after closure to PostProcessList
                 def ppList = requestContext.getAttribute(GServ.contextAttributes.postProcessList) ?: []
                 log.trace "FilterRunner: Scheduling after filter ${theFilter.name} for req #${requestContext.getAttribute(GServ.contextAttributes.requestId)} "
                 ppList << fn
-                requestContext.setAttribute( GServ.contextAttributes.postProcessList, ppList )
+                requestContext.setAttribute(GServ.contextAttributes.postProcessList, ppList)
                 return requestContext
 
             case FilterType.Before:
@@ -57,19 +59,18 @@ class FilterRunner {
                     // run the filter
                     // replace with new context if returned
                     requestContext = process(theFilter, requestContext) ?: requestContext
-                    //httpExchange.setAttribute(GServ.contextAttributes.requestContext, requestContext)
                 } catch (Throwable ex) {
                     //TODO must handle this better -
-                    log.trace( "FilterRunner: $theFilter threw exception: ${ex.message}.", ex )
-                    log.error( "FilterRunner: $theFilter threw exception: ${ex.message}." )
+                    log.trace("FilterRunner: $theFilter threw exception: ${ex.message}.", ex)
+                    log.error("FilterRunner: $theFilter threw exception: ${ex.message}.")
                 } finally {
                 }
-                return    requestContext
+                return requestContext
 
         }//switch
     }
 
-    RequestContext process(Filter theFilter, RequestContext context){
+    RequestContext process(Filter theFilter, RequestContext context) {
         Closure cl = theFilter.requestHandler()//_handler
         def options = theFilter.options()
         FilterDelegate dgt = prepareDelegate(theFilter, context)
@@ -89,13 +90,13 @@ class FilterRunner {
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         /// Pass the route variables to the behavior if option is set
         /// Else there will be no args
-        List  args = options[FilterOptions.PassRouteParams] ? prepareArguments(context,theFilter) : [];
+        List args = options[FilterOptions.PassRouteParams] ? prepareArguments(context, theFilter) : [];
         /// Execute the behavior for this filter
         def ret = errorHandlingWrapper(cl, args)
         ret
     }
 
-    private def prepareDelegate(filter, requestContext,  templateEngineName ="") {
+    private def prepareDelegate(filter, requestContext, templateEngineName = "") {
         new FilterDelegate(filter, requestContext, _serverConfig, templateEngineName)
     }
 
@@ -106,7 +107,7 @@ class FilterRunner {
      * @param theFilter
      * @return
      */
-    private def prepareArguments(context,  theFilter) {
+    private def prepareArguments(context, theFilter) {
         def uri = context.requestURI
         def args = []
         def method = theFilter.method()
@@ -126,7 +127,7 @@ class FilterRunner {
             }
         }
 
-        def qmap = Utils.queryStringToMap(uri.query)
+        def qmap = PathMatchingUtils.queryStringToMap(uri.query)
         theFilter.queryPattern().queryKeys().each { k ->
             args.add(qmap[k])
         }

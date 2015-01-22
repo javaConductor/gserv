@@ -30,7 +30,6 @@ class LdapPlugin extends AbstractPlugin {
         ldapTemplate = new LdapTemplate(ctxSrc);
     }
 
-
     boolean authenticate(String user, String pswd, RequestContext requestContext, Closure dnCallback) {
         def authenticated = ldapTemplate.authenticate(
                 "",
@@ -40,19 +39,8 @@ class LdapPlugin extends AbstractPlugin {
             void executeWithContext(DirContext ctx, LdapEntryIdentification ldapEntryIdentification) {
                 println "auth: absoluteName: ${ldapEntryIdentification.absoluteName}"
                 println "auth: relativeName: ${ldapEntryIdentification.relativeName}";
-                def orgId = getOrgId(ldapEntryIdentification.absoluteName.toString())
-                println "auth: orgId: $orgId";
                 if (dnCallback)
                     dnCallback(ldapEntryIdentification.absoluteName.toString())
-            }
-
-            def getOrgId(String userDN) {
-                Integer orgID
-                if (userDN) {
-                    String[] userAttributes = userDN.split(",");
-                    orgID = Long.parseLong(userAttributes[2].substring(2));
-                }
-                orgID
             }
 
         })

@@ -26,8 +26,7 @@ package io.github.javaconductor.gserv.resourceloader
 
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
-import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.GServInstance
+import io.github.javaconductor.gserv.server.GServInstance
 import io.github.javaconductor.gserv.configuration.GServConfig
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -47,7 +46,7 @@ class ResourceLoader {
      */
     def loadResources(File resourceScriptFile, classPath) {
         assert true, "resourceScriptFile required"
-        if ( !resourceScriptFile.exists()){
+        if (!resourceScriptFile.exists()) {
             throw new ResourceScriptException("Bad resource script file: $resourceScriptFile not found.")
         }
 
@@ -59,11 +58,11 @@ class ResourceLoader {
             resourceCache[resourceScriptFile.absolutePath] = resources
         } catch (MultipleCompilationErrorsException ex) {
             log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} "+ ex.message )
+            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
             throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
         } catch (Throwable ex) {
             log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} "+ ex.message )
+            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
             throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
         }
         resources

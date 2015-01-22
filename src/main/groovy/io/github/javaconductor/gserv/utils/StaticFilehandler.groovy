@@ -86,7 +86,7 @@ class StaticFileHandler {
  * @param useResourceDocs
  * @return InputStream
  */
-    InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean  useResourceDocs) {
+    InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean useResourceDocs) {
         /// if useResourceDocs then look in the resources
         (useResourceDocs) ? getFile(staticRoots, filePath) : getFsFile(staticRoots, filePath)
     }

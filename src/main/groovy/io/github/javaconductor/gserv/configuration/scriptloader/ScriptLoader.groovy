@@ -25,11 +25,9 @@
 package io.github.javaconductor.gserv.configuration.scriptloader
 
 import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.GServInstance
+import io.github.javaconductor.gserv.server.GServInstance
 import io.github.javaconductor.gserv.configuration.GServConfig
-import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
-import io.github.javaconductor.gserv.resourceloader.ResourceScriptException
 
 /**
  * Created by javaConductor on 8/26/2014.
@@ -57,7 +55,7 @@ class ScriptLoader {
                         System.err.println("No resourceScript: ${f.absolutePath}")
                         return []
                     }
-                    def instances = []
+                    def instances
                     try {
                         instances = resourceLoader.loadResources(f, classpath)
                     } catch (Throwable ex) {
@@ -65,6 +63,5 @@ class ScriptLoader {
                     }
                     return instances ?: []
                 }.flatten()
-    };////
-
+    }
 }

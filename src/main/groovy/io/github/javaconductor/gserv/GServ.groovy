@@ -25,21 +25,12 @@
 package io.github.javaconductor.gserv
 
 import io.github.javaconductor.gserv.configuration.GServConfig
-import io.github.javaconductor.gserv.events.EventManager
-import io.github.javaconductor.gserv.events.Events
-import io.github.javaconductor.gserv.filters.FilterMatcher
-import io.github.javaconductor.gserv.filters.FilterOptions
-import io.github.javaconductor.gserv.filters.FilterRunner
-import io.github.javaconductor.gserv.plugins.IPlugin
-import io.github.javaconductor.gserv.requesthandler.AsyncHandler
-import io.github.javaconductor.gserv.requesthandler.RequestContext
-import io.github.javaconductor.gserv.utils.ActorPool
+import io.github.javaconductor.gserv.factory.GServFactory
+import io.github.javaconductor.gserv.resources.GServResource
+import io.github.javaconductor.gserv.resources.ResourceObject
+import io.github.javaconductor.gserv.server.GServPlugins
 import io.github.javaconductor.gserv.utils.LinkBuilder
-import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler
 import groovy.util.logging.Log4j
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.ResizeablePool
 import io.github.javaconductor.gserv.delegates.*
 
 /**
@@ -51,12 +42,12 @@ class GServ {
     static def contextAttributes = [
             "receivedMS"     : 'g$$when',
             "serverConfig"   : 'g$$serverConfig',
-            "currentAction"   : 'g$$route',
+            "currentAction"  : 'g$$route',
             "requestId"      : 'g$$requestId',
             "isWrapper"      : 'g$$wrapper',
-            "matchedAction"   : 'g$$matchedAction',
+            "matchedAction"  : 'g$$matchedAction',
             "postProcessList": 'g$$postProcessList',
-            "requestContext": 'g$$requestContext'
+            "requestContext" : 'g$$requestContext'
     ]
     static def returnCodes = [
             Normal                  : 0,
@@ -65,7 +56,7 @@ class GServ {
             GeneralError            : -3
     ]
 
-    def serverPlugins = new gServPlugins()// has no plugins
+    def serverPlugins = new GServPlugins()// has no plugins
 
     /**
      * Defines the plugins to be used with this ServerInstance
@@ -192,13 +183,13 @@ class GServ {
         /// add this info to the config
 
         cfg.addServerIP(options.serverIP)
-        .addFilters(tmpFilters)
-        .addStaticRoots(tmpStaticRoots)
-        .addActions(tmpActions)
-        .useResourceDocs(_useResourceDocs)
-        .templateEngineName(templateEngineName)
-        .name(tmpName)
-        .linkBuilder(lBuilder)
+                .addFilters(tmpFilters)
+                .addStaticRoots(tmpStaticRoots)
+                .addActions(tmpActions)
+                .useResourceDocs(_useResourceDocs)
+                .templateEngineName(templateEngineName)
+                .name(tmpName)
+                .linkBuilder(lBuilder)
         //}
         factory.createHttpInstance(cfg)
     }
@@ -211,178 +202,4 @@ class GServ {
         http(options, instanceDefinition, true);
     }
 
-}
-
-/**
- * This is the Handler that is called for each request by the Java 1.6 HttpServer
- *
- */
-@Log4j
-class gServHandler implements HttpHandler {
-    private def _factory = new GServFactory();
-    private def _actions
-    private def _staticRoots
-    private def _templateEngineName
-    private def _dispatcher, _handler
-    private GServConfig _cfg
-    private def _nuHandler, _nuDispatcher
-    Calendar cal = new GregorianCalendar();
-    Long reqId = 1;
-    FilterMatcher m = new FilterMatcher()
-    FilterRunner filterRunner
-    /**
-     * Create a handler with a specific configuration
-     *
-     * @param cfg
-     * @return
-     */
-    def gServHandler(GServConfig cfg) {
-        _cfg = cfg;
-        filterRunner = new FilterRunner(_cfg)
-        this._actions = cfg.actions()
-        this._staticRoots = cfg.staticRoots()
-        this._templateEngineName = cfg.templateEngineName()
-
-        _nuHandler = {
-            new AsyncHandler(cfg)
-        }
-        _handler = _nuHandler()
-
-        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false)), _nuHandler);
-        _nuDispatcher = {
-            _factory.createDispatcher(actors, _cfg );
-        }
-        _dispatcher = _nuDispatcher();
-        _dispatcher.start()
-    }
-
-    static Long requestId = 0L
-    /**
-     * This method is called for each request
-     * This is called after the Filters and done.
-     *
-     * @param httpExchange
-     */
-    void handle(HttpExchange httpExchange) {
-        RequestContext context = new GServFactory().createRequestContext(httpExchange)
-        synchronized (requestId){
-            context.setAttribute(GServ.contextAttributes.requestId, ++requestId)
-            log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId")
-        }
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
-        context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
-        boolean matched = _cfg.requestMatched(context)
-        def filters = m.matchFilters(_cfg.filters(),context)
-        filters = filters.findAll {theFilter ->
-            (!theFilter.options()[FilterOptions.MatchedActionsOnly]) ||
-                    (theFilter.options()[FilterOptions.MatchedActionsOnly] && matched)
-                }
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Running filters -> $filters")
-        context = filterRunner.runFilters(filters, context)
-        def t = "${(context.isClosed() ? ' Context CLOSED!' : '')}"
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: After filters $t ")
-
-        if (context.isClosed())
-            return;
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
-//        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
-        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
-        try {
-            EventManager.instance().publish(Events.RequestRecieved, [
-                    requestId: currentReqId,
-                    method   : context.requestMethod,
-                    uri      : context.requestURI,
-                    headers  : context.requestHeaders])
-            def start = cal.getTimeInMillis();
-            _handle(context)
-            EventManager.instance().publish(Events.RequestDispatched, [
-                    requestId: currentReqId,
-                    method   : context.requestMethod,
-                    uri      : context.requestURI,
-                    headers  : context.requestHeaders])
-        } catch (Throwable e) {
-            def msg = "Error req #${currentReqId} ${e.message} "
-            log.error(msg, e)
-            EventManager.instance().publish(Events.RequestProcessingError, [
-                    requestId: currentReqId,
-                    error    : "${msg}",
-                    method   : context.requestMethod,
-                    uri      : context.requestURI,
-                    headers  : context.requestHeaders])
-            context.sendResponseHeaders(500, msg.bytes.size())
-            context.responseBody.write(msg.bytes)
-            context.responseBody.close()
-            context.close()
-        }
-    }
-
-    private void _handle(RequestContext context) {
-        log.trace("ServerHandler._handle(${context})")
-        //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
-        try {
-            _dispatcher << [requestContext: context]
-        } catch (IllegalStateException e) {
-            _dispatcher = _nuDispatcher()
-            _handle(context)
-        }
-        log.trace("ServerHandler._handle(${context}) Sent to dispatcher.")
-
-    }
-}
-
-/**
- *
- * Container for the application of plugins.
- *
- */
-class gServPlugins {
-    def plugins = []
-
-    def add(IPlugin p) {
-        plugins.add(p)
-    }
-
-    /**
-     * Apply the plugins to a ServerConfiguration
-     *
-     * @param serverConfig
-     * @return GServConfig
-     */
-    def applyPlugins(GServConfig serverConfig) {
-        def delegates = prepareAllDelegates(DefaultDelegates.delegates)
-        serverConfig.delegateManager(new DelegatesMgr(delegates))
-        /// for each plugin we add to the actions, filters, and staticRoots
-        //TODO plugins MAY also contribute to the Type formatter (to)
-        plugins.each {
-            serverConfig.addActions(it.actions())
-                    .addFilters(it.filters())
-                    .addStaticRoots(it.staticRoots())
-        }
-        serverConfig.delegateTypeMap(delegates)
-        serverConfig
-    }
-
-    /**
-     * Apply each plugin to each delegate
-     *
-     * @param delegates
-     * @return preparedDelegates
-     */
-    def prepareAllDelegates(delegates) {
-        delegates.each { kv ->
-            def delegateType = kv.key
-            def delegateExpando = kv.value
-            plugins.each { plugin ->
-                if (!plugin) {
-                    println "Skipping null plugin in list"
-                } else {
-                    plugin.decorateDelegate(delegateType, delegateExpando)// get the side-effect
-                }
-            }
-        }
-        delegates
-    }
 }

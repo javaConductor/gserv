@@ -140,10 +140,12 @@ trait ResourceHandlerFn {
      *
      */
     void write(byte[] data) {
-        requestContext.sendResponseHeaders(200, data.size() as long)
-        requestContext.getResponseBody().write(data)
-        requestContext.getResponseBody().close()
-        requestContext.close()
+        if (!requestContext.isClosed()) {
+            requestContext.sendResponseHeaders(200, data.size() as long)
+            requestContext.getResponseBody().write(data)
+            requestContext.getResponseBody().close()
+            requestContext.close()
+        }
     }
 
     /**
@@ -202,12 +204,14 @@ trait ResourceHandlerFn {
      * @param message
      */
     void error(int code, String message) {
-        message = message ?: "Error!"
-        //println "requestHandlerDelegate.error($code, $message)"
-        requestContext.sendResponseHeaders(code, message.bytes.size() as long)
-        requestContext.getResponseBody().write(message.bytes)
-        requestContext.getResponseBody().close()
-        requestContext.close()
+        if (!requestContext.isClosed()) {
+            message = message ?: "Error!"
+            //println "requestHandlerDelegate.error($code, $message)"
+            requestContext.sendResponseHeaders(code, message.bytes.size() as long)
+            requestContext.getResponseBody().write(message.bytes)
+            requestContext.getResponseBody().close()
+            requestContext.close()
+        }
     }
 
     /**

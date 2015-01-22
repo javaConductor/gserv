@@ -22,21 +22,21 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv
+package io.github.javaconductor.gserv.server
 
 import com.sun.net.httpserver.HttpContext
-import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpsServer
 import groovy.jmx.builder.JmxBuilder
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.filters.FilterByteArrayOutputStream
 import io.github.javaconductor.gserv.jmx.GServJMX
 import io.github.javaconductor.gserv.requesthandler.RequestContext
-import io.github.javaconductor.gserv.requesthandler.wrapper.ExchangeWrapper
 import io.github.javaconductor.gserv.requesthandler.wrapper.RequestContextWrapper
 
 import javax.management.MBeanServer
@@ -44,6 +44,7 @@ import javax.management.ObjectName
 import javax.net.ssl.*
 import java.lang.management.ManagementFactory
 import java.security.KeyStore
+import java.security.SecureRandom
 
 /**
  * An HTTP Server Instance.  Pass a port number to the start() method to start the instance on that port.
@@ -66,7 +67,7 @@ class GServInstance {
      */
     def GServInstance(cfg) {
         _cfg = cfg
-        _handler = new gServHandler(cfg);
+        _handler = new GServHandler(cfg);
         _authenticator = cfg.authenticator();
         _filters = cfg.filters();
         _templateEngineName = cfg.templateEngineName();
@@ -97,7 +98,7 @@ class GServInstance {
         this.mbean
     }
 
-    def createInitFilter(){
+    def createInitFilter() {
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
             def requestId = requestContext.getAttribute(GServ.contextAttributes.requestId)
             log.trace("initFilter(#${requestId} context: $requestContext")
@@ -257,7 +258,7 @@ class gServHttpsInstance extends GServInstance {
 
         // setup the HTTPS context and parameters
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-
+SecureRandom
         server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext) {
 
             @Override

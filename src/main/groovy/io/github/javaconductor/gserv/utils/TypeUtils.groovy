@@ -3,7 +3,7 @@ package io.github.javaconductor.gserv.utils
 import java.util.regex.Pattern
 
 /**
- * Misc Utils for Pattern matching
+ * Misc PathMatchingUtils for Pattern matching
  */
 trait TypeUtils {
 

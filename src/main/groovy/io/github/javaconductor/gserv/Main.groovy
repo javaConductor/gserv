@@ -24,6 +24,8 @@
 
 package io.github.javaconductor.gserv
 
+import io.github.javaconductor.gserv.cli.GServRunner
+
 /**
  * Created by javaConductor on 3/5/14.
  */

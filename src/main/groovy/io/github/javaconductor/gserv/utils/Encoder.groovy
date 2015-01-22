@@ -50,27 +50,7 @@ class Encoder {
      * @return byte[] MD5 of the data
      */
     static def md5WithBase64(byte[] stuff) {
-        base64(md5(stuff))
-    }
-
-    /**
-     * Returns base64 string
-     *
-     * @param stuff
-     * @return String Base-64 Encoded
-     */
-    static String base64(byte[] stuff) {
-        stuff.encodeBase64().toString()
-    }
-
-    /**
-     * Decodes base64String and returns byte array
-     *
-     * @param base64String
-     * @return byte[]
-     */
-    static byte[] base64decode(String base64String) {
-        base64String.decodeBase64();
+        (md5(stuff).encodeBase64())
     }
 
 }

@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv.filters
+package io.github.javaconductor.gserv.pathmatching
 
-import io.github.javaconductor.gserv.Matcher
-import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**

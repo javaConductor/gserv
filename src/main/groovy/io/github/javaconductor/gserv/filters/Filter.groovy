@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.filters
 
-import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.actions.ResourceAction
 
 
 /**
@@ -41,7 +41,7 @@ class Filter extends ResourceAction {
 
     @Override
     String toString() {
-        name +"->"+  super.toString()
+        name + "->" + super.toString()
     }
 
 }
@@ -61,13 +61,13 @@ class FilterOptions {
      *  Note: Only applies to 'Before' Filters
      *
      */
-    static final String PassActionParams =  'passActionParams'
+    static final String PassActionParams = 'passActionParams'
 
     @Deprecated
-    static final String PassRouteParams =PassActionParams
+    static final String PassRouteParams = PassActionParams
 
 /**
-     *  Boolean:    if true, the filter will only be activated when it matches a route
-     */
+ *  Boolean:    if true, the filter will only be activated when it matches a route
+ */
     static final String MatchedActionsOnly = 'matchedActionsOnly'
 }

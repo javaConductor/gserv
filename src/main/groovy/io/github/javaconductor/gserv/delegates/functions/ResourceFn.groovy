@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.delegates.functions
 
-import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 
 /**
  *

@@ -26,8 +26,8 @@ package io.github.javaconductor.gserv.plugins.compression
 
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterOptions
@@ -64,7 +64,6 @@ class CompressionPlugin extends AbstractPlugin {
 
     private def handleAfter(RequestContext context, data) {
         def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
-        def outStream
         def outEncoding
         if (outEncodings)
             if (outEncodings[0]?.contains("gzip"))

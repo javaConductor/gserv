@@ -28,7 +28,6 @@ import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ServerConfigFn
 import io.github.javaconductor.gserv.events.EventManager
-import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
@@ -45,12 +44,12 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
     def actions = { ->
         value("actionList")
     }
-  def filters = { -> value("filterList") }
+    def filters = { -> value("filterList") }
     def staticRoots = { value("staticRoots") }
     def linkBuilder = { value("linkBuilder") }
 
     def ServerInstanceDelegate() {
-      value("name", "gServ Application")
+        value("name", "gServ Application")
         value("actionList", [])
         value("filterList", [])
         value("staticRoots", [])

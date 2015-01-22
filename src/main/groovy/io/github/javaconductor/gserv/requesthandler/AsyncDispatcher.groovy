@@ -25,8 +25,8 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.Matcher
-import io.github.javaconductor.gserv.ResourceAction
+import io.github.javaconductor.gserv.pathmatching.Matcher
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -91,7 +91,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
         ResourceAction action = _matcher.matchAction(_config.actions(), context)
         if (action) {
             context.setAttribute(GServ.contextAttributes.matchedAction, action)
-            evtMgr.publish(Events.RequestMatchedDynamic, [requestId: currentReqId,
+            evtMgr.publish(Events.RequestMatchedDynamic, [requestId : currentReqId,
                                                           actionPath: action.toString(), method: context.getRequestMethod()])
             context.setAttribute(GServ.contextAttributes.currentAction, action)
             def actr
@@ -106,7 +106,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 log.trace "Error Processing request(${currentReqId}) dispatching to $action: ${e.message}", e
                 evtMgr.publish(Events.RequestProcessingError, [
                         requestId   : currentReqId,
-                        actionPath   : action.toString(),
+                        actionPath  : action.toString(),
                         errorMessage: e.message,
                         method      : context.requestMethod])
 
@@ -119,7 +119,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 } else {
                     evtMgr.publish(Events.RequestProcessingError, [
                             requestId   : currentReqId,
-                            actionPath   : action.toString(),
+                            actionPath  : action.toString(),
                             errorMessage: e.message,
                             method      : context.requestMethod])
                 }
@@ -137,7 +137,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 def mimeType = MimeTypes.getMimeType(fileExtensionFromPath(context.requestURI.path))
                 //header("Content-Type", mimeType)
                 context.getResponseHeaders().put("Content-Type", [mimeType])
-                evtMgr.publish(Events.RequestMatchedStatic, [requestId: currentReqId,
+                evtMgr.publish(Events.RequestMatchedStatic, [requestId : currentReqId,
                                                              actionPath: context.requestURI.path, method: context.getRequestMethod()])
 //                println "AsyncDispatcher.process(): Found static resource: ${httpExchange.requestURI.path}: seems to be ${istream.available()} bytes."
                 context.sendResponseHeaders(200, istream.available())

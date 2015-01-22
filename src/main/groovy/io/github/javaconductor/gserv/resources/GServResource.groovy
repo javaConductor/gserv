@@ -1,5 +1,6 @@
-package io.github.javaconductor.gserv
+package io.github.javaconductor.gserv.resources
 
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.delegates.ResourceDelegate
 import io.github.javaconductor.gserv.utils.LinkBuilder
 
@@ -61,7 +62,7 @@ class GServResource {
 
     static def Resource(basePath, ResourceObject target) {
         def addAction = { actionList, action ->
-            actionList = Utils.removeAction(actionList, action)
+            actionList = PathMatchingUtils.removeAction(actionList, action)
             actionList << action
             actionList
         };

@@ -25,7 +25,6 @@
 package io.github.javaconductor.gserv.test
 
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.GServInstance
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import spock.lang.Specification

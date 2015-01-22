@@ -42,7 +42,7 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
 @Log4j
 class RequestContextWrapper extends AbstractRequestContext {
     RequestContext _context
-    Map _requestHdrs=[:], _responseHdrs=[:]
+    Map _requestHdrs = [:], _responseHdrs = [:]
     int _code
     InputStream _originalInputStream
     OutputStream _originalOutputStream, _responseBody
@@ -58,12 +58,12 @@ class RequestContextWrapper extends AbstractRequestContext {
         _context = context
         this.requestURI = _context.requestURI
         this.principal = _context.principal
-        this.requestHeaders = _context.requestHeaders as  Map
+        this.requestHeaders = _context.requestHeaders as Map
         this.responseHeaders.putAll(_context.responseHeaders)
         this.requestMethod = _context.requestMethod
         _originalOutputStream = _context.responseBody
         _originalInputStream = _context.requestBody
-       this.requestBody =   _context.requestBody
+        this.requestBody = _context.requestBody
         this.attributes = _context.attributes as Map
         this.responseCode = _context.responseCode
 
@@ -87,7 +87,7 @@ class RequestContextWrapper extends AbstractRequestContext {
     @Override
     def close() {
         def currentReqId = getAttribute(GServ.contextAttributes.requestId)
-        if(_wasClosed){
+        if (_wasClosed) {
             log.warn("RequestContext(#$currentReqId) close() called multiple times.")
             return
         }
@@ -117,16 +117,16 @@ class RequestContextWrapper extends AbstractRequestContext {
     }
 
     def setStreams(InputStream is, OutputStream os) {
-        _context.setStreams(is ,os)
+        _context.setStreams(is, os)
     }
 /**
-     * Sends the Headers and writes the bytes to the original stream
-     * Return code from the intercepted sendResponseHeaders() call or 200 is used as the statusCode in the response
-     *
-     * @param bytes
-     */
+ * Sends the Headers and writes the bytes to the original stream
+ * Return code from the intercepted sendResponseHeaders() call or 200 is used as the statusCode in the response
+ *
+ * @param bytes
+ */
     synchronized def writeIt(bytes) {
-    def currentReqId = getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = getAttribute(GServ.contextAttributes.requestId)
         log.trace "Wrapper.writeIt(): Writing response($_code) for req #${currentReqId} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
         if (!_wasClosed) {
             EventManager.instance().publish(Events.FilterProcessing, [

@@ -48,6 +48,7 @@ class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, Fil
     //def exchange
     def $this
     def requestContext
+
     def FilterDelegate(Filter filter, RequestContext requestContext, GServConfig serverConfig, String templateEngineName) {
         assert requestContext
 //        value("chain", chain);

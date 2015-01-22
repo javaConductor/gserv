@@ -2,8 +2,8 @@ package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.Utils
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
 import io.github.javaconductor.gserv.events.EventManager
@@ -46,7 +46,7 @@ class ActionRunner {
             }
         }
 
-        def qmap = Utils.queryStringToMap(uri.query)
+        def qmap = PathMatchingUtils.queryStringToMap(uri.query)
         action.queryPattern().queryKeys().each { k ->
             args.add(qmap[k])
         }
@@ -86,7 +86,7 @@ class ActionRunner {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
                         requestId: context.getAttribute(GServ.contextAttributes.requestId),
                         uri      : context.requestURI.path, msg: e.message, e: e])
-                if(!context.isClosed()) {
+                if (!context.isClosed()) {
                     cl.delegate.error(500, e.message)
                 }
                 log.error "ActionRunner: Error Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} : ${e.message}", e

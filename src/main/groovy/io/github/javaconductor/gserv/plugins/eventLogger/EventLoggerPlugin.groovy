@@ -24,8 +24,8 @@
 
 package io.github.javaconductor.gserv.plugins.eventLogger
 
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.plugins.AbstractPlugin

@@ -1,7 +1,4 @@
-package io.github.javaconductor.gserv
-
-import io.github.javaconductor.gserv.GServResource
-
+package io.github.javaconductor.gserv.resources
 /**
  * Created by javaConductor on 11/16/2014.
  */

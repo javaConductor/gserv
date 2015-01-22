@@ -9,8 +9,8 @@ import java.security.Principal
  */
 abstract class AbstractRequestContext implements RequestContext {
 
-    Map<String,String> requestHeaders = [:]
-    Map<String,String> responseHeaders = [:]
+    Map<String, String> requestHeaders = [:]
+    Map<String, String> responseHeaders = [:]
     InputStream requestBody
     OutputStream responseBody
     Map attributes = [:]
@@ -127,7 +127,8 @@ abstract class AbstractRequestContext implements RequestContext {
     void setAttribute(String key, Object value) {
         attributes[key] = value
     }
-    abstract void sendResponseHeaders( int responseCode, long size)
+
+    abstract void sendResponseHeaders(int responseCode, long size)
 
     def id() {
         return attributes[GServ.contextAttributes.requestId]
@@ -150,4 +151,4 @@ abstract class AbstractRequestContext implements RequestContext {
     abstract Object nativeObject();
     abstract  def setStreams(InputStream is, OutputStream os);
     */
-    }
+}

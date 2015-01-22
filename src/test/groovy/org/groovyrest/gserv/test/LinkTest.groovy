@@ -24,8 +24,8 @@
 
 package io.github.javaconductor.gserv.test
 
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import org.junit.Before
 import org.junit.Test

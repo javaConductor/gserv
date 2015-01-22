@@ -1,7 +1,7 @@
 package test.integration
 
 import groovyx.net.http.HTTPBuilder
-import io.github.javaconductor.gserv.GServRunner
+import io.github.javaconductor.gserv.cli.GServRunner
 import org.junit.Ignore
 import org.junit.Test
 import org.spockframework.util.Assert

@@ -25,7 +25,7 @@
 package io.github.javaconductor.gserv.configuration
 
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.GServFactory
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.exceptions.ConfigException
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import groovy.json.JsonSlurper

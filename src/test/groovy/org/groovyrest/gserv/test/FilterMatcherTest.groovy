@@ -24,10 +24,10 @@
 
 package io.github.javaconductor.gserv.test
 
-import io.github.javaconductor.gserv.filters.FilterMatcher
-import io.github.javaconductor.gserv.Matcher
-import io.github.javaconductor.gserv.ResourceAction
-import io.github.javaconductor.gserv.ResourceActionFactory
+import io.github.javaconductor.gserv.pathmatching.FilterMatcher
+import io.github.javaconductor.gserv.pathmatching.Matcher
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import org.junit.Before
 import org.junit.Test
 

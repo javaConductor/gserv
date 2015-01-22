@@ -25,16 +25,15 @@
 package io.github.javaconductor.gserv.delegates.functions
 
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.GServResource
-import io.github.javaconductor.gserv.ResourceActionFactory
-import io.github.javaconductor.gserv.ResourceObject
+import io.github.javaconductor.gserv.resources.GServResource
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
+import io.github.javaconductor.gserv.resources.ResourceObject
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 import org.apache.commons.io.IOUtils
-import sun.misc.BASE64Decoder
 
 /**
  *
@@ -211,7 +210,7 @@ trait ServerConfigFn {
         basic = basic[0];// we get a list as response but we only need the first one
         //" Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
         def base64 = basic.trim().substring(6);
-        def authString = new String(new BASE64Decoder().decodeBuffer(base64));
+        def authString = new String(base64.toString().decodeBase64());
         return authString.split(':')
     }
 

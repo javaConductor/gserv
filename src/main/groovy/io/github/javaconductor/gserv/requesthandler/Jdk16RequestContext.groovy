@@ -12,7 +12,8 @@ class Jdk16RequestContext extends AbstractRequestContext {
 
     HttpExchange _exchange
     boolean _closed = false
-    Jdk16RequestContext(HttpExchange exchange){
+
+    Jdk16RequestContext(HttpExchange exchange) {
         assert exchange
         this.requestBody = exchange.requestBody
         this.responseBody = exchange.responseBody
@@ -27,25 +28,26 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _exchange = exchange
     }
 
-    def isClosed(){
+    def isClosed() {
         _closed
     }
+
     void sendResponseHeaders(int responseCode, long size) {
-        if ( !_closed )
-            _exchange.sendResponseHeaders(responseCode,size)
+        if (!_closed)
+            _exchange.sendResponseHeaders(responseCode, size)
         else {
             log.warn("sendResponseHeaders() called twice.")
         }
     }
 
-    def setStreams(InputStream is, OutputStream os){
+    def setStreams(InputStream is, OutputStream os) {
         requestBody = is
         responseBody = os
     }
 
     @Override
     def close() {
-        if (!_closed){
+        if (!_closed) {
             _exchange.close()
             _exchange.setAttribute(GServ.contextAttributes.requestContext, null)
         }
@@ -55,7 +57,8 @@ class Jdk16RequestContext extends AbstractRequestContext {
     String dump() {
         ""
     }
-    Object nativeObject(){
+
+    Object nativeObject() {
         _exchange
     }
 

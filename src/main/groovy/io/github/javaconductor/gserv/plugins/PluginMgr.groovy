@@ -46,7 +46,7 @@ class PluginMgr {
         initDefaultPlugins()
     }
 
-    def initDefaultPlugins(){
+    def initDefaultPlugins() {
         register('ldap', LdapPlugin.class)
         register('cors', CorsPlugin.class)
         register('caching', CachingPlugin.class)
@@ -57,8 +57,8 @@ class PluginMgr {
 
     def register(name, Class pluginClass) {
 
-        if (plugins[name] ){
-            log.warn(  "Plugin name: $name is being overridden with class: ${ pluginClass.canonicalName }" )
+        if (plugins[name]) {
+            log.warn("Plugin name: $name is being overridden with class: ${pluginClass.canonicalName}")
         }
 
         plugins[name] = pluginClass

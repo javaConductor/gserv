@@ -24,10 +24,11 @@
 
 package io.github.javaconductor.gserv.configuration
 
-import io.github.javaconductor.gserv.*
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.delegates.DefaultDelegates
 import io.github.javaconductor.gserv.delegates.DelegatesMgr
-import io.github.javaconductor.gserv.GServResource
+import io.github.javaconductor.gserv.pathmatching.Matcher
+import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.LinkBuilder
@@ -58,7 +59,7 @@ class GServConfig {
     private def _name = 'gserv App';
     private def _actions = [];
     def _staticRoots = [], _filters = [], _authenticator,
-            _templateEngineName, _defaultPort
+        _templateEngineName, _defaultPort
     def delegateTypeMap
     boolean bUseResourceDocs
     def delegateMgr
@@ -66,7 +67,7 @@ class GServConfig {
     def _defaultResource
     InetSocketAddress _bindAddress
     StaticFileHandler _staticFileHandler = new StaticFileHandler()
-    io.github.javaconductor.gserv.Matcher matcher = new Matcher()
+    Matcher matcher = new Matcher()
     def serverIPs = []
     HttpsConfig _https
 
@@ -143,7 +144,7 @@ class GServConfig {
         matcher.matchAction(_actions, context)
     }
 
-    boolean requestMatched(RequestContext context ) {
+    boolean requestMatched(RequestContext context) {
         !!(matchAction(context) || _staticFileHandler.resolveStaticResource(
                 context.requestURI.path,
                 _staticRoots,

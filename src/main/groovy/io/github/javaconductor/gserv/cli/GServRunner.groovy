@@ -22,19 +22,16 @@
  * THE SOFTWARE.
  */
 
-package io.github.javaconductor.gserv
+package io.github.javaconductor.gserv.cli
 
-import io.github.javaconductor.gserv.configuration.GServConfig
-import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.exceptions.ConfigException
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resourceloader.ResourceScriptException
 import groovy.util.logging.Log4j
 import org.apache.commons.cli.Option
-
-import static groovyx.gpars.GParsPool.withPool
 
 /**
  * Runs instances of gserv  as specified by the command-line args.

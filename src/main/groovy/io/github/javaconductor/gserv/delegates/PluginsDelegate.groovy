@@ -26,7 +26,7 @@ package io.github.javaconductor.gserv.delegates
 
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
-import io.github.javaconductor.gserv.gServPlugins
+import io.github.javaconductor.gserv.server.GServPlugins
 import io.github.javaconductor.gserv.plugins.PluginMgr
 
 /**
@@ -34,7 +34,7 @@ import io.github.javaconductor.gserv.plugins.PluginMgr
  */
 class PluginsDelegate {
     def pluginMgr = PluginMgr.instance()
-    def plugins = new gServPlugins()
+    def plugins = new GServPlugins()
 
     /**
      * This function is used to declare the use of a plugin in a ServerInstances
