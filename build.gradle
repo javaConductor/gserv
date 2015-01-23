@@ -31,7 +31,7 @@ apply plugin: 'signing'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
-version = "0.9.4"
+version = "0.9.5"
 
 //
 //jar {
@@ -46,6 +46,7 @@ version = "0.9.4"
 //    exclude(['groovy/','org/codehaus/groovy/'])
 //    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
 //}
+
 
 sourceSets {
     integrationTest {
@@ -114,7 +115,7 @@ task integration(type: Test) {
 groovydoc {
 
 }
-
+/*
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -160,7 +161,7 @@ uploadArchives {
         }
     }
 }
-
+*/
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -171,9 +172,13 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
-task standaloneJar(type: Jar) {
-    classifier = 'jar'
+task standaloneJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.output.classesDir
     from {
+        sourceSets.main.output.collect {
+            println it
+            it.isDirectory() ? it : zipTree(it)
+        }
         configurations.compile.collect {
             it.isDirectory() ? it : zipTree(it)
         }
@@ -181,29 +186,14 @@ task standaloneJar(type: Jar) {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+//    include sourceSets.main.output.classesDir.name
     manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
     archiveName = "gservApp-${version}.jar"
 }
 
-task frameworkJar(type: Jar) {
-    println configurations
-    classifier = 'jar'
-    from {
-        configurations.runtime.collect {
-            println it
-            it.isDirectory() ? it : zipTree(it)
-        }
-        /* configurations.runtime.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }*/
-    }
-    exclude(['groovy/','org/codehaus/groovy/'])
-    archiveName = "gservFramework-${version}"
-}
 
 artifacts {
     archives standaloneJar
-    archives frameworkJar
     archives sourcesJar
     archives groovydocJar
 }

@@ -1,11 +1,8 @@
 package io.github.javaconductor.gserv.jmx
-
-import groovy.time.Duration
-
 /**
  * Created by javaConductor on 10/7/2014.
  */
-class GServJMX implements GServJMXMXBean {
+class GServJMX implements GServJMXBean {
     def GServJMX() {
         //      this.started = new Date()
     }
