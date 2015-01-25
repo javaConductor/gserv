@@ -27,26 +27,10 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven'
-apply plugin: 'signing'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
 version = "0.9.5"
-
-//
-//jar {
-//    from {
-//        configurations.compile.collect {
-//            it.isDirectory() ? it : zipTree(it)
-//        }
-//        configurations.runtime.collect {
-//            it.isDirectory() ? it : zipTree(it)
-//        }
-//    }
-//    exclude(['groovy/','org/codehaus/groovy/'])
-//    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
-//}
-
 
 sourceSets {
     integrationTest {
@@ -70,21 +54,13 @@ repositories {
     mavenCentral()
 //    mavenLocal()
 }
-//
-//<scm>
-//<connection>scm:git:git@github.com:javaconductor/gserv.git</connection>
-//  <developerConnection>scm:git:git@github.com:javaconductor/gserv.git</developerConnection>
-//  <url>git@github.com:javaconductor/gserv.git</url>
-//</scm>
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'log4j:log4j:1.2.17'
-
     compile 'org.springframework.ldap:spring-ldap-core:2.0.2.RELEASE'
-//    compile('org.codehaus.groovy:groovy-all:2.3.0')
     compile 'org.codehaus.groovy:groovy-all:2.3.7'
     compile('org.codehaus.gpars:gpars:1.1.0')
     compile('commons-io:commons-io:2.4')
@@ -190,7 +166,6 @@ task standaloneJar(type: Jar, dependsOn: classes) {
     manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
     archiveName = "gservApp-${version}.jar"
 }
-
 
 artifacts {
     archives standaloneJar
