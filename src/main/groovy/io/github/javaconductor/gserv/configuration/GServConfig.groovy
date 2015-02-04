@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv.configuration
 
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.DefaultDelegates
 import io.github.javaconductor.gserv.delegates.DelegatesMgr
 import io.github.javaconductor.gserv.pathmatching.Matcher
@@ -58,18 +59,19 @@ class GServConfig {
 
     private def _name = 'gserv App';
     private def _actions = [];
-    def _staticRoots = [], _filters = [], _authenticator,
+    private def _staticRoots = [], _filters = [], _authenticator,
         _templateEngineName, _defaultPort
+    private def _defaultResource
+    private InetSocketAddress _bindAddress
+    private StaticFileHandler _staticFileHandler = new StaticFileHandler()
+    private HttpsConfig _https
     def delegateTypeMap
     boolean bUseResourceDocs
     def delegateMgr
     def linkBuilder
-    def _defaultResource
-    InetSocketAddress _bindAddress
-    StaticFileHandler _staticFileHandler = new StaticFileHandler()
     Matcher matcher = new Matcher()
     def serverIPs = []
-    HttpsConfig _https
+    InputStreamTypeConverter inputStreamTypeConverter = new InputStreamTypeConverter()
 
     GServConfig() {
         this.delegateManager(new DelegatesMgr(DefaultDelegates.getDelegates()))
@@ -310,5 +312,11 @@ class GServConfig {
             throw new IllegalArgumentException("Password is required for HTTPS.")
         }
 
+    }
+
+    def converter() { this.inputStreamTypeConverter }
+
+    def converter(InputStreamTypeConverter inputStreamTypeConverter) {
+        this.inputStreamTypeConverter = inputStreamTypeConverter
     }
 }

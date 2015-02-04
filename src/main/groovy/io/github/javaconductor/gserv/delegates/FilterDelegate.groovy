@@ -26,11 +26,9 @@ package io.github.javaconductor.gserv.delegates
 
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.configuration.GServConfig
-import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.functions.FilterFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
-import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
@@ -49,15 +47,18 @@ class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, Fil
     def $this
     def requestContext
 
-    def FilterDelegate(Filter filter, RequestContext requestContext, GServConfig serverConfig, String templateEngineName) {
+    def FilterDelegate(Filter filter, RequestContext requestContext,
+                       GServConfig serverConfig, String templateEngineName) {
         assert requestContext
 //        value("chain", chain);
         value("linkBuilder", serverConfig.linkBuilder());
         value("staticRoots", serverConfig.staticRoots());
         value("templateEngineName", serverConfig.templateEngineName());
-        value("to", new InputStreamTypeConverter().converters);
+        value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
+        value("to", serverConfig.inputStreamTypeConverter.converters);
         value("serverConfig", serverConfig);
         value('$this', filter);
+
         this.requestContext = requestContext
         $this = filter
     }

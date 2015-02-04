@@ -30,7 +30,6 @@ import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import groovy.util.logging.Log4j
 import groovyx.gpars.actor.DynamicDispatchActor
-import io.github.javaconductor.gserv.utils.TypeUtils
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,7 +38,7 @@ import io.github.javaconductor.gserv.utils.TypeUtils
  * Time: 10:13 PM
  */
 @Log4j
-class AsyncHandler extends DynamicDispatchActor implements TypeUtils {
+class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
     EventManager _evtMgr = EventManager.instance()
     private def _cfg
     private def _seq

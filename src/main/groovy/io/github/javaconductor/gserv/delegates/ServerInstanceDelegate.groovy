@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv.delegates
 
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ServerConfigFn
 import io.github.javaconductor.gserv.events.EventManager
@@ -47,9 +48,12 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
     def filters = { -> value("filterList") }
     def staticRoots = { value("staticRoots") }
     def linkBuilder = { value("linkBuilder") }
+    def converter = { value("inputStreamTypeConverter") }
 
     def ServerInstanceDelegate() {
         value("name", "gServ Application")
+
+        value('inputStreamTypeConverter', new InputStreamTypeConverter());
         value("actionList", [])
         value("filterList", [])
         value("staticRoots", [])

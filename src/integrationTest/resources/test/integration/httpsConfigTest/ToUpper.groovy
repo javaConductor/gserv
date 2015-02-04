@@ -1,4 +1,4 @@
-package test.integration.configtest
+package test.integration.httpsConfigTest
 /*
  * The MIT License (MIT)
  *

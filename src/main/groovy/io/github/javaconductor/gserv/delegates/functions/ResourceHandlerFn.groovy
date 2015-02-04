@@ -26,7 +26,6 @@ package io.github.javaconductor.gserv.delegates.functions
 
 import groovy.text.Template
 import groovy.text.TemplateEngine
-import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.exceptions.TemplateException
 
 /**
@@ -237,6 +236,6 @@ trait ResourceHandlerFn {
         getFile(value("staticRoots"), fname)
     }
 
-    def to = (new InputStreamTypeConverter().converters)
+    def to = (value("to")) //serverConfig.inputStreamTypeConverter.converters
 }
 

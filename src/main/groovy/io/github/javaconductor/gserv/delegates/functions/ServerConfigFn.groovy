@@ -166,7 +166,7 @@ trait ServerConfigFn {
      * @param url
      * @param method
      * @param options
-     * @param closure fn(requestContext, byte[] data)
+     * @param clozure fn(requestContext, byte[] data)
      * @return this
      */
     def before(name, url, method, options, order, clozure) {
@@ -176,6 +176,14 @@ trait ServerConfigFn {
         this
     }
 
+/**
+ *
+ * @param methods
+ * @param path
+ * @param realm
+ * @param challengeFn
+ * @return
+ */
     def basicAuthentication(methods, path, realm, challengeFn) {
 
         assert challengeFn;
@@ -188,10 +196,12 @@ trait ServerConfigFn {
                 def userPswd = getBasicAuthUserPswd(requestContext);
                 log.trace("basicAuth before(): userPswd:$userPswd");
                 if (!userPswd || userPswd.length < 2) {
+                    log.trace("basicAuth before(): userPswd:$userPswd");
                     (requestContext).responseHeaders.put("WWW-Authenticate", "Basic realm=$realm")
                     error(401, "Authentication Required");
                 } else {
                     def bAuthenticated = _authenticated(userPswd[0], userPswd[1], requestContext, challengeFn);
+                    log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!");
                     if (!bAuthenticated) {
                         error(403, "Bad credentials for path ${requestContext.requestURI.path}.");
                     }
@@ -199,8 +209,7 @@ trait ServerConfigFn {
                 return (requestContext);
             }
         }
-    }
-//basicAuthentication
+    }//basicAuthentication
 
     def getBasicAuthUserPswd(requestContext) {
         def basic = requestContext.requestHeaders.get("Authorization");
@@ -277,4 +286,7 @@ trait ServerConfigFn {
         addStaticRoot(directory)
     }
 
+    def conversion(Class c, Closure fn) {
+        value('inputStreamTypeConverter').add(c, fn)
+    }
 }

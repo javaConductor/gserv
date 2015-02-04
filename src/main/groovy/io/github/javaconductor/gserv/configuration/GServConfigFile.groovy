@@ -58,18 +58,11 @@ class GServConfigFile {
 
         ///// CREATE the initial GServConfig from the file values
         HttpsConfig httpsCfg
-        if (cfg.https) {
-            cfg.applyHttpsConfig(cfg.https)
-        }
+
 
         if (!cfg.apps) {//else
             System.err.println("Error in gserv config(${configFile.absolutePath}) - No apps specified.  At least one is required.")
             return [];
-        }
-        ClassLoader classLoader = GServ.classLoader
-        ///// Get the classpath and add those jars to the Classpath
-        if (cfg.classpath) {
-            classLoader = addClasspath(classLoader, cfg.classpath)
         }
 
         GServConfig newCfg;
@@ -77,29 +70,25 @@ class GServConfigFile {
 
             try {
                 newCfg = appToConfig(app, cfg.classpath)
-                if (app.https) {
-
-                    newCfg.httpsConfig(cfg.httpsConfig())
+                if (app.https && cfg.https) {
+                    newCfg.applyHttpsConfig(cfg.https)
                 }
             } catch (Exception ex) {
                 log.error("Unable to instantiate configuration", ex)
                 throw ex;
             }
-            if (httpsCfg && app.https) {
-                newCfg.httpsConfig(httpsCfg);
-            }
             newCfg
-        }
+        }//collect
         configs
     }//parse
-
+/*
     ClassLoader addClasspath(ClassLoader classLoader, List classpath) {
         def urls = classpath.collect { jar ->
             new File(jar).toURI().toURL()
         }.toArray(new URL[classpath.size()])
         URLClassLoader.newInstance(urls, classLoader)
     }
-
+*/
     def addResources(resourceScripts, config) {
         def resources = []
         if (resourceScripts) {
@@ -114,7 +103,7 @@ class GServConfigFile {
         }
         config.addResources(resources)
         config;
-    };////
+    }////
 
     def appToConfig(app, classpath = []) {
 

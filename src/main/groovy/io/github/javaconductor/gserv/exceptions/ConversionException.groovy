@@ -1,8 +1,7 @@
-package test.integration.configtest
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Lee Collins
+ * Copyright (c) 2014 Lee Collins
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +22,17 @@ package test.integration.configtest
  * THE SOFTWARE.
  */
 
-[
-        Resource("/upper") {
-            get("/:word") { word ->
-                write(word.toUpperCase().bytes)
-            }
-        }
-]
+package io.github.javaconductor.gserv.exceptions
 
+/**
+ * Created by javaConductor on 8/18/2014.
+ */
+class ConversionException extends Exception {
+    def ConversionException(String s) {
+        super(s)
+    }
+
+    def ConversionException(String s, Throwable e) {
+        super(s, e)
+    }
+}

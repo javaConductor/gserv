@@ -27,13 +27,14 @@ package io.github.javaconductor.gserv.pathmatching
 import io.github.javaconductor.gserv.actions.ActionPathElement
 import io.github.javaconductor.gserv.actions.ActionPathQuery
 import io.github.javaconductor.gserv.actions.ResourceAction
-import io.github.javaconductor.gserv.filters.Filter
-import io.github.javaconductor.gserv.filters.FilterType
-import io.github.javaconductor.gserv.utils.ParseUtils
+import io.github.javaconductor.gserv.pathmatching.types.IntegerType
+import io.github.javaconductor.gserv.pathmatching.types.NumberType
+import io.github.javaconductor.gserv.pathmatching.types.PathElementType
+import io.github.javaconductor.gserv.pathmatching.types.RegExType
 
 import java.util.regex.Pattern
 
-import static io.github.javaconductor.gserv.utils.TextUtils.*;
+import static io.github.javaconductor.gserv.utils.TextUtils.*
 
 /**
  * Misc PathMatchingUtils for Pattern matching
@@ -86,19 +87,34 @@ class PathMatchingUtils {
         return true;
     }
 
+    /**
+     * Returns true if name is neither a data nor a matching pattern
+     *
+     * @param name
+     * @return
+     */
     static def isValuePattern(name) {
-        //returns true if name is matching pattern with ‘:’
         !(isMatchingPattern(name) || isDataOnlyPattern(name))
     }
 
+    /**
+     * Returns true if name is matching pattern with ‘:’
+     *
+     * @param name
+     * @return
+     */
     static def isMatchingPattern(name) {
-        //returns true if name is matching pattern with ‘:’
         (name?.startsWith(':'))
     }
 
+    /**
+     *  Returns true if name  will not be used for Route matching but is data-only.
+     *  Qry params with this designation will passed to the HTTP Method handler
+     *
+     * @param name
+     * @return
+     */
     static def isDataOnlyPattern(name) {
-        //  returns true if name  will not be used for Route matching but is data-only.
-        // Qry params with this designation will passed to the HTTP Method handler
         //  should start with ‘?:'
         (name?.startsWith('?:'))
     }
@@ -136,7 +152,7 @@ class PathMatchingUtils {
             return createType(parts[1])
     }
 
-    static def createType(elementType) {
+    static PathElementType createType(elementType) {
         switch (elementType) {
             case "Number":
             case "Integer":
@@ -150,23 +166,10 @@ class PathMatchingUtils {
         }
     }
 
+    static def numberType = new NumberType()
+    static def integerType = new IntegerType()
 
-    static def numberType = [
-            name    : "Number",
-            validate: { s ->
-                isNumber(s)
-            },
-            toType  : { s -> Double.parseDouble(s) }
-    ]
-    static def integerType = [
-            name    : "Integer",
-            validate: { s ->
-                isInteger(s)
-            },
-            toType  : { s -> Integer.parseInt(s) }
-    ]
-
-    static def createKnownType(elementType) {
+    static PathElementType createKnownType(elementType) {
 
         switch (elementType) {
             case "Number":
@@ -184,15 +187,7 @@ class PathMatchingUtils {
     }
 
     static def createRegExType(regEx) {
-        def regExType = [
-                name    : "RegEx",
-                validate: { s ->
-                    Pattern p = new Pattern(regEx, 0)
-                    p.matcher(s).matches()
-                },
-                toType  : { s -> (s) }
-        ]
-        regExType
+        new RegExType(regEx)
     }
 
     static def extractElement(pathElement) {

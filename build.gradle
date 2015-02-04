@@ -30,7 +30,7 @@ apply plugin: 'maven'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
-version = "0.9.5"
+version = "0.9.6"
 
 sourceSets {
     integrationTest {
@@ -52,7 +52,7 @@ check.dependsOn integrationTest
 
 repositories {
     mavenCentral()
-//    mavenLocal()
+    mavenLocal()
 }
 
 // In this section you declare the dependencies for your production and test code
@@ -71,6 +71,7 @@ dependencies {
     compile 'org.apache.ivy:ivy:2.2.0'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
+    compile 'io.github.javaconductor:gserv-test:0.9.5'
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     testCompile 'cglib:cglib-nodep:3.1'
     testCompile 'org.objenesis:objenesis:1.2'

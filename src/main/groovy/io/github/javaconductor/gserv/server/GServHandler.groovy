@@ -17,6 +17,8 @@ import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.ActorPool
 
+import java.util.concurrent.atomic.AtomicLong
+
 /**
  * This is the Handler that is called for each request by the Java 1.6 HttpServer
  *
@@ -60,7 +62,8 @@ class GServHandler implements HttpHandler {
         _dispatcher.start()
     }
 
-    static Long requestId = 0L
+//    static Long requestId = 0L
+    AtomicLong requestId = new AtomicLong(0L)
     /**
      * This method is called for each request
      * This is called after the Filters and done.
@@ -69,10 +72,9 @@ class GServHandler implements HttpHandler {
      */
     void handle(HttpExchange httpExchange) {
         RequestContext context = new GServFactory().createRequestContext(httpExchange)
-        synchronized (requestId) {
-            context.setAttribute(GServ.contextAttributes.requestId, ++requestId)
-            log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId")
-        }
+        def r = new Long(requestId.addAndGet(1L))
+        context.setAttribute(GServ.contextAttributes.requestId, r)
+        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$r")
 
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
         context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)

@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv
 
 import io.github.javaconductor.gserv.configuration.GServConfig
+import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.resources.ResourceObject
@@ -152,7 +153,7 @@ class GServ {
                 .authenticator(tmpAuthenticator)
                 .addStaticRoots(tmpStaticRoots)
                 .actions(tmpActions)
-                .addFilters(tmpFilters);
+                .addFilters(tmpFilters)
         /// each plugin is applied to the configuration
         cfg = serverPlugins.applyPlugins(cfg);
         if (options.https) {
@@ -169,6 +170,7 @@ class GServ {
         boolean _useResourceDocs
         def templateEngineName
         def lBuilder
+        InputStreamTypeConverter inputStreamTypeConverter
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
             tmpName = name()
@@ -178,6 +180,7 @@ class GServ {
             tmpStaticRoots = staticRoots()
             templateEngineName = templateEngine ?: "default"
             lBuilder = linkBuilder()
+            inputStreamTypeConverter = converter()
         }
 
         /// add this info to the config
@@ -190,6 +193,7 @@ class GServ {
                 .templateEngineName(templateEngineName)
                 .name(tmpName)
                 .linkBuilder(lBuilder)
+                .converter(inputStreamTypeConverter)
         //}
         factory.createHttpInstance(cfg)
     }

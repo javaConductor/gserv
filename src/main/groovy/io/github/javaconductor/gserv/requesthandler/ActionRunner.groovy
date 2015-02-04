@@ -9,6 +9,8 @@ import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 
+import java.util.concurrent.atomic.AtomicLong
+
 /**
  * Created by lcollins on 12/16/2014.
  */
@@ -62,10 +64,14 @@ class ActionRunner {
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         cl
     }
-
+    AtomicLong reqId = new AtomicLong(0L)
     def process(RequestContext context, ResourceAction action) {
-
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        if (!currentReqId) {
+            currentReqId = reqId.addAndGet(1L)
+            context.setAttribute(GServ.contextAttributes.requestId, currentReqId)
+        }
+
         //log.trace "ActionRunner.process() req#${currentReqId} requestContext has ${context.requestBody.bytes.size()} bytes to read."
         log.trace "ActionRunner.process() req#${currentReqId}."
 
@@ -81,20 +87,20 @@ class ActionRunner {
                 //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
                 log.trace "ActionRunner: Running req#${currentReqId} ${context.requestURI.path}"
                 clozure(*argList)
-                log.trace "ActionRunner: req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} - Finished."
+                log.trace "ActionRunner: req#${currentReqId} ${context.requestURI.path} - Finished."
             } catch (Throwable e) {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
-                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        requestId: currentReqId,
                         uri      : context.requestURI.path, msg: e.message, e: e])
                 if (!context.isClosed()) {
                     cl.delegate.error(500, e.message)
                 }
-                log.error "ActionRunner: Error Running req#${context.getAttribute(GServ.contextAttributes.requestId)} ${context.requestURI.path} : ${e.message}", e
+                log.error "ActionRunner: Error Running req#${currentReqId} ${context.requestURI.path} : ${e.message}", e
                 context
             }
             finally {
                 EventManager.instance().publish(Events.ResourceProcessed, [
-                        requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                        requestId: currentReqId,
                         uri      : context.requestURI.path, msg: 'Resource processing done.'])
             }
         })(cl, args);

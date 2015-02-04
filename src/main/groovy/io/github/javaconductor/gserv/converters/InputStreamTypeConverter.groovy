@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv.converters
 
 import groovy.json.JsonSlurper
+import io.github.javaconductor.gserv.exceptions.ConversionException
 import org.apache.commons.io.IOUtils
 
 /**
@@ -36,9 +37,24 @@ import org.apache.commons.io.IOUtils
  */
 class InputStreamTypeConverter {
     def converters
+    def typeConverters
 
     def InputStreamTypeConverter() {
-        converters = ["text": readText, "json": readJson, "xml": readXml]
+        converters = ["text": readText, "json": readJson, "xml": readXml, "type": typeConverter]
+        typeConverters = [:]
+    }
+
+    /**
+     * @param c Target class of conversion
+     * @param inputStream
+     * @return stream data as class 'c'
+     */
+    def typeConverter = { Class c, InputStream inputStream ->
+        def convertFn = typeConverters[c.name]
+        if (!convertFn) {
+            throw new ConversionException("No converter for class: ${c.name}.")
+        }
+        convertFn(inputStream)
     }
 
     /**
@@ -48,16 +64,27 @@ class InputStreamTypeConverter {
      * @param fn
      * @return
      */
-    def add(name, fn) {
+    def add(String name, fn) {
         converters[name] = fn
+    }
+
+    /**
+     *  Add a class converter function 'fn' to be referenced by 'name'
+     *
+     * @param aClass
+     * @param fn
+     * @return
+     */
+    def add(Class aClass, Closure fn) {
+        typeConverters[aClass.name] = fn
     }
 
     /**
      *  Builtin converter for JSON
      *
-     * @param name
-     * @param fn
-     * @return converted text
+     * @param istream The inputStream
+     *
+     * @return converted text (Map)
      */
     def readJson = { istream ->
         def js = new JsonSlurper()
@@ -68,9 +95,9 @@ class InputStreamTypeConverter {
     /**
      *  Builtin converter for XML
      *
-     * @param name
-     * @param fn
-     * @return converted text
+     * @param istream The inputStream
+     *
+     * @return converted text (GPathResult)
      */
     def readXml = { istream ->
         def xs = new XmlSlurper()
@@ -80,8 +107,8 @@ class InputStreamTypeConverter {
     /**
      *  Builtin converter for String as byte stream
      *
-     * @param name
-     * @param fn
+     * @param istream The inputStream
+     *
      * @return converted text
      */
     def readText = { istream ->
@@ -92,4 +119,5 @@ class InputStreamTypeConverter {
      *  Invokes converter 'name' on input stream 'istream'
      */
     def to = { name, istream -> converters[name](istream) }
+
 }

@@ -24,6 +24,8 @@
 
 package io.github.javaconductor.gserv.delegates
 
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.requesthandler.RequestContext
@@ -38,13 +40,16 @@ class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn 
     def $this
     def eventManager = EventManager.instance()
 
-    def HttpMethodDelegate(requestContext, action, serverConfig) {
+    def HttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
         value("tmgr", new TemplateManager());
         value("linkBuilder", serverConfig.linkBuilder());
         value("staticRoots", serverConfig.staticRoots());
+        value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
+        value('to', serverConfig.inputStreamTypeConverter.converters);
         value("templateEngineName", serverConfig.templateEngineName());
         //value("to", new InputStreamTypeConverter().converters);
         // $this inside the closure will be the currently processing action
+        to = value('to')
         $this = action
         this.requestContext = requestContext
         this.serverConfig = serverConfig
