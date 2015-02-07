@@ -50,6 +50,15 @@ trait ServerConfigFn {
         this.value("name")
     }
 
+    def defaultResource(nm) {
+        this.value "defaultResource", nm
+        this
+    }
+
+    def defaultResource() {
+        this.value("defaultResource")
+    }
+
     def addAction(action) {
         this.value("actionList").add(action)
         this

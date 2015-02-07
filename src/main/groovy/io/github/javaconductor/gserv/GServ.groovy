@@ -170,6 +170,7 @@ class GServ {
         boolean _useResourceDocs
         def templateEngineName
         def lBuilder
+        def defaultRes
         InputStreamTypeConverter inputStreamTypeConverter
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
@@ -181,10 +182,10 @@ class GServ {
             templateEngineName = templateEngine ?: "default"
             lBuilder = linkBuilder()
             inputStreamTypeConverter = converter()
+            defaultRes = defaultResource()
         }
 
         /// add this info to the config
-
         cfg.addServerIP(options.serverIP)
                 .addFilters(tmpFilters)
                 .addStaticRoots(tmpStaticRoots)
@@ -194,6 +195,7 @@ class GServ {
                 .name(tmpName)
                 .linkBuilder(lBuilder)
                 .converter(inputStreamTypeConverter)
+                .defaultResource(defaultRes)
         //}
         factory.createHttpInstance(cfg)
     }

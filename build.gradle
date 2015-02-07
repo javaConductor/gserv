@@ -164,7 +164,15 @@ task standaloneJar(type: Jar, dependsOn: classes) {
         }
     }
 //    include sourceSets.main.output.classesDir.name
-    manifest.attributes("Main-Class": "io.github.javaconductor.gserv.Main")
+    manifest {
+        attributes(["Main-Class": "io.github.javaconductor.gserv.Main"])
+        attributes(["Specification-Title": "gServ"])
+        attributes(["Specification-Version": "$version"])
+        attributes(["Specification-Vendor": "Lee Collins"])
+        attributes(["Implementation-Title": "gServ"])
+        attributes(["Implementation-Version": "$version"])
+        attributes(["Implementation-Vendor": "Lee Collins"])
+    }
     archiveName = "gservApp-${version}.jar"
 }
 

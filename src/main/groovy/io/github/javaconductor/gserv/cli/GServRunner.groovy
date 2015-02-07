@@ -41,10 +41,11 @@ class GServRunner {
     def factory = new GServFactory();
     def scriptLoader = new ScriptLoader();
     def resourceLoader = new ResourceLoader();
+    def version = getGServVersion()
     CliBuilder cli = new CliBuilder(
             usage: 'gserv [options]',
             header: '\nAvailable options (use -h for help):\n',
-            footer: '\ngServ © 2014-2015 Lee Collins.  All rights reserved.'
+            footer: "\ngServ Version $version - Copyright 2014-2015 Lee Collins.  All rights reserved."
     );
 
     def GServRunner() {
@@ -57,6 +58,7 @@ class GServRunner {
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.n(longOpt: 'appName', 'The name of the Application', args: 1, required: false)
+        cli.v(longOpt: 'version', 'Prints the current gServ version', args: 0, required: false)
     }
 
     /**
@@ -87,6 +89,11 @@ class GServRunner {
         def configFile
         def configFilename = options.c;
         try {
+            //TODO Fix -v option
+            if (options.v) {
+                println "gServ Version ${getGServVersion()}"
+                return
+            }
             if (!configFilename) {
                 def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
                 if (!options.p)
@@ -139,5 +146,9 @@ class GServRunner {
         });
 
     }//start
+
+    String getGServVersion() {
+        this.class.package.implementationVersion
+    }
 
 }//class
