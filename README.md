@@ -2,7 +2,7 @@
         <h2 class="docs-sub-header">What is gServ?</h2>
         <span class="docs-content">
             gServ is a tool for creating and deploying REST based services using Groovy without the
-            hassle of a container (JBoss, Tomcat, etc.).  Using gServ, you can easily define
+            hassle of a container (JBoss, Tomcat, etc.) .  Using gServ, you can easily define
             REST resources as Groovy scripts or embed  gServ in your application. gServ is
             perfect for creating lightweight micro services.
         </span>
@@ -22,7 +22,10 @@
                 <li> HTTPS
             </ul>
                 <h3>Requirements:</h3>
-                <ul><li>Java JDK 1.6+</ul>
+                <ul><li>Java JDK 1.6+</li>
+                    <li>Groovy 2.3+ (Framework only)</li>
+                </ul>
+
     <div class="docs-content">
         <h3>Basic Concepts</h3>
         <table width="90%" class="docs-content">
@@ -45,7 +48,7 @@
 <tr><th colspan='2'>
 Creating REST Resources
 </th></tr>
-<tr><td width='60%'>
+<tr><td>
 <pre>
 
 /// create a GServ instance
@@ -71,7 +74,7 @@ def bkResource = gserv.resource("/books") {
 }
 
 </pre>
-</td>
+</td></tr><tr>
 <td width='40%'>
 The root path is passed to the GServ.resource() method along with a closure defining the actions for the resource.
 </td>
@@ -96,8 +99,8 @@ gserv.http {
 
 
 </pre>
-</td>
-<td>
+</td></tr>
+<tr><td>
 The http() method creates a GServInstance that can later listen on a port and handle HTTP requests. This server instance
 defines static roots usually used for templates for single-page apps and a single FAQ page.
 Then, after the server instance is returned from the http() method, we can immediately call start(8080) on it.
@@ -127,7 +130,8 @@ gserv.http {
 
 </pre>
 </td>
-<td>
+</tr>
+<tr><td>
 A server instance can be created by simply adding resources.  Here we add our 2 resources: bkResources and
 userResources.  Now, all URIs related to both resources are available once the instance is started. This instance also
 defines a static_root which tells gserv where to find static files such as the FAQ page which should be at /public/webapp/App.faq.html.
