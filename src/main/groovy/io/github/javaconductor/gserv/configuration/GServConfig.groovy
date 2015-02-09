@@ -318,5 +318,6 @@ class GServConfig {
 
     def converter(InputStreamTypeConverter inputStreamTypeConverter) {
         this.inputStreamTypeConverter = inputStreamTypeConverter
+        this
     }
 }

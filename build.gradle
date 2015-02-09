@@ -71,7 +71,6 @@ dependencies {
     compile 'org.apache.ivy:ivy:2.2.0'
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
-    compile 'io.github.javaconductor:gserv-test:0.9.5'
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
     testCompile 'cglib:cglib-nodep:3.1'
     testCompile 'org.objenesis:objenesis:1.2'
@@ -176,8 +175,21 @@ task standaloneJar(type: Jar, dependsOn: classes) {
     archiveName = "gservApp-${version}.jar"
 }
 
+
+task createDist(type: Copy, dependsOn: standaloneJar) {
+
+    from('build/libs') {
+        include 'gservApp-0.9.6.jar'
+        rename 'gservApp-0.9.6.jar', 'gserv.jar'
+    }
+    into 'dist'
+}
+
+createDist.mustRunAfter(standaloneJar)
+
 artifacts {
     archives standaloneJar
     archives sourcesJar
     archives groovydocJar
 }
+

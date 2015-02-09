@@ -39,13 +39,13 @@ import org.apache.commons.cli.Option
 @Log4j
 class GServRunner {
     def factory = new GServFactory();
-    def scriptLoader = new ScriptLoader();
-    def resourceLoader = new ResourceLoader();
+    //def scriptLoader = new ScriptLoader();
+    //def resourceLoader = new ResourceLoader();
     def version = getGServVersion()
     CliBuilder cli = new CliBuilder(
             usage: 'gserv [options]',
             header: '\nAvailable options (use -h for help):\n',
-            footer: "\ngServ Version $version - Copyright 2014-2015 Lee Collins.  All rights reserved."
+            footer: "\ngServ $version - Copyright 2014-2015 Lee Collins.  All rights reserved."
     );
 
     def GServRunner() {
@@ -80,6 +80,10 @@ class GServRunner {
      */
     def start(cliArgs) {
         def options = cli.parse(cliArgs)
+        if (options?.v) {
+            println "gServ ${getGServVersion()}"
+            return
+        }
         if (!options || !validateOptions(options)) {
             cli.usage()
             return;
@@ -89,15 +93,10 @@ class GServRunner {
         def configFile
         def configFilename = options.c;
         try {
-            //TODO Fix -v option
-            if (options.v) {
-                println "gServ Version ${getGServVersion()}"
-                return
-            }
             if (!configFilename) {
                 def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
                 if (!options.p)
-                    throw new ConfigException("Port is required for gserv cli.")
+                    throw new ConfigException("Port not specified.")
 
                 staticRoot = options.s;
                 bindAddress = options.a;
