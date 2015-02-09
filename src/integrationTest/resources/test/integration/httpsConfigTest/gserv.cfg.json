@@ -1,0 +1,12 @@
+{
+    "apps" : [{
+            "https": true,
+      "name": "upper",
+      "resourceScripts": ["ToUpper.groovy"],
+            "port" : 11111,
+      "static_roots": ["/Users/lcollins/src/main/resources/docs"],
+      "defaultResource": "index.html"
+        }],
+
+    "classpath" : []
+}
