@@ -110,7 +110,7 @@ class GServHandler implements HttpHandler {
                     uri      : context.requestURI,
                     headers  : context.requestHeaders])
         } catch (Throwable e) {
-            def msg = "Error req #${currentReqId} ${e.message} "
+            def msg = "Error req #${currentReqId} ${e.message ?: e.class.name} "
             log.error(msg, e)
             EventManager.instance().publish(Events.RequestProcessingError, [
                     requestId: currentReqId,

@@ -66,7 +66,6 @@ class FilterRunner {
                 } finally {
                 }
                 return requestContext
-
         }//switch
     }
 

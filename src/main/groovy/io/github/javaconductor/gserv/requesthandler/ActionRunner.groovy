@@ -1,13 +1,15 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Log4j
+import groovy.util.slurpersupport.GPathResult
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.actions.ResourceAction
-import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.exceptions.ConversionException
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 
 import java.util.concurrent.atomic.AtomicLong
 
@@ -16,7 +18,8 @@ import java.util.concurrent.atomic.AtomicLong
  */
 @Log4j
 class ActionRunner {
-    def _cfg
+    GServConfig _cfg
+    private AtomicLong reqId = new AtomicLong(0L)
 
     ActionRunner(GServConfig cfg) {
         _cfg = cfg
@@ -26,14 +29,44 @@ class ActionRunner {
         _cfg.delegateMgr.createHttpMethodDelegate(context, action, _cfg)
     }
 
+    private def convertStreamToType(InputStream instream, Class type) {
+        if (type.equals(String.class)) {
+            return _cfg.converter().to.text(instream)
+        }
+
+        if (type.equals(GPathResult.class)) {
+            return _cfg.converter().to.xml(instream)
+        }
+
+        if (type.equals((new byte[0]).class)) {
+            return instream.bytes
+        }
+
+        _cfg.converter().to.type(type, instream)
+    }
+
     private def prepareArguments(URI uri, InputStream istream, ResourceAction action) {
         def args = []
         def method = action.method()
         if (method == "PUT" || method == "POST") {
-            // add the data before the other args
-            // data is a byte[]
-            args.add(istream)
-        }
+            ////lets see  the Type of the first arg
+            Class class1stArg = action.requestHandler().parameterTypes[0]
+            log.trace("PUT/POST firstArg type: ${class1stArg.name}")
+            if (class1stArg && !class1stArg.name.contains("java.lang.Object")) {
+                def value
+                try {
+                    value = convertStreamToType(istream, class1stArg)
+                } catch (Exception e) {
+                    log.trace("Cannot convert input to class: ${class1stArg.name}", e)
+                    throw new ConversionException("Cannot convert input to class: ${class1stArg.name}")
+                }
+                args.add(value)
+            } else {
+                // add the data before the other args
+                // data is a byte[]
+                args.add(istream)
+            }
+        }//PUTorPOST
 
         def pathElements = uri.path.split("/").findAll { !(!it) }
         //// loop thru the Patterns getting the corresponding uri path elements
@@ -52,8 +85,6 @@ class ActionRunner {
         action.queryPattern().queryKeys().each { k ->
             args.add(qmap[k])
         }
-        //println "AsyncHandler.prepareArguments(): $args"
-        // log.debug "AsyncHandler.prepareArguments(): $args"
         args
     }
 
@@ -64,7 +95,7 @@ class ActionRunner {
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         cl
     }
-    AtomicLong reqId = new AtomicLong(0L)
+
     def process(RequestContext context, ResourceAction action) {
         def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
         if (!currentReqId) {
@@ -88,6 +119,15 @@ class ActionRunner {
                 log.trace "ActionRunner: Running req#${currentReqId} ${context.requestURI.path}"
                 clozure(*argList)
                 log.trace "ActionRunner: req#${currentReqId} ${context.requestURI.path} - Finished."
+            } catch (ConversionException e) {
+                EventManager.instance().publish(Events.ResourceProcessingError, [
+                        requestId: currentReqId,
+                        uri      : context.requestURI.path, msg: e.message, e: e])
+                if (!context.isClosed()) {
+                    cl.delegate.error(403, e.message)
+                }
+                log.error "ActionRunner: Error Running req#${currentReqId} ${context.requestURI.path} : ${e.message}", e
+                context
             } catch (Throwable e) {
                 EventManager.instance().publish(Events.ResourceProcessingError, [
                         requestId: currentReqId,

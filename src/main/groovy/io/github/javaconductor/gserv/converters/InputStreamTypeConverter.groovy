@@ -40,7 +40,7 @@ class InputStreamTypeConverter {
     def typeConverters
 
     def InputStreamTypeConverter() {
-        converters = ["text": readText, "json": readJson, "xml": readXml, "type": typeConverter]
+        to = converters = ["text": readText, "json": readJson, "xml": readXml, "type": typeConverter]
         typeConverters = [:]
     }
 
@@ -118,6 +118,7 @@ class InputStreamTypeConverter {
     /**
      *  Invokes converter 'name' on input stream 'istream'
      */
-    def to = { name, istream -> converters[name](istream) }
+//    def to = { name, istream -> converters[name](istream) }
+    def to
 
 }
