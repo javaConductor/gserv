@@ -30,10 +30,12 @@ import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.templating.TemplateManager
+import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
  * This is the delegate for any HTTP Method handler closure
  */
+@Mixin(StaticFileHandler)
 class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
     RequestContext requestContext
     def serverConfig

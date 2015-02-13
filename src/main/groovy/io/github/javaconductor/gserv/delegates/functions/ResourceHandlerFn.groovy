@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.delegates.functions
 import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.exceptions.TemplateException
+import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
  *
@@ -232,8 +233,9 @@ trait ResourceHandlerFn {
      * @param fname
      * @return InputStream
      */
+    StaticFileHandler fh = new StaticFileHandler()
     def getFile(String fname) {
-        getFile(value("staticRoots"), fname)
+        fh.getFile(value("staticRoots"), fname)
     }
 
     def to = (value("to")) //serverConfig.inputStreamTypeConverter.converters

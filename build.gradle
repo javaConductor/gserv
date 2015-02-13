@@ -91,53 +91,7 @@ task integration(type: Test) {
 groovydoc {
 
 }
-/*
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'gServ'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description "Framework for REST based services and SPAs in Groovy"
-
-                url 'http://github.com/javaconductor/gservExamples'
-
-                scm {
-                    connection 'scm:git:git@github.com:javaconductor/gserv.git'
-                    developerConnection 'scm:git:git@github.com:javaconductor/gserv.git'
-                    url 'git@github.com:javaconductor/gserv.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The MIT License (MIT)'
-                        url 'http://opensource.org/licenses/MIT'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'javaConductor'
-                        name 'Lee Collins'
-                        email 'javaConductor@yahoo.com'
-                    }
-                }
-            }
-        }
-    }
-}
-*/
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -146,6 +100,18 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task groovydocJar(type: Jar, dependsOn: groovydoc) {
     classifier = 'groovydoc'
     from groovydoc.destinationDir
+}
+
+jar {
+    manifest {
+        attributes(["Main-Class": "io.github.javaconductor.gserv.Main"])
+        attributes(["Specification-Title": "gServ"])
+        attributes(["Specification-Version": "$version"])
+        attributes(["Specification-Vendor": "Lee Collins"])
+        attributes(["Implementation-Title": "gServ"])
+        attributes(["Implementation-Version": "$version"])
+        attributes(["Implementation-Vendor": "Lee Collins"])
+    }
 }
 
 task standaloneJar(type: Jar, dependsOn: classes) {
@@ -169,12 +135,11 @@ task standaloneJar(type: Jar, dependsOn: classes) {
         attributes(["Specification-Version": "$version"])
         attributes(["Specification-Vendor": "Lee Collins"])
         attributes(["Implementation-Title": "gServ"])
-        attributes(["Implementation-Version": "$version"])
+        attributes(["Implementation-Version": "$version-${new Date().time}"])
         attributes(["Implementation-Vendor": "Lee Collins"])
     }
     archiveName = "gservApp-${version}.jar"
 }
-
 
 task createDist(type: Copy, dependsOn: standaloneJar) {
 

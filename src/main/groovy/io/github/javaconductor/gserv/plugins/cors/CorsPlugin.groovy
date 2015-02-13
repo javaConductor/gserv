@@ -195,7 +195,7 @@ class CorsPlugin extends AbstractPlugin {
     }
 
 /**
- * TODO
+ *
  * @param delegateType
  * @param delegateMetaClass
  * @return

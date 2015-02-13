@@ -84,7 +84,6 @@ class Matcher {
         //	it matches if pathPattern is regExpr and the uriValue matches
         //	it matches if pathPattern is var and the uriValue is not empty NOW
         //	else it returns false NOW
-        //TODO If segment specifies type, Check for Type -
         def actionPathText = actionPathPattern.text()
         if ('*' == actionPathText)
             return true
