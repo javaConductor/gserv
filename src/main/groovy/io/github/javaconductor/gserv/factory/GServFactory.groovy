@@ -180,8 +180,8 @@ class GServFactory {
 
     }//createConfigs
 
-    RequestContext createRequestContext(HttpExchange httpExchange) {
-        new Jdk16RequestContext(httpExchange);
+    RequestContext createRequestContext(GServConfig config, HttpExchange httpExchange) {
+        new Jdk16RequestContext(config, httpExchange);
     }
 
 }

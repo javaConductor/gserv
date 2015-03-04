@@ -99,7 +99,7 @@ class GServInstance {
     }
 
     def createInitFilter() {
-        def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { ->
+        def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { requestContext, args ->
             def requestId = requestContext.getAttribute(GServ.contextAttributes.requestId)
             log.trace("initFilter(#${requestId} context: $requestContext")
             /// here we should check for a blank file name
@@ -111,29 +111,8 @@ class GServInstance {
             RequestContext rc = new RequestContextWrapper(requestContext)
             rc.requestURI = uri
             rc.setAttribute(GServ.contextAttributes.postProcessList, [])
-            def baos = new FilterByteArrayOutputStream({ _this ->
-                log.trace "Running ppList for ${uri.path} - req #${requestId}"
-                /// run the PostProcess List
-                def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
-
-                def s = _this
-                /// get bytes from BAOS
-                def bytes = s.toByteArray()
-
-                ppList.each { fn ->
-                    try {
-                        log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
-                        bytes = fn(rc, bytes) ?: bytes
-                    } catch (Throwable ex) {
-                        log.error("FilterError: ${ex.message}")
-                        ex.printStackTrace(System.err)
-                    }
-                }
-                rc.responseBody.write(bytes)
-                rc.close()
-            })
-            rc.setStreams(rc.requestBody, baos)
-            nextFilter(rc)
+            rc.setStreams(rc.requestBody, new ByteArrayOutputStream())
+//            nextFilter(rc)
             rc
         }
         initFilter

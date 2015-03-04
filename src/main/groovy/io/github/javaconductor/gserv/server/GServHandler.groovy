@@ -17,6 +17,7 @@ import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.ActorPool
 
+import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -54,7 +55,7 @@ class GServHandler implements HttpHandler {
         }
         _handler = _nuHandler()
 
-        def actors = new ActorPool(10, 40, new DefaultPGroup(new ResizeablePool(false)), _nuHandler);
+        def actors = new ActorPool(1, 2, new DefaultPGroup(1), _nuHandler);
         _nuDispatcher = {
             _factory.createDispatcher(actors, _cfg);
         }
@@ -71,7 +72,7 @@ class GServHandler implements HttpHandler {
      * @param httpExchange
      */
     void handle(HttpExchange httpExchange) {
-        RequestContext context = new GServFactory().createRequestContext(httpExchange)
+        RequestContext context = new GServFactory().createRequestContext(_cfg, httpExchange)
         def r = new Long(requestId.addAndGet(1L))
         context.setAttribute(GServ.contextAttributes.requestId, r)
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$r")

@@ -70,12 +70,13 @@ class CachingPlugin extends AbstractPlugin {
                     path,
                     [(FilterOptions.PassActionParams)  : false,
                      (FilterOptions.MatchedActionsOnly): true],
-                    1) {
-                ->
+              1) { requestContext, args ->
 
                 def calcETag = weakHandler(requestContext)
                 //check the hdr
                 def etagValue = requestContext.requestHeaders["If-None-Match"]
+              if (etagValue)
+                etagValue = etagValue[0]
                 if (etagValue == calcETag) {
                     def msg = "Unchanged."
                     error(304, msg)
@@ -83,7 +84,7 @@ class CachingPlugin extends AbstractPlugin {
                     // etag it
                     etagIt(requestContext, calcETag, options)
                     //exchange.responseHeaders["ETag"] = calcETag
-                    nextFilter()
+                  //nextFilter()
                 }
                 return requestContext
             }
@@ -108,7 +109,7 @@ class CachingPlugin extends AbstractPlugin {
                 //check the hdr
                 def calcETag = strongHandler(context, data)
                 def etagValue = context.requestHeaders["If-None-Match"]
-                if (etagValue && etagValue == calcETag) {
+              if (etagValue && etagValue[0] == calcETag) {
                     def msg = "Unchanged."
                     error(304, msg)
                 } else {

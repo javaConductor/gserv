@@ -23,10 +23,14 @@
  */
 
 package io.github.javaconductor.gserv.utils
+
+import groovy.util.logging.Log4j
+
 /**
  * Map file extensions to MIME types. Based on the Apache mime.types file.
  * http://www.iana.org/assignments/media-types/
  */
+@Log4j
 public class MimeTypes {
 
     public static final String MIME_APPLICATION_OCTET_STREAM = "application/octet-stream";
@@ -138,16 +142,26 @@ public class MimeTypes {
     public static final String MIME_VIDEO_X_SGI_MOVIE = "video/x-sgi-movie";
     public static final String MIME_X_CONFERENCE_X_COOLTALK = "x-conference/x-cooltalk";
 
+    private static def extensionTypes = [css : MIME_TEXT_CSS, js: MIME_APPLICATION_X_JAVASCRIPT,
+                                         png : MIME_IMAGE_PNG, jpg: MIME_IMAGE_JPEG, jpeg: MIME_IMAGE_JPEG,
+                                         xml : MIME_APPLICATION_XML,
+                                         json: MIME_APPLICATION_JSON, txt: MIME_TEXT_PLAIN, text: MIME_TEXT_PLAIN,
+                                         zip : MIME_APPLICATION_ZIP, gzip: MIME_APPLICATION_X_GZIP
+    ]
+
     /**
      * Returns the corresponding MIME type to the given extension.
      * If no MIME type was found it returns 'application/octet-stream' type.
      */
     public static String getMimeType(String ext) {
-        String mimeType = URLConnection.guessContentTypeFromName("x.$ext")
+        String mimeType = extensionTypes[ext]
+        if (!mimeType)
+            mimeType = URLConnection.guessContentTypeFromName("x.$ext")
         //String mimeType = lookupMimeType(ext);
         if (mimeType == null) {
             mimeType = MIME_APPLICATION_OCTET_STREAM;
         }
+        log.trace("Extension $ext -> mimeType: $mimeType ")
         return mimeType;
     }
 

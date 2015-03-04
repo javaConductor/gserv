@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.test.tester
 import groovy.util.logging.Log4j
 import groovyx.gpars.dataflow.Promise
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 
 /**
@@ -43,6 +44,7 @@ class TestRequestContext extends AbstractRequestContext {
     }
 
     def TestRequestContext(String method, Map headers, String path, byte[] data, Promise promise, Closure callBack) {
+        super(new GServFactory().createGServConfig())
         this._callBack = ({ code, hdrs, bytesData ->
             promise << [statusCode: code, responseHeaders: hdrs, output: bytesData]
             if (callBack)
@@ -81,5 +83,6 @@ class TestRequestContext extends AbstractRequestContext {
     Object isClosed() {
         _wasClosed
     }
+
 
 }

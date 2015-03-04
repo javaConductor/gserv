@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.plugins.compression
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.cli.GServRunner
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -63,6 +64,7 @@ class CompressionPlugin extends AbstractPlugin {
     def CompressionTypes = ["GZIP": "gzip", "DEFLATE": "deflate"]
 
     private def handleAfter(RequestContext context, data) {
+        def reqId = context.attributes[GServ.contextAttributes.requestId]
         def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
         def outEncoding
         if (outEncodings)
@@ -70,13 +72,16 @@ class CompressionPlugin extends AbstractPlugin {
                 outEncoding = CompressionTypes.GZIP
             else if (outEncodings[0]?.contains("deflate"))
                 outEncoding = CompressionTypes.DEFLATE
-        def bytes = data
+        byte[] bytes = data ?: new byte[0]
         /// if Should GZIP this
         if (outEncoding)
             if (shouldCompress(context.responseCode)) {
+                def oldSz = bytes.length
                 bytes = compressBytes(bytes, outEncoding)
+                def newSz = bytes.length
+                log.trace("Request #$reqId compressed [$outEncoding] $oldSz -> $newSz")
                 /// add headers to real Exchange
-                context.responseHeaders.add("Content-Encoding", outEncoding)
+                context.responseHeaders.put("Content-Encoding", [outEncoding])
             }
         bytes
     }
@@ -87,7 +92,8 @@ class CompressionPlugin extends AbstractPlugin {
         /// wrap the input if needed
         def inEncoding = context.requestHeaders["Content-Encoding"]
         def instream
-        if (inEncoding)
+        if (inEncoding) {
+            inEncoding = inEncoding[0]
             switch (inEncoding) {
                 case "gzip":
                     instream = new GZIPInputStream(inputStream)
@@ -100,6 +106,7 @@ class CompressionPlugin extends AbstractPlugin {
                 default:
                     break;
             }
+        }
 
         if (instream) {
             EventManager.instance().publish(Events.FilterProcessing, [
@@ -126,12 +133,12 @@ class CompressionPlugin extends AbstractPlugin {
 
             case "get":
             case "GET":
-                [ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { e, data ->
-                    data = handleAfter(e, data) ?: data
+                [ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { context, data ->
+                    data = handleAfter(context, data) ?: data
 //                    println "CompressionPlugin: before GET doFilter()"
                     EventManager.instance().publish(Events.FilterProcessing, [
-                            requestId: e.getAttribute(GServ.contextAttributes.requestId),
-                            name     : "Compression-$method-After-Filter",
+                            requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                            name     : "Compressioncontext-$method-After-Filter",
                             message  : "Filter is done! Compression Filter passing control down the chain. "])
                     data
                 }]
@@ -141,10 +148,9 @@ class CompressionPlugin extends AbstractPlugin {
             case "POST":
                 [ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter",
                         method, '/**',
-                        [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 1) {
-                    ->
+                        [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 1) { requestContext, args ->
                     RequestContext ctxt = handleBefore(requestContext) ?: requestContext
-                    nextFilter(ctxt)
+                    //nextFilter(ctxt)
                     log.trace "CompressionPlugin: before $method doFilter()"
                     ctxt
                 },

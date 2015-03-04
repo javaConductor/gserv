@@ -1,6 +1,7 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.configuration.GServConfig
 
 import java.security.Principal
 
@@ -9,8 +10,8 @@ import java.security.Principal
  */
 abstract class AbstractRequestContext implements RequestContext {
 
-    Map<String, String> requestHeaders = [:]
-    Map<String, String> responseHeaders = [:]
+    Map<String, List> requestHeaders = [:]
+    Map<String, List> responseHeaders = [:]
     InputStream requestBody
     OutputStream responseBody
     Map attributes = [:]
@@ -21,20 +22,26 @@ abstract class AbstractRequestContext implements RequestContext {
     InetSocketAddress localAddress
     InetSocketAddress remoteAddress
     String protocol
+    GServConfig _config
 
-    Map<String, String> getRequestHeaders() {
+
+    def AbstractRequestContext(GServConfig config) {
+        _config = config
+    }
+
+    Map<String, List> getRequestHeaders() {
         return requestHeaders
     }
 
-    void setRequestHeaders(Map<String, String> requestHeaders) {
+    void setRequestHeaders(Map<String, List> requestHeaders) {
         this.requestHeaders = requestHeaders
     }
 
-    Map<String, String> getResponseHeaders() {
+    Map<String, List> getResponseHeaders() {
         return responseHeaders
     }
 
-    void setResponseHeaders(Map<String, String> responseHeaders) {
+    void setResponseHeaders(Map<String, List> responseHeaders) {
         this.responseHeaders = responseHeaders
     }
 
@@ -145,10 +152,14 @@ abstract class AbstractRequestContext implements RequestContext {
         ]
     }
 
-/*
-    abstract def close()
-    abstract String dump()
-    abstract Object nativeObject();
-    abstract  def setStreams(InputStream is, OutputStream os);
-    */
+    GServConfig config() {
+        this._config
+    }
+
+    @Override
+    String toString() {
+        "#${id()} -> $requestMethod:$requestURI"
+//        return super.toString()
+    }
+
 }

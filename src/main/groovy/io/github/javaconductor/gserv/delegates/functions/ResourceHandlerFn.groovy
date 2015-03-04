@@ -133,6 +133,7 @@ trait ResourceHandlerFn {
         header("Content-Type", contentTyp)
         write(data)
     }
+
     /**
      * Writes a byteArray and closes the output stream
      *
@@ -166,6 +167,14 @@ trait ResourceHandlerFn {
      */
     void header(String headerName, String headerValue) {
         this.requestContext.getResponseHeaders().put(headerName, [headerValue]);
+    }
+
+    /**
+     *
+     * @param uri
+     */
+    void location(String uri) {
+        this.requestContext.getResponseHeaders().put("Location", [uri]);
     }
 
     /**

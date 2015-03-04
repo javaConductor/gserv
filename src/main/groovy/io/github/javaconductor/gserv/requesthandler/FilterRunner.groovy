@@ -21,7 +21,6 @@ class FilterRunner {
     }
 
     RequestContext runFilters(List<Filter> filters, RequestContext c) {
-
         RequestContext context = c
         for (Filter f : filters) {
             log.trace("FilterRunner() running $f on $context")
@@ -30,9 +29,27 @@ class FilterRunner {
                 log.trace("FilterRunner() filter $f closed context")
                 return context
             }
-            log.trace("FilterRunner() running $f on $context")
+//            log.trace("FilterRunner() running $f on $context")
         }
+//        log.trace("FilterRunner() running $f on $context")
         context
+    }
+
+    byte[] runAfterFilters(RequestContext rc, byte[] bytes) {
+        def requestId = rc.getAttribute(GServ.contextAttributes.requestId)
+        log.trace "Running ppList for ${rc.getRequestURI().path} - req #${requestId}"
+        /// run the PostProcess List
+        def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
+        ppList.each { fn ->
+            try {
+                log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
+                bytes = fn(rc, bytes) ?: bytes
+            } catch (Throwable ex) {
+                log.error("FilterError: ${ex.message}")
+                ex.printStackTrace(System.err)
+            }
+        }
+        bytes
     }
 
     RequestContext runFilter(Filter theFilter, RequestContext requestContext) {
@@ -63,7 +80,6 @@ class FilterRunner {
                     //TODO must handle this better -
                     log.trace("FilterRunner: $theFilter threw exception: ${ex.message}.", ex)
                     log.error("FilterRunner: $theFilter threw exception: ${ex.message}.")
-                } finally {
                 }
                 return requestContext
         }//switch
@@ -75,7 +91,7 @@ class FilterRunner {
         FilterDelegate dgt = prepareDelegate(theFilter, context)
         def errorHandlingWrapper = { clozure, List argList ->
             try {
-                return clozure(*argList)
+                return clozure(context, argList)
             } catch (Throwable e) {
                 log.error("FilterRunner error: ${e.message}", e)
                 e.printStackTrace(System.err)
@@ -89,7 +105,8 @@ class FilterRunner {
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         /// Pass the route variables to the behavior if option is set
         /// Else there will be no args
-        List args = options[FilterOptions.PassRouteParams] ? prepareArguments(context, theFilter) : [];
+        List args = prepareArguments(context, theFilter)
+
         /// Execute the behavior for this filter
         def ret = errorHandlingWrapper(cl, args)
         ret

@@ -104,7 +104,10 @@ class CORSConfig {
             case (CORSMode.BlackList):
                 log.trace("CORSConfig(BlackList): Looking for $host in $list")
                 def hcfg = findHostConfig(host)
-                def allow = (!hcfg) || !hcfg.hasMethod(method)
+                def allow = (!hcfg)
+                if (!allow) {
+                    allow = (!hcfg.hasMethod(method))
+                }
                 log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} access to $host")
                 return allow
 

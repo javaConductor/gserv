@@ -34,16 +34,7 @@ class ActorPool {
     def min, max
     def pGroup
 
-    def ActorPool(actorList, pGroup, nuActorFn) {
-        this.actorList = actorList ?: []
-        this.nuActorFn = nuActorFn
-        this.min = 1
-        this.max = actorList.size() + 1
-        this.pGroup = pGroup
-    }
-
     def ActorPool(min, max, pGroup, nuActorFn) {
-        this.actorList = actorList ?: []
         this.nuActorFn = nuActorFn
         this.min = min
         this.max = max

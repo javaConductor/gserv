@@ -1,5 +1,6 @@
 package io.github.javaconductor.gserv.plugins.ldap
 
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.delegates.DelegateTypes
 import org.springframework.ldap.core.AuthenticatedLdapEntryContextCallback
@@ -10,6 +11,7 @@ import io.github.javaconductor.gserv.plugins.AbstractPlugin
 
 import javax.naming.directory.DirContext
 
+@Slf4j
 class LdapPlugin extends AbstractPlugin {
     LdapTemplate ldapTemplate
     String challengeFnName
@@ -31,19 +33,26 @@ class LdapPlugin extends AbstractPlugin {
     }
 
     boolean authenticate(String user, String pswd, RequestContext requestContext, Closure dnCallback) {
-        def authenticated = ldapTemplate.authenticate(
-                "",
-                "(uid=$user)",
-                "$pswd", new AuthenticatedLdapEntryContextCallback() {
-            @Override
-            void executeWithContext(DirContext ctx, LdapEntryIdentification ldapEntryIdentification) {
-                println "auth: absoluteName: ${ldapEntryIdentification.absoluteName}"
-                println "auth: relativeName: ${ldapEntryIdentification.relativeName}";
-                if (dnCallback)
-                    dnCallback(ldapEntryIdentification.absoluteName.toString())
-            }
+        def authenticated
+        try {
+            authenticated = ldapTemplate.authenticate(
+                    "",
+                    "(uid=$user)",
+                    "$pswd", new AuthenticatedLdapEntryContextCallback() {
+                @Override
+                void executeWithContext(DirContext ctx, LdapEntryIdentification ldapEntryIdentification) {
+                    println "auth: absoluteName: ${ldapEntryIdentification.absoluteName}"
+                    println "auth: relativeName: ${ldapEntryIdentification.relativeName}";
+                    if (dnCallback)
+                        dnCallback(ldapEntryIdentification.absoluteName.toString())
+                }
 
-        })
+            })
+        } catch (org.springframework.ldap.CommunicationException e) {
+
+            error(403, "Cannot authenticate at this time.")
+            log.error("Cannot connect to LDAP Server.", e?.cause ?: e)
+        }
         authenticated
     }//auth
 

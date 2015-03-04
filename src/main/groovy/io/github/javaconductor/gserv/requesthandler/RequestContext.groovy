@@ -1,5 +1,7 @@
 package io.github.javaconductor.gserv.requesthandler
 
+import io.github.javaconductor.gserv.configuration.GServConfig
+
 import java.security.Principal
 
 /**
@@ -7,13 +9,13 @@ import java.security.Principal
  */
 interface RequestContext {
 
-    Map<String, String> getRequestHeaders()
+    Map<String, List> getRequestHeaders()
 
-    void setRequestHeaders(Map<String, String> requestHeaders)
+    void setRequestHeaders(Map<String, List> requestHeaders)
 
-    Map<String, String> getResponseHeaders()
+    Map<String, List> getResponseHeaders()
 
-    void setResponseHeaders(Map<String, String> responseHeaders)
+    void setResponseHeaders(Map<String, List> responseHeaders)
 
     InputStream getRequestBody()
 
@@ -66,6 +68,8 @@ interface RequestContext {
     def setStreams(InputStream is, OutputStream os)
 
     void sendResponseHeaders(int responseCode, long size)
+
+    GServConfig config()
 
     def id()
 

@@ -26,9 +26,11 @@ package io.github.javaconductor.gserv.requesthandler.wrapper
 
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
+import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
@@ -37,13 +39,13 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
 @Log4j
 class RequestContextWrapper extends AbstractRequestContext {
     RequestContext _context
-    Map _requestHdrs = [:], _responseHdrs = [:]
     int _code
     InputStream _originalInputStream
     OutputStream _originalOutputStream, _responseBody
     def _wasClosed = false
 
-    def RequestContextWrapper(RequestContext context) {
+    def RequestContextWrapper(RequestContext context, OutputStream outputStream = new ByteArrayOutputStream()) {
+        super(context.config())
         if (!context)
             throw new IllegalArgumentException("context must NOT be null. Should be valid RequestContext impl.")
 
@@ -66,7 +68,7 @@ class RequestContextWrapper extends AbstractRequestContext {
         this.localAddress = _context.localAddress
         def currentReqId = getAttribute(GServ.contextAttributes.requestId)
 
-        this.responseBody = _responseBody = new ByteArrayOutputStream()
+        this.responseBody = _responseBody = outputStream
         log.trace("RequestContext(#$currentReqId) -> $_context ")
 
         setAttribute(GServ.contextAttributes.isWrapper, true)
@@ -120,7 +122,7 @@ class RequestContextWrapper extends AbstractRequestContext {
  *
  * @param bytes
  */
-    synchronized def writeIt(bytes) {
+    synchronized def writeIt(byte[] bytes) {
         def currentReqId = getAttribute(GServ.contextAttributes.requestId)
         log.trace "Wrapper.writeIt(): Writing response($_code) for req #${currentReqId} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
         if (!_wasClosed) {
@@ -129,7 +131,8 @@ class RequestContextWrapper extends AbstractRequestContext {
                     requestId: currentReqId,
                     message  : "Writing ${bytes.size()} Bytes on stream.close()"])
 
-            _context.responseHeaders.putAll this._responseHdrs
+            bytes = new FilterRunner(this.config()).runAfterFilters(this, bytes)
+            _context.responseHeaders.putAll this.responseHeaders
             try {
                 _context.sendResponseHeaders(_code ?: 200, bytes.size())
                 originalOutputStream().write(bytes)
@@ -150,15 +153,13 @@ class RequestContextWrapper extends AbstractRequestContext {
                     message  : "Can't Write Bytes - already closed!"])
         }
     }// writeIt
-
     @Override
-    String toString() {
-        "#${id()} -> $requestMethod:$requestURI"
-        return super.toString()
+    GServConfig config() {
+        super.config()
     }
 
-    def id() {
-        return attributes[GServ.contextAttributes.requestId]
-    }
+//    def id() {
+//        return attributes[GServ.contextAttributes.requestId]
+//    }
 
 }//

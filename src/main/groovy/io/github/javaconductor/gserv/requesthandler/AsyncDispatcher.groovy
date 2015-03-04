@@ -40,6 +40,8 @@ import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.scheduler.ResizeablePool
 import org.apache.commons.io.IOUtils
 
+import java.util.concurrent.ForkJoinPool
+
 /**
  * Created with IntelliJ IDEA.
  * User: javaConductor
@@ -55,7 +57,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     private GServConfig _config
 
     def AsyncDispatcher(ActorPool actorPool, GServConfig config) {
-        this.setParallelGroup(new DefaultPGroup(new ResizeablePool(false, 10)))
+        this.setParallelGroup(new DefaultPGroup(2))
         _actorPool = actorPool
         _config = config;
     }
@@ -69,7 +71,8 @@ class AsyncDispatcher extends DynamicDispatchActor {
      */
     void actorPool(pool) {
         _actorPool = pool
-        this.setParallelGroup(new DefaultPGroup(_actorPool))
+        this.setParallelGroup(new DefaultPGroup(1))
+//        this.setParallelGroup(new DefaultPGroup(_actorPool))
     }
 
     ActorPool actorPool() {

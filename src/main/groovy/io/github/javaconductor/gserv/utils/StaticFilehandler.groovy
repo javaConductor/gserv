@@ -24,6 +24,7 @@
 
 package io.github.javaconductor.gserv.utils
 
+import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -33,6 +34,7 @@ import org.apache.commons.io.IOUtils
  * Created by javaConductor on 1/13/14.
  * Code for manipulating static files
  */
+@Log4j
 class StaticFileHandler {
     def fileFn(contentType, filePath) {
         file(contentType, filePath)
@@ -50,19 +52,20 @@ class StaticFileHandler {
 
         if (!mimeType) {
             mimeType = URLConnection.guessContentTypeFromName(filename)
+            log.trace("File: $filename said to have type $mimeType")
         }
 
         { ->
-            EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: exchange.getAttribute(GServ.contextAttributes.requestId),
-                    mimeType : mimeType,
-                    msg      : "Sending static file.",
-                    path     : "$filename"])
+//            EventManager.instance().publish(Events.ResourceProcessing, [
+//                    requestId: exchange.getAttribute(GServ.contextAttributes.requestId),
+//                    mimeType : mimeType,
+//                    msg      : "Sending static file.",
+//                    path     : "$filename"])
             /// search the staticRoots
             InputStream is = getFile(_staticRoots, filename)
             if (is) {
                 def sz = is.available();
-                requestContext.responseHeaders.add("Content-Type", mimeType)
+                requestContext.responseHeaders.put("Content-Type", [mimeType])
                 requestContext.sendResponseHeaders(200, sz)
                 IOUtils.copy(is, requestContext.responseBody)
             } else {

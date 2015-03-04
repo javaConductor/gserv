@@ -89,14 +89,12 @@ class EventLoggerPlugin extends AbstractPlugin {
 
     @Override
     List<ResourceAction> filters() {
-        def f = ResourceActionFactory.createBeforeFilter("EventLogFilter", '*', "/", [(FilterOptions.PassActionParams): false]) {
+        def f = ResourceActionFactory.createBeforeFilter("EventLogFilter", '*', "/", [(FilterOptions.PassActionParams): false]) { requestContext, args
             ->
             if (requestContext.requestURI.path.equals(logUrl)) {
                 def events = lastEvents(1000)
                 events = prepareEvents(events)
                 writeJson(events)
-            } else {
-                nextFilter()
             }
             requestContext
         }
