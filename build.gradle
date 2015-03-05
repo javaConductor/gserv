@@ -30,7 +30,7 @@ apply plugin: 'maven'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
-version = "0.9.7"
+version = "0.9.8"
 
 sourceSets {
     integrationTest {
@@ -144,8 +144,8 @@ task standaloneJar(type: Jar, dependsOn: classes) {
 task createDist(type: Copy, dependsOn: standaloneJar) {
 
     from('build/libs') {
-        include 'gservApp-0.9.6.jar'
-        rename 'gservApp-0.9.6.jar', 'gserv.jar'
+        include "gservApp-${version}.jar"
+        rename "gservApp-${version}.jar", 'gserv.jar'
     }
     into 'dist'
 }
