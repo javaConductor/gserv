@@ -3,8 +3,8 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 
 defaultTasks 'clean', 'assemble'
-sourceCompatibility = 1.7
-version = '0.9.5'
+sourceCompatibility = 1.6
+version = '0.9.8'
 mainClassName="io.github.javaconductor.gserv.installer.Installer"
 
 //copyInstallerToParent.mustRunAfter assemble

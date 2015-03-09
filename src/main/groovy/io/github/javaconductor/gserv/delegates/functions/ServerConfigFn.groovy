@@ -197,27 +197,27 @@ trait ServerConfigFn {
 
         assert challengeFn;
 
-        def options = [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true];
+        def options = [(FilterOptions.MatchedActionsOnly): true];
         methods.each { method ->
-            before("basicAuth($method->$path)", path, method, options, 2) { ->
+            before("basicAuth($method->$path)", path, method, options, 2) { requestContext, args ->
                 log.trace("basicAuth before()");
 
                 def userPswd = getBasicAuthUserPswd(requestContext);
                 log.trace("basicAuth before(): userPswd:$userPswd");
                 if (!userPswd || userPswd.length < 2) {
-                    log.trace("basicAuth before(): userPswd:$userPswd");
-                    (requestContext).responseHeaders.put("WWW-Authenticate", "Basic realm=$realm")
-                    error(401, "Authentication Required");
+                    log.trace("basicAuth before(): userPswd:$userPswd")
+                    (requestContext).responseHeaders.put("WWW-Authenticate", ["Basic realm=$realm".toString()])
+                    error(401, "Authentication Required")
                 } else {
-                    def bAuthenticated = _authenticated(userPswd[0], userPswd[1], requestContext, challengeFn);
-                    log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!");
+                    def bAuthenticated = _authenticated(userPswd[0], userPswd[1], requestContext, challengeFn)
+                    log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!")
                     if (!bAuthenticated) {
-                        error(403, "Bad credentials for path ${requestContext.requestURI.path}.");
+                        error(403, "Bad credentials for path ${requestContext.requestURI.path}.")
                     }
                 }
-                return (requestContext);
+                return (requestContext)
             }
-        }
+        }//each
     }//basicAuthentication
 
     def getBasicAuthUserPswd(requestContext) {
@@ -270,7 +270,7 @@ trait ServerConfigFn {
             InputStream is = getFile(value('staticRoots'), filename)
             if (is) {
                 def sz = is.available();
-                requestContext.responseHeaders.put("Content-Type", mimeType)
+                requestContext.responseHeaders.put("Content-Type", [mimeType])
                 requestContext.sendResponseHeaders(200, sz)
                 IOUtils.copy(is, requestContext.responseBody)
             } else {

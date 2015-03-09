@@ -87,13 +87,12 @@ class FilterRunner {
 
     RequestContext process(Filter theFilter, RequestContext context) {
         Closure cl = theFilter.requestHandler()//_handler
-        def options = theFilter.options()
         FilterDelegate dgt = prepareDelegate(theFilter, context)
         def errorHandlingWrapper = { clozure, List argList ->
             try {
                 return clozure(context, argList)
             } catch (Throwable e) {
-                log.error("FilterRunner error: ${e.message}", e)
+                log.error("FilterRunner filter: [$theFilter] error: ${e.message}", e)
                 e.printStackTrace(System.err)
                 dgt.error(500, e.message)
                 context

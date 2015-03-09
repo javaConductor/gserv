@@ -237,7 +237,7 @@ class gServHttpsInstance extends GServInstance {
 
         // setup the HTTPS context and parameters
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-SecureRandom
+//SecureRandom
         server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext) {
 
             @Override

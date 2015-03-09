@@ -30,7 +30,6 @@ import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.plugins.caching.CachingPlugin
 import io.github.javaconductor.gserv.plugins.compression.CompressionPlugin
 import io.github.javaconductor.gserv.plugins.cors.CorsPlugin
-import io.github.javaconductor.gserv.plugins.ldap.LdapPlugin
 
 /**
  * Created by javaConductor on 1/24/14.
@@ -47,7 +46,7 @@ class PluginMgr {
     }
 
     def initDefaultPlugins() {
-        register('ldap', LdapPlugin.class)
+       // register('ldap', LdapPlugin.class)
         register('cors', CorsPlugin.class)
         register('caching', CachingPlugin.class)
         register('compression', CompressionPlugin.class)
