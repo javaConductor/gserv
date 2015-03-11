@@ -37,7 +37,6 @@ class CachingPlugin extends AbstractPlugin {
     @Override
     def init(Object options) {
         this.options = options ?: [:]
-        return null
     }
 
     /**
@@ -68,11 +67,10 @@ class CachingPlugin extends AbstractPlugin {
             def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter",
                     "GET",
                     path,
-                    [(FilterOptions.PassActionParams)  : false,
-                     (FilterOptions.MatchedActionsOnly): true],
+                    [(FilterOptions.MatchedActionsOnly): true],
               1) { requestContext, args ->
 
-                def calcETag = weakHandler(requestContext)
+                def calcETag = weakHandler(requestContext, args)
                 //check the hdr
                 def etagValue = requestContext.requestHeaders["If-None-Match"]
               if (etagValue)
@@ -94,7 +92,7 @@ class CachingPlugin extends AbstractPlugin {
         }
     }/// method
 
-    def etagIt(requestContext, etag, options) {
+    private def etagIt(requestContext, etag, options) {
         requestContext.responseHeaders["Cache-Control"] = "public, max-age=3600;"
         requestContext.responseHeaders["ETag"] = etag
     }
@@ -104,7 +102,7 @@ class CachingPlugin extends AbstractPlugin {
         return { path, etagFn ->
             def strongHandler = etagFn
             /// we must create a afterFilter to create an ETag value from the output once it is generated.
-            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.PassActionParams): false, (FilterOptions.MatchedActionsOnly): true], 9
+            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.MatchedActionsOnly): true], 9
             ) { context, data ->
                 //check the hdr
                 def calcETag = strongHandler(context, data)
