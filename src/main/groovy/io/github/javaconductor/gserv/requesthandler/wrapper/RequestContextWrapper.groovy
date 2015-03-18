@@ -139,6 +139,8 @@ class RequestContextWrapper extends AbstractRequestContext {
                 log.trace "Wrote response($_code) for req #$currentReqId ) size=${bytes.size()}"
             } catch (Throwable ex) {
                 log.error "Error writing response($_code) for req #${currentReqId} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}", ex
+                _context.close()
+                _wasClosed = true
             }
             // println "Wrote response($_code) for ${requestURI.path} size=${bytes.size()}"
             originalOutputStream().close()
