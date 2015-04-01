@@ -42,12 +42,23 @@ class HeaderSpec {
     public final void testAcceptHeader() {
         def port = 51000
         def stopFn = instance.start(port)
-        Thread.sleep(500)
         Response r = getOf("http://localhost:$port/",
                 header("Accept", "text/plain"),
                 withTimeout(5, TimeUnit.MINUTES))
 
         assertThat(r, hasHeader("Content-Type", "text/plain"))
+        assertThat(r, hasStatusCode(200))
+        stopFn()
+    }
+
+    @Test
+    public final void testAcceptHeader2() {
+        def port = 51000
+        def stopFn = instance.start(port)
+        Response r = getOf("http://localhost:$port/",
+                withTimeout(5, TimeUnit.MINUTES))
+
+        assertThat(r, hasHeader("Content-Type", "application/json"))
         assertThat(r, hasStatusCode(200))
         stopFn()
     }
