@@ -30,7 +30,7 @@ apply plugin: 'maven'
 
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
-version = "0.9.8"
+version = "0.9.9"
 sourceCompatibility = 1.6
 
 sourceSets {
