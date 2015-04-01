@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.delegates.functions
 import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.exceptions.TemplateException
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
@@ -110,7 +111,7 @@ trait ResourceHandlerFn {
      * @param ctype
      */
     void contentType(contentType) {
-        header("Content-Type", contentType)
+        responseHeader("Content-Type", contentType)
     }
 
     /**
@@ -130,7 +131,7 @@ trait ResourceHandlerFn {
      * @param data
      */
     void write(String contentTyp, byte[] data) {
-        header("Content-Type", contentTyp)
+        responseHeader("Content-Type", contentTyp)
         write(data)
     }
 
@@ -160,13 +161,62 @@ trait ResourceHandlerFn {
     }
 
     /**
+     * Gets  request header
+     *
+     * @param headerName
+     * @return String
+     */
+    String requestHeader(String headerName) {
+        this.requestContext.getRequestHeader(headerName);
+    }
+
+    /**
+     * Gets request headers
+     *
+     * @param headerName
+     * @return List < String >
+     */
+    List<String> requestHeaders(String headerName) {
+        this.requestContext.getRequestHeaders(headerName);
+    }
+
+    /**
+     * Gets  response header
+     *
+     * @param headerName
+     * @return String
+     */
+    String responseHeader(String headerName) {
+        this.requestContext.getResponseHeader(headerName);
+    }
+
+    /**
+     * Gets response headers
+     *
+     * @param headerName
+     */
+    List<String> responseHeaders(String headerName) {
+        this.requestContext.getResponseHeader(headerName);
+    }
+
+    /**
      * Sets the response header
      *
      * @param headerName
      * @param headerValue
      */
-    void header(String headerName, String headerValue) {
-        this.requestContext.getResponseHeaders().put(headerName, [headerValue]);
+    void responseHeader(String headerName, String headerValue) {
+        this.requestContext.setResponseHeader(headerName, headerValue);
+    }
+
+    /**
+     * Sets response headers
+     *
+     * @param headerName
+     * @param headerValues List of strings
+     */
+    void responseHeaders(String headerName, List headerValues) {
+        this.requestContext.setResponseHeaders(headerName, headerValues);
     }
 
     /**

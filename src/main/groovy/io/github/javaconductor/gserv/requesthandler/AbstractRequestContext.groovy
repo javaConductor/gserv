@@ -33,6 +33,11 @@ abstract class AbstractRequestContext implements RequestContext {
         return requestHeaders
     }
 
+    @Override
+    String getRequestHeader(String header) {
+        requestHeaders[header] ? requestHeaders[header][0] : null
+    }
+
     void setRequestHeaders(Map<String, List> requestHeaders) {
         this.requestHeaders = requestHeaders
     }

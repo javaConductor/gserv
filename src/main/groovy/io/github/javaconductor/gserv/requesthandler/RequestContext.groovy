@@ -11,6 +11,8 @@ interface RequestContext {
 
     Map<String, List> getRequestHeaders()
 
+    String getRequestHeader(String header)
+
     void setRequestHeaders(Map<String, List> requestHeaders)
 
     Map<String, List> getResponseHeaders()
