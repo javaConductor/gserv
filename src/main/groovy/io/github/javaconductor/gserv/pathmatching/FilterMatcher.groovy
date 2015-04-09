@@ -50,14 +50,15 @@ class FilterMatcher extends Matcher {
         def ret = filterList.findAll { p ->
             def rmethod = p.method()
             def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
-            def b = (methodOk && match(p, requestContext.requestURI))
+            def b = (methodOk && match(p, requestContext))
             b
         }
         return ret;
     }
 
     @Override
-    ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method) {
+    ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method, Map headers) {
+
         //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
         def ret = filterList.find { p ->
             def rmethod = p.method()
@@ -75,21 +76,22 @@ class FilterMatcher extends Matcher {
      * @return true if uri matches pattern
      */
     @Override
-    boolean match(ResourceAction filter, URI uri) {
+    boolean match(ResourceAction filter, RequestContext context) {
+        URI uri = context.requestURI
         def parts = uri.path.split("/")
         parts = parts.findAll { p -> p }
         def a = filter.pathSize()
         // filters w/ empty path matches all
         if (a == 0)
-            return true
+            return matchCustomMatcher(context, filter)
         for (int i = 0; i != filter.pathSize(); ++i) {
             if (filter.path(i).text() == '**')
-                return true
+                return matchCustomMatcher(context, filter)
             def ans = (filter.path(i).text() == '*') || matchActionPathSegment(filter.path(i), parts[i])
             if (!ans)
                 return false;
         }
-        return true;
+        return matchCustomMatcher(context, filter)
     }
 
 }

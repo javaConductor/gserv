@@ -50,13 +50,15 @@ abstract class AbstractRequestContext implements RequestContext {
         responseHeaders[header] ? responseHeaders[header][0] : null
     }
 
-    void setResponseHeaders(Map<String, List> responseHeaders) {
+    void setResponseHeaders(Map<String, List<String>> responseHeaders) {
         this.responseHeaders = responseHeaders
     }
 
     void setResponseHeader(String header, String value) {
         this.responseHeaders[header] = this.responseHeaders[header] ?: []
         this.responseHeaders[header] << value
+        this.responseHeaders[header] = this.responseHeaders[header].unique()
+
     }
 
     InputStream getRequestBody() {

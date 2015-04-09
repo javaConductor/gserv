@@ -26,6 +26,7 @@ package io.github.javaconductor.gserv.factory
 
 import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 import io.github.javaconductor.gserv.server.GServInstance
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
@@ -82,6 +83,7 @@ class GServFactory {
      * @return GServConfig instances that were created from the parsing.
      \   */
     List<GServConfig> createConfigs(File cfgFile) {
+        assert cfgFile
         try {
             return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
         } catch (Exception ex) {
@@ -97,9 +99,10 @@ class GServFactory {
      * @return GServConfig .
      \    */
     GServConfig createConfig(File cfgScriptFile) {
+        assert cfgScriptFile
         try {
             new ResourceLoader().loadInstance(cfgScriptFile, [])
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             log.error("Could not create application from gservconfig script: ${cfgScriptFile.absolutePath}: ${ex.message}")
             throw ex;
         }
@@ -182,6 +185,37 @@ class GServFactory {
 
     RequestContext createRequestContext(GServConfig config, HttpExchange httpExchange) {
         new Jdk16RequestContext(config, httpExchange);
+    }
+
+    RequestContext createRequestContext(String method, URI uri, Map headers) {
+        def context = new AbstractRequestContext(null) {
+            boolean closed = false
+
+            @Override
+            void sendResponseHeaders(int responseCode, long size) {
+
+            }
+
+            @Override
+            def close() {
+                closed = true
+                return null
+            }
+
+            @Override
+            def isClosed() {
+                return closed
+            }
+
+            @Override
+            def setStreams(InputStream is, OutputStream os) {
+                return null
+            }
+        }
+        context.requestHeaders = headers
+        context.requestURI = uri
+        context.requestMethod = method
+        context
     }
 
 }

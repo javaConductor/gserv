@@ -76,28 +76,28 @@ class GServHandler implements HttpHandler {
         def r = new Long(requestId.addAndGet(1L))
         context.setAttribute(GServ.contextAttributes.requestId, r)
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$r")
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
-        context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
-        boolean matched = _cfg.requestMatched(context)
-        def filters = m.matchFilters(_cfg.filters(), context)
-        filters = filters.findAll { theFilter ->
-            (!theFilter.options()[FilterOptions.MatchedActionsOnly]) ||
-                    (theFilter.options()[FilterOptions.MatchedActionsOnly] && matched)
-        }
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Running filters -> $filters")
-        context = filterRunner.runFilters(filters, context)
-        def t = "${(context.isClosed() ? ' Context CLOSED!' : '')}"
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: After filters $t ")
-
-        if (context.isClosed())
-            return;
-
-        log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
-//        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
-        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId
         try {
+            log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
+            context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
+            boolean matched = _cfg.requestMatched(context)
+            def filters = m.matchFilters(_cfg.filters(), context)
+            filters = filters.findAll { theFilter ->
+                (!theFilter.options()[FilterOptions.MatchedActionsOnly]) ||
+                        (theFilter.options()[FilterOptions.MatchedActionsOnly] && matched)
+            }
+
+            log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Running filters -> $filters")
+            context = filterRunner.runFilters(filters, context)
+            def t = "${(context.isClosed() ? ' Context CLOSED!' : '')}"
+            log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: After filters $t ")
+
+            if (context.isClosed())
+                return;
+
+            log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
+            //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
+            currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
             EventManager.instance().publish(Events.RequestRecieved, [
                     requestId: currentReqId,
                     method   : context.requestMethod,

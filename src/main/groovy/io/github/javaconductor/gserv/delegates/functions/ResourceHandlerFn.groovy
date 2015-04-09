@@ -27,7 +27,6 @@ package io.github.javaconductor.gserv.delegates.functions
 import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.exceptions.TemplateException
-import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
@@ -143,6 +142,7 @@ trait ResourceHandlerFn {
      */
     void write(byte[] data) {
         if (!requestContext.isClosed()) {
+            //     log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext ")
             requestContext.sendResponseHeaders(200, data.size() as long)
             requestContext.getResponseBody().write(data)
             requestContext.getResponseBody().close()
@@ -153,7 +153,7 @@ trait ResourceHandlerFn {
     /**
      * Sets the contentType header, writes a string to the outputStream, and closes the output stream
      *
-     * @param contentTyp
+     * @param contentType
      * @param data
      */
     void write(String contentTyp, String data) {
@@ -206,7 +206,7 @@ trait ResourceHandlerFn {
      * @param headerValue
      */
     void responseHeader(String headerName, String headerValue) {
-        this.requestContext.setResponseHeader(headerName, headerValue);
+        requestContext.setResponseHeader(headerName, headerValue);
     }
 
     /**
@@ -293,10 +293,13 @@ trait ResourceHandlerFn {
      * @return InputStream
      */
     StaticFileHandler fh = new StaticFileHandler()
+
     def getFile(String fname) {
         fh.getFile(value("staticRoots"), fname)
     }
 
     def to = (value("to")) //serverConfig.inputStreamTypeConverter.converters
+
+
 }
 

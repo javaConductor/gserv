@@ -25,6 +25,9 @@
 package io.github.javaconductor.gserv.delegates.functions
 
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
+import io.github.javaconductor.gserv.pathmatching.AcceptsMatcher
+import io.github.javaconductor.gserv.pathmatching.ContentTypeMatcher
+import io.github.javaconductor.gserv.pathmatching.HeaderMatcher
 
 /**
  *
@@ -63,6 +66,17 @@ trait ResourceFn {
             handle(methodName, url, clozure)
         }
     }
+//    /**
+//     * Declares a handler for an HTTP GET request for the specified URL.
+//     *
+//     * @param url /example/:name/:age
+//     * @param clozure clozure(name, age )
+//     * @return
+//     */
+//    def get(url, clozure) {
+//        get(null, url, clozure)
+//    }
+
     /**
      * Declares a handler for an HTTP GET request for the specified URL.
      *
@@ -70,8 +84,8 @@ trait ResourceFn {
      * @param clozure clozure(name, age )
      * @return
      */
-    def get(url, clozure) {
-        get(null, url, clozure)
+    def get(String url, Object... matchersAndClozure) {
+        get(null, url, matchersAndClozure)
     }
 
     /**
@@ -82,11 +96,16 @@ trait ResourceFn {
      * @param clozure clozure(name, age )
      * @return
      */
-    def get(actionName, url, clozure) {
-        log.trace("serverInitClosure: get ${actionName ?: ''} base=${(value("path")) ?: 'none'} url=$url")
+    def get(String actionName, String url, Object... matchersAndClosure) {
+        def clozure = matchersAndClosure.last()
+        def customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+        log.trace("resourceFn: get ${actionName ?: ''} base=${(value("path")) ?: 'none'} url=$url")
         def rte = _addUrlToPatternList("GET", url, clozure)
         if (actionName)
             value("linkBuilder").addLink(actionName, rte)
+        if (customMatchers) {
+            rte.customMatchers(customMatchers as List)
+        }
         rte
     }
 
@@ -98,7 +117,7 @@ trait ResourceFn {
      * @return
      */
     def put(url, clozure) {
-        log.trace("serverInitClosure: put url=$url")
+        log.trace("resourceFn: put url=$url")
         def rte = _addUrlToPatternList("PUT", url, clozure)
         //if(routeName) linkBuilder.add(routeName, rte)
         rte
@@ -112,7 +131,7 @@ trait ResourceFn {
      * @return
      */
     def post(url, clozure) {
-        log.trace("serverInitClosure: post url=$url")
+        log.trace("resourceFn: post url=$url")
         _addUrlToPatternList("POST", url, clozure)
     }
 
@@ -124,7 +143,7 @@ trait ResourceFn {
      * @return
      */
     def delete(url, clozure) {
-        log.trace("serverInitClosure: delete url=$url")
+        log.trace("resourceFn: delete url=$url")
         _addUrlToPatternList("DELETE", url, clozure)
     }
 
@@ -136,12 +155,31 @@ trait ResourceFn {
             }
             absUrl += url
         }
-        log.trace "resourceInitClosure: _addUrlToPatternList url=$absUrl".toString();
+        log.trace "resourceFn: _addUrlToPatternList url=$absUrl".toString();
 
         def action = ResourceActionFactory.createAction(method, absUrl, clozure)
         value("actionList").add(action)
         action
     }
+
+    def onlyIfAccepts(String... types) {
+        new AcceptsMatcher(types)
+    }
+
+    def onlyIfContentType(String... types) {
+        new ContentTypeMatcher(types)
+    }
+
+    def onlyIfHeader(String hdr, String... values) {
+        new HeaderMatcher(hdr, values)
+    }
+
+    /*
+    *
+                onlyHeader("X-MODE", "chill"),
+                onlyHeaderIn("X-MODE", "work" , "chill"),
+                onlyIfAccepts("application/json", "application/xml"),
+                onlyIfContentType("application/json", "application/xml")*/
 
 }
 

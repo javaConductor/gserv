@@ -35,8 +35,11 @@ class Jdk16RequestContext extends AbstractRequestContext {
     }
 
     void sendResponseHeaders(int responseCode, long size) {
-        if (!_closed)
+        if (!_closed) {
+            _exchange.responseHeaders.putAll(responseHeaders)
+            log.trace("Sending headers ($this) : ${_exchange.responseHeaders} ")
             _exchange.sendResponseHeaders(responseCode, size)
+        }
         else {
             log.warn("sendResponseHeaders() called twice.")
         }

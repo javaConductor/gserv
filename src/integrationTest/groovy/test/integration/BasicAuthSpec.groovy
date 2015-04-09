@@ -18,9 +18,9 @@ class BasicAuthSpec {
     @Test
     public final void testBasicAuthentication() {
 
-        def http = new HTTPBuilder('http://localhost:51000/')
+        def http = new HTTPBuilder('http://localhost:51200/')
         def dir = baseDir + "basicauth"
-        def args = ["-p", "51000",
+        def args = ["-p", "51200",
                     "-i", dir + "/BasicAuth.groovy"]
         def stopFn = new GServRunner().start(args);
         def testCnt = 2
@@ -40,11 +40,11 @@ class BasicAuthSpec {
                 }
                 response.failure = { resp ->
                     --testCnt
-                    
+
                     //stop the server
                     if (testCnt == 0)
                         stopFn()
-                        assert "Failed!", false 
+                    assert "Failed!", false
                 }
             }
         } finally {

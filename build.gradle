@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 Lee Collins
+ * Copyright (c) 2014 - 2015  Lee Collins
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven'
 
+mainClass = 'io.github.javaconductor.gserv.Main'
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
 version = "0.9.9"
@@ -61,7 +62,6 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.5'
     compile 'log4j:log4j:1.2.17'
-    compile 'org.springframework.ldap:spring-ldap-core:2.0.2.RELEASE'
     compile 'org.codehaus.groovy:groovy-all:2.3.7'
     compile('org.codehaus.gpars:gpars:1.1.0')
     compile('commons-io:commons-io:2.4')
@@ -83,7 +83,6 @@ dependencies {
     integrationTestCompile configurations.testCompile
     integrationTestCompile sourceSets.test.output
     integrationTestRuntime configurations.testRuntime
-
 }
 
 task integration(type: Test) {
@@ -160,4 +159,3 @@ artifacts {
     archives sourcesJar
     archives groovydocJar
 }
-

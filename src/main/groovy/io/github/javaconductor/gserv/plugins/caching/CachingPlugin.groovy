@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.plugins.caching
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
  * Created by javaConductor on 4/23/2014.
@@ -88,13 +89,13 @@ class CachingPlugin extends AbstractPlugin {
             }
             // add it to the config
             addFilter(f)
-            requestContext
+          //requestContext
         }
     }/// method
 
-    private def etagIt(requestContext, etag, options) {
-        requestContext.responseHeaders["Cache-Control"] = "public, max-age=3600;"
-        requestContext.responseHeaders["ETag"] = etag
+  private def etagIt(RequestContext requestContext, etag, options) {
+    requestContext.setResponseHeader("Cache-Control", "public, max-age=3600;")
+    requestContext.setResponseHeader("ETag", etag)
     }
 
     private def createStrongDelegateFunction() {

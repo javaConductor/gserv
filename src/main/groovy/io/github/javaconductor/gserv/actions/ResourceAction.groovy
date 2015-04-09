@@ -1,5 +1,7 @@
 package io.github.javaconductor.gserv.actions
 
+import io.github.javaconductor.gserv.pathmatching.CustomActionMatcher
+
 /**
  * Represents a URI/HttpMethod/Behavior Combination.  The encapsulation of a resource.
  */
@@ -9,6 +11,7 @@ class ResourceAction {
     private def _queryPattern
     private def _handler, _method
     private def _options
+    private List<CustomActionMatcher> _customMatchers = []
     String name
 
     String toString() {
@@ -63,4 +66,17 @@ class ResourceAction {
     ActionPathQuery queryPattern() {
         _queryPattern
     }
+
+    List<CustomActionMatcher> customMatchers() {
+        _customMatchers
+    }
+
+    def customMatchers(List<CustomActionMatcher> matchers) {
+        _customMatchers = matchers
+    }
+
+    def customMatcher(CustomActionMatcher matcher) {
+        _customMatchers << matcher
+    }
+
 }

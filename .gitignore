@@ -8,3 +8,4 @@ gserv.iml
 gradle.properties
 gradle-app.setting
 maven_push.gradle
+/target/

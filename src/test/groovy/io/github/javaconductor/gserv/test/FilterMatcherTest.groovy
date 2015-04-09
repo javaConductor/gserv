@@ -24,6 +24,7 @@
 
 package io.github.javaconductor.gserv.test
 
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.pathmatching.FilterMatcher
 import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.actions.ResourceAction
@@ -48,7 +49,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/anything_goes"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/anything_goes"), [:]))
     }
 
 
@@ -60,7 +61,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
     }
 
     @Test
@@ -71,7 +72,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/yippy/yappy/yahooey"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
     }
 
     @Test
@@ -82,7 +83,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
     }
 
     @Test
@@ -93,7 +94,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/yippy/yappy/yahooey"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
     }
 
     @Test
@@ -104,7 +105,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert !m.match(pat, new URI("/yiippy/yappy/yahooey"))
+        assert !m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yiippy/yappy/yahooey"), [:]))
     }
 
     @Test
@@ -115,7 +116,7 @@ public class FilterMatcherTest {
                 { ->
 
                 })
-        assert m.match(pat, new URI("/yippy/yappy/yahooey"))
+        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
     }
 
 }

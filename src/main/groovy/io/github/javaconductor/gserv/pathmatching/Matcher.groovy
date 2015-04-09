@@ -24,36 +24,70 @@
 
 package io.github.javaconductor.gserv.pathmatching
 
+import groovy.transform.CompileStatic
+import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.GServFactory
+import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
+import org.omg.CORBA.Request
 
+@Log4j
 class Matcher {
 
-    //returns the pattern that matches the uri
+    /**
+     *
+     * @param actionList
+     * @param context
+     * @return
+     */
     ResourceAction matchAction(List<ResourceAction> actionList, RequestContext context) {
-        def uri = context.getRequestURI()
-        def method = context.requestMethod
-        return matchAction(actionList, uri, method)
-    }
-
-    ResourceAction matchAction(List<ResourceAction> actionList, URI uri, String method) {
-        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
         def ret = actionList.find { action ->
             //println "Check route: $p"
-            (action.method() == method && match(action, uri))
+            (action.method() == context.requestMethod && match(action, context))
         }
-        //if (ret) println "Matched action: $ret"
         return ret;
     }
 
-    //returns true if uri matches pattern
+    /**
+     *
+     * @param actionList
+     * @param uri
+     * @param method
+     * @param headers
+     * @return
+     */
+    ResourceAction matchAction(List<ResourceAction> actionList, URI uri, String method, Map headers) {
+        def context = new GServFactory().createRequestContext(method, uri, headers)
+        matchAction(actionList, context)
+    }
+/**
+ *
+ * @param context
+ * @param action
+ * @return
+ */
+//@CompileStatic
+    boolean matchCustomMatcher(RequestContext context, ResourceAction action) {
+        // it matches if there are no custom matchers
+        if (action.customMatchers().isEmpty()) {
+            return true
+        }
+        def ret = action.customMatchers().every { CustomActionMatcher cm ->
+            println("Matcher.matchCustomMatcher(): ${context.responseHeaders} -> $action")
+            cm.matches((RequestContext) context, (ResourceAction) action)
+        }
+        ret
+    }
+
     /**
      *
      * @param action
      * @param uri
      * @return
      */
-    boolean match(ResourceAction action, URI uri) {
+    boolean match(ResourceAction action, RequestContext context) {
+        URI uri = context.requestURI
         def parts = uri.path.split("/")
         parts = parts.findAll { p -> p }
         def a = action.pathSize()
@@ -62,9 +96,12 @@ class Matcher {
             return false;
 
         // empty == empty
-        if (a == 0)
-            return true
-
+        if (a == 0) {
+            /// check the customMatchers
+            def ret = matchCustomMatcher(context, action)
+            println "Matcher matching:  ${context.responseHeaders} = ${ret}"
+            return ret
+        }
         def ans
         for (int i = 0; i != action.pathSize(); ++i) {
             ans = matchActionPathSegment(action.path(i), parts[i])
@@ -72,12 +109,18 @@ class Matcher {
                 return false;
         }
 
-        return matchActionQuery(
+        return matchCustomMatcher(context, action) && matchActionQuery(
                 action.queryPattern()?.queryMap() ?: [:],
                 (action.queryPattern()?.queryMatchMap()?.keySet()?.toList() ?: []),
                 PathMatchingUtils.queryStringToMap(uri.query));
     }
 
+    /**
+     *
+     * @param actionPathPattern
+     * @param uriValue
+     * @return
+     */
     def matchActionPathSegment(actionPathPattern, uriValue) {
         //returns true if the a part of the path matches the equivalent part of the uri
         //	it matches if pathPattern not var and same as uriValue  NOW
@@ -99,7 +142,13 @@ class Matcher {
         /// does it match what the route says
         (uriValue == actionPathText)
     }
-
+/**
+ *
+ * @param qryMap
+ * @param queryKeys
+ * @param requestQueryMap
+ * @return
+ */
     boolean matchActionQuery(Map qryMap, List<String> queryKeys, Map requestQueryMap) {
         queryKeys.every { key ->
             (

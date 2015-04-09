@@ -24,9 +24,11 @@
 
 package io.github.javaconductor.gserv.test
 
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
+import io.github.javaconductor.gserv.test.tester.TestRequestContext
 import spock.lang.Specification
 
 public class MatcherSpec extends Specification {
@@ -128,7 +130,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/the_thing"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/the_thing"), [:]))
     }
 
     public void "should not match path"() {
@@ -141,7 +143,7 @@ public class MatcherSpec extends Specification {
 
                 })
         then:
-        !m.match(pat, new URI("http://acme.com/the_thing/2many"))
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/the_thing/2many"), [:]))
     }
 
     public void "should match query variable"() {
@@ -152,7 +154,7 @@ public class MatcherSpec extends Specification {
                 { o, t, q ->
                 })
         then:
-        m.match(pat, new URI("/first/second?q1=third"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("/first/second?q1=third"), [:]))
         pat.queryPattern().queryKeys().size() == 1;
     }
 
@@ -166,7 +168,9 @@ public class MatcherSpec extends Specification {
                 });
 
         then:
-        !m.match(pat, new URI("/first/second"));
+        !m.match(pat,
+                new GServFactory().createRequestContext("GET", new URI("/first/second"), [:])
+        )
     }
 
     public void "should match static query value"() {
@@ -179,7 +183,7 @@ public class MatcherSpec extends Specification {
                 });
 
         then:
-        m.match(pat, new URI("/first/second?q1=query"));
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("/first/second?q1=query"), [:]))
     }
 
 
@@ -192,7 +196,7 @@ public class MatcherSpec extends Specification {
                 })
 
         then:
-        m.match(pat, new URI("/first/second?yo=true&q1=query"));
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("/first/second?yo=true&q1=query"), [:]));
     };
 
     public void "should fail with wrong static query value"() {
@@ -205,7 +209,7 @@ public class MatcherSpec extends Specification {
                 });
 
         then:
-        !m.match(pat, new URI("/first/second?q1=notRight"));
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("/first/second?q1=notRight"), [:]));
     }
 
     public void "should fail query match but not path"() {
@@ -218,7 +222,7 @@ public class MatcherSpec extends Specification {
                 });
 
         then:
-        !m.match(pat, new URI("/first/second/third?q1=query"));
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("/first/second/third?q1=query"), [:]));
     }
 
     public void "should match path with type"() {
@@ -232,7 +236,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/009"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/009"), [:]))
     }
 
     public void "should not match path with type"() {
@@ -246,7 +250,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        !m.match(pat, new URI("http://acme.com/notnumber"))
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/notnumber"), [:]))
     }
 
     public void "should NOT match int path with double value"() {
@@ -260,7 +264,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        !m.match(pat, new URI("http://acme.com/75.9"))
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/75.9"), [:]))
     }
 
     public void "should match regEx path."() {
@@ -274,7 +278,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI(URLDecoder.decode("http://acme.com/75", "UTF-8")))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI(URLDecoder.decode("http://acme.com/75", "UTF-8")), [:]))
     };
 
     public void "should not match regEx path."() {
@@ -288,7 +292,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        !m.match(pat, new URI("http://acme.com/notnumber"))
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/notnumber"), [:]))
     }
 
     public void "should match regEx path w space."() {
@@ -302,7 +306,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/7_5"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/7_5"), [:]))
     }
 
     public void "should not match regEx path too many spaces."() {
@@ -316,7 +320,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        !m.match(pat, new URI("http://acme.com/7%20%205"))
+        !m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/7%20%205"), [:]))
     }
 
     public void "should match regEx path 3 spaces."() {
@@ -330,7 +334,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/7%20%20%205"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/7%20%20%205"), [:]))
     }
 
     public void "should match SSN regEx."() {
@@ -344,7 +348,7 @@ public class MatcherSpec extends Specification {
                 })
         then:
         pat.pathSize() == 1;
-        m.match(pat, new URI("http://acme.com/359-99-7447"))
+        m.match(pat, new GServFactory().createRequestContext("GET", new URI("http://acme.com/359-99-7447"), [:]))
     }
 
 }

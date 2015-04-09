@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 Lee Collins
+ * Copyright (c) 2014-2015 Lee Collins
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,7 @@ class RequestContextWrapper extends AbstractRequestContext {
             log.warn("RequestContext(#$currentReqId) close() called multiple times.")
             return
         }
-        log.debug("RequestContext(#$currentReqId) is closing... ")
+        log.trace("RequestContext(#$currentReqId) is closing... ")
         writeIt(_responseBody.toByteArray())
         _wasClosed = true
         log.debug("RequestContext(#$currentReqId) has been closed.")
@@ -132,8 +132,13 @@ class RequestContextWrapper extends AbstractRequestContext {
                     message  : "Writing ${bytes.size()} Bytes on stream.close()"])
 
             bytes = new FilterRunner(this.config()).runAfterFilters(this, bytes)
-            _context.responseHeaders.putAll this.responseHeaders
+
+            def nuHdr = _context.responseHeaders + this.responseHeaders
+            //_context.responseHeaders.putAll this.responseHeaders
+            _context.setResponseHeaders(nuHdr)
             try {
+                log.trace("Read headers wrapper $responseHeaders for req #$currentReqId )")
+                log.trace("Writing headers $nuHdr for req #$currentReqId )")
                 _context.sendResponseHeaders(_code ?: 200, bytes.size())
                 originalOutputStream().write(bytes)
                 log.trace "Wrote response($_code) for req #$currentReqId ) size=${bytes.size()}"

@@ -22,18 +22,18 @@ class ConversionSpec {
     GServResource res = GServ.Resource("/app") {
 
         get('/') {
-            header("Content-Type", "text/plain")
+            responseHeader("Content-Type", "text/plain")
             write "Hello"
         }
 
         put('/') { instream ->
-            header("Content-Type", "text/plain")
+            responseHeader("Content-Type", "text/plain")
             def data = to.type(domainType.class, instream)
             write "text/plain", """age = ${data.age}, name = ${data.name}"""
         }
 
         get('/error') {
-            header("Content-Type", "text/plain")
+            responseHeader("Content-Type", "text/plain")
             throw new RuntimeException("Testing exceptions handling in tests.")
 //            write "Hello"
         }
@@ -56,7 +56,6 @@ class ConversionSpec {
         }
         resource res
     }
-
 
     @Test
     void testException() {
@@ -93,7 +92,7 @@ class ConversionSpec {
 
         assertNotNull(p.get())
         def respData = p.get()
-        assertEquals(respData.statusCode, 200)
+        assertEquals(200, respData.statusCode)
         assertEquals(new String(respData.output), "age = 75, name = Elder James")
     }
 
