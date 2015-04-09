@@ -25,14 +25,12 @@ class CustomMatcherSpec {
             write("text/plain", "Here is some plain text.")
         }
 
-        delegate.get("/2") {
-            if (requestHeader("Accept") == "text/plain") {
-                write("text/plain", "Here is some plain text.")
-                println responseHeader("Content-Type")
-            } else
-                writeJson([msg: "Here is some JSON."])
-        }
+        delegate.get("/2"
+                , onlyIfHeader("Accept", "text/plain")
+        ) {
+            write("text/plain", "Here is some plain text.")
 
+        }
     }
     def instance = new GServ().http([:]) {
         resource res
@@ -53,7 +51,7 @@ class CustomMatcherSpec {
         finally {
             stopFn()
         }
-    }
+        }
 
 
     @Test
@@ -69,5 +67,38 @@ class CustomMatcherSpec {
         } finally {
             stopFn()
         }
+        }
+
+    @Test
+    public final void testOnlyIfHeader() {
+        def port = 51000
+        def stopFn = instance.start(port)
+        try {
+            Response r = getOf("http://localhost:$port/2",
+                    header("Accept", "text/plain"),
+                    withTimeout(5, TimeUnit.MINUTES))
+            assertThat(r, hasHeader("Content-Type", "text/plain"))
+            assertThat(r, hasStatusCode(200))
+        } finally {
+            stopFn()
+        }
     }
-}
+
+
+    @Test
+    public final void testOnlyIfHeaderFail() {
+        def port = 51000
+        def stopFn = instance.start(port)
+        try {
+            Response r = getOf("http://localhost:$port/2",
+                    // header("Accept", "text/plain"),
+                    withTimeout(5, TimeUnit.MINUTES))
+            // assertThat(r, hasHeader("Content-Type", "text/plain"))
+            assertThat(r, hasStatusCode(404))
+        } finally {
+            stopFn()
+        }
+    }
+    }
+
+

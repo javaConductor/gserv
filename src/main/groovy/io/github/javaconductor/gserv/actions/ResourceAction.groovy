@@ -1,6 +1,6 @@
 package io.github.javaconductor.gserv.actions
 
-import io.github.javaconductor.gserv.pathmatching.CustomActionMatcher
+import io.github.javaconductor.gserv.pathmatching.custom.CustomActionMatcher
 
 /**
  * Represents a URI/HttpMethod/Behavior Combination.  The encapsulation of a resource.

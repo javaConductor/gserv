@@ -28,6 +28,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.factory.GServFactory
+import io.github.javaconductor.gserv.pathmatching.custom.CustomActionMatcher
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 @Log4j

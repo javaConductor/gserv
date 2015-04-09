@@ -25,9 +25,9 @@
 package io.github.javaconductor.gserv.delegates.functions
 
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
-import io.github.javaconductor.gserv.pathmatching.AcceptsMatcher
-import io.github.javaconductor.gserv.pathmatching.ContentTypeMatcher
-import io.github.javaconductor.gserv.pathmatching.HeaderMatcher
+import io.github.javaconductor.gserv.pathmatching.custom.AcceptsMatcher
+import io.github.javaconductor.gserv.pathmatching.custom.ContentTypeMatcher
+import io.github.javaconductor.gserv.pathmatching.custom.HeaderMatcher
 
 /**
  *
