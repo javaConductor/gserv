@@ -64,7 +64,7 @@ class CompressionPlugin extends AbstractPlugin {
     def CompressionTypes = ["GZIP": "gzip", "DEFLATE": "deflate"]
 
     private def handleAfter(RequestContext context, data) {
-        def reqId = context.attributes[GServ.contextAttributes.requestId]
+        def reqId = context.id()
         def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
         def outEncoding
         if (outEncodings)
@@ -110,13 +110,13 @@ class CompressionPlugin extends AbstractPlugin {
 
         if (instream) {
             EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: context.id(),
                     name     : "Compression-Before-Filter",
                     message  : "Processing Compression Filter - Replacing input stream."])
             context.setStreams(instream, context.responseBody)
         } else {
             EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: context.id(),
                     name     : "Compression-Before-Filter",
                     message  : "Processing Compression Filter - NOT Replacing input stream."])
             //println("compressionPlugin: no compression here.")
@@ -137,7 +137,7 @@ class CompressionPlugin extends AbstractPlugin {
                     data = handleAfter(context, data) ?: data
 //                    println "CompressionPlugin: before GET doFilter()"
                     EventManager.instance().publish(Events.FilterProcessing, [
-                            requestId: context.getAttribute(GServ.contextAttributes.requestId),
+                            requestId: context.id(),
                             name     : "Compressioncontext-$method-After-Filter",
                             message  : "Filter is done! Compression Filter passing control down the chain. "])
                     data
@@ -148,7 +148,7 @@ class CompressionPlugin extends AbstractPlugin {
             case "POST":
                 [ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter",
                         method, '/**',
-                        [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 1) { requestContext, args ->
+                        [(FilterOptions.MatchedActionsOnly): true], 1) { requestContext, args ->
                     RequestContext ctxt = handleBefore(requestContext) ?: requestContext
                     //nextFilter(ctxt)
                     log.trace "CompressionPlugin: before $method doFilter()"

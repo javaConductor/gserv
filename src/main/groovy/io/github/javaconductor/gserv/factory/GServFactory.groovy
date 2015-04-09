@@ -187,6 +187,7 @@ class GServFactory {
         new Jdk16RequestContext(config, httpExchange);
     }
 
+    @Deprecated
     RequestContext createRequestContext(String method, URI uri, Map headers) {
         def context = new AbstractRequestContext(null) {
             boolean closed = false

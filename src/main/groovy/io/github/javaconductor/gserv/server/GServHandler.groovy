@@ -97,7 +97,7 @@ class GServHandler implements HttpHandler {
 
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
             //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
-            currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+            currentReqId = context.id()
             EventManager.instance().publish(Events.RequestRecieved, [
                     requestId: currentReqId,
                     method   : context.requestMethod,

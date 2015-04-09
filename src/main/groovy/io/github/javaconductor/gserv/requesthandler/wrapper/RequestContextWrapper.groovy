@@ -66,10 +66,9 @@ class RequestContextWrapper extends AbstractRequestContext {
 
         this.remoteAddress = _context.remoteAddress
         this.localAddress = _context.localAddress
-        def currentReqId = getAttribute(GServ.contextAttributes.requestId)
 
         this.responseBody = _responseBody = outputStream
-        log.trace("RequestContext(#$currentReqId) -> $_context ")
+        log.trace("RequestContext(#${id()}) -> $_context ")
 
         setAttribute(GServ.contextAttributes.isWrapper, true)
     }
@@ -83,7 +82,7 @@ class RequestContextWrapper extends AbstractRequestContext {
 
     @Override
     def close() {
-        def currentReqId = getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = id()
         if (_wasClosed) {
             log.warn("RequestContext(#$currentReqId) close() called multiple times.")
             return
@@ -123,7 +122,7 @@ class RequestContextWrapper extends AbstractRequestContext {
  * @param bytes
  */
     synchronized def writeIt(byte[] bytes) {
-        def currentReqId = getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = id()
         log.trace "Wrapper.writeIt(): Writing response($_code) for req #${currentReqId} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
         if (!_wasClosed) {
             EventManager.instance().publish(Events.FilterProcessing, [

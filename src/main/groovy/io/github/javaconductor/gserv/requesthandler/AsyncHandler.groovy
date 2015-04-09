@@ -58,7 +58,7 @@ class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
  */
     def onMessage(request) {
         RequestContext context = request.requestContext
-        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = context.id()
         //log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
         def action
         try {

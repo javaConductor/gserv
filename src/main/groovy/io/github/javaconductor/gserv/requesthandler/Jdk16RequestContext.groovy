@@ -34,6 +34,7 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _closed
     }
 
+
     void sendResponseHeaders(int responseCode, long size) {
         if (!_closed) {
             _exchange.responseHeaders.putAll(responseHeaders)

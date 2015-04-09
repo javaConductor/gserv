@@ -56,15 +56,6 @@ enum FilterType {
  * Filter options. Specified when creating filters.
  */
 class FilterOptions {
-    /**
-     *  Boolean:    if true, any path values corresponding to path variables will be passed to the Filter def closure
-     *  Note: Only applies to 'Before' Filters
-     *
-     */
-    static final String PassActionParams = 'passActionParams'
-
-    @Deprecated
-    static final String PassRouteParams = PassActionParams
 
 /**
  *  Boolean:    if true, the filter will only be activated when it matches a route

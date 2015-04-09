@@ -72,7 +72,6 @@ class AsyncDispatcher extends DynamicDispatchActor {
     void actorPool(pool) {
         _actorPool = pool
         this.setParallelGroup(new DefaultPGroup(1))
-//        this.setParallelGroup(new DefaultPGroup(_actorPool))
     }
 
     ActorPool actorPool() {
@@ -88,7 +87,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
     def evtMgr = EventManager.instance()
 
     def process(RequestContext context) {
-        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = context.id()
         //log.trace "AsyncDispatcher.process($currentReqId) "
         log.debug "AsyncDispatcher.process($currentReqId)  "
         ResourceAction action = _matcher.matchAction(_config.actions(), context)
@@ -147,7 +146,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 sendStream(istream, context.responseBody)
                 context.responseBody.close()
                 context.close()
-                log.trace "AsyncDispatcher.process(): Static resource ${context.requestURI.path} was sent for req #${context.getAttribute(GServ.contextAttributes.requestId)}."
+                log.trace "AsyncDispatcher.process(): Static resource ${context.requestURI.path} was sent for req #${context.id()}."
                 return
             }
         }

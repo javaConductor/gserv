@@ -12,19 +12,13 @@ class AcceptsMatcher implements CustomActionMatcher {
 
     AcceptsMatcher(String... mimeTypes) {
         _mimeTypes = mimeTypes as List
-        println "${_mimeTypes.getClass().toString()}"
     }
 
     @CompileStatic
     boolean matches(RequestContext context, ResourceAction action) {
         List<String> types = context.requestHeaders["Accept"] as List
-        if (!context.requestHeaders["Accept"])
+        if (!types)
             return false;
-//        def ret = _mimeTypes.any{ String t ->
-//            types.any { String accept ->
-//                t == accept
-//            }
-//        }
         def ret = !_mimeTypes.disjoint(types)
         return ret
     }

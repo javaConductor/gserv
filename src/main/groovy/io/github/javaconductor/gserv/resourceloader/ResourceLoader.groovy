@@ -58,11 +58,11 @@ class ResourceLoader {
             resourceCache[resourceScriptFile.absolutePath] = resources
         } catch (MultipleCompilationErrorsException ex) {
             log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            log.error("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+            log.warn("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
             throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
         } catch (Throwable ex) {
             log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            log.error("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+            log.warn("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
             throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
         }
         resources

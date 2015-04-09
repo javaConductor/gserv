@@ -19,12 +19,6 @@ class HeaderMatcher implements CustomActionMatcher {
         def requestHdrValues = context.requestHeaders[_header]
         if (!requestHdrValues)
             return _values.isEmpty()// return true if both are empty
-        _values.intersect(requestHdrValues)
-//
-//        _values.any{ matchValue ->
-//            requestHdrValues.any { requestValue ->
-//                matchValue == value
-//            }
-//        }
+        !_values.disjoint(requestHdrValues)
     }
 }

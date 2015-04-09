@@ -36,7 +36,7 @@ class FilterRunner {
     }
 
     byte[] runAfterFilters(RequestContext rc, byte[] bytes) {
-        def requestId = rc.getAttribute(GServ.contextAttributes.requestId)
+        def requestId = rc.id()
         log.trace "Running ppList for ${rc.getRequestURI().path} - req #${requestId}"
         /// run the PostProcess List
         def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
@@ -65,7 +65,7 @@ class FilterRunner {
 
                 /// add after closure to PostProcessList
                 def ppList = requestContext.getAttribute(GServ.contextAttributes.postProcessList) ?: []
-                log.trace "FilterRunner: Scheduling after filter ${theFilter.name} for req #${requestContext.getAttribute(GServ.contextAttributes.requestId)} "
+                log.trace "FilterRunner: Scheduling after filter ${theFilter.name} for req #${requestContext.id()} "
                 ppList << fn
                 requestContext.setAttribute(GServ.contextAttributes.postProcessList, ppList)
                 return requestContext

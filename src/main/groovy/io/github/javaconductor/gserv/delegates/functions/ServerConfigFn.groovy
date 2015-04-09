@@ -262,7 +262,7 @@ trait ServerConfigFn {
 
         { ->
             EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: requestContext.getAttribute(GServ.contextAttributes.requestId),
+                    requestId: requestContext.id(),
                     mimeType : mimeType,
                     msg      : "Sending static file.",
                     path     : "$filename"])

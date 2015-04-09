@@ -97,7 +97,7 @@ class ActionRunner {
     }
 
     def process(RequestContext context, ResourceAction action) {
-        def currentReqId = context.getAttribute(GServ.contextAttributes.requestId)
+        def currentReqId = context.id()
         if (!currentReqId) {
             currentReqId = reqId.addAndGet(1L)
             context.setAttribute(GServ.contextAttributes.requestId, currentReqId)

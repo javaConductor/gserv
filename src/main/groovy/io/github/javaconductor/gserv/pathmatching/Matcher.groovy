@@ -28,9 +28,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.factory.GServFactory
-import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
-import org.omg.CORBA.Request
 
 @Log4j
 class Matcher {
@@ -67,14 +65,14 @@ class Matcher {
  * @param action
  * @return
  */
-//@CompileStatic
+    @CompileStatic
     boolean matchCustomMatcher(RequestContext context, ResourceAction action) {
         // it matches if there are no custom matchers
         if (action.customMatchers().isEmpty()) {
             return true
         }
         def ret = action.customMatchers().every { CustomActionMatcher cm ->
-            println("Matcher.matchCustomMatcher(): ${context.responseHeaders} -> $action")
+            //println("Matcher.matchCustomMatcher(): ${context.responseHeaders} -> $action")
             cm.matches((RequestContext) context, (ResourceAction) action)
         }
         ret
@@ -99,7 +97,7 @@ class Matcher {
         if (a == 0) {
             /// check the customMatchers
             def ret = matchCustomMatcher(context, action)
-            println "Matcher matching:  ${context.responseHeaders} = ${ret}"
+            //println "Matcher matching:  ${context.responseHeaders} = ${ret}"
             return ret
         }
         def ans

@@ -57,9 +57,6 @@ class GServConfigFile {
         }
 
         ///// CREATE the initial GServConfig from the file values
-        HttpsConfig httpsCfg
-
-
         if (!cfg.apps) {//else
             System.err.println("Error in gserv config(${configFile.absolutePath}) - No apps specified.  At least one is required.")
             return [];
@@ -81,14 +78,7 @@ class GServConfigFile {
         }//collect
         configs
     }//parse
-/*
-    ClassLoader addClasspath(ClassLoader classLoader, List classpath) {
-        def urls = classpath.collect { jar ->
-            new File(jar).toURI().toURL()
-        }.toArray(new URL[classpath.size()])
-        URLClassLoader.newInstance(urls, classLoader)
-    }
-*/
+
     def addResources(resourceScripts, config) {
         def resources = []
         if (resourceScripts) {

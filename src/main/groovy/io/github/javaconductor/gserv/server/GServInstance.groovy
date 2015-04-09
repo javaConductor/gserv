@@ -81,11 +81,6 @@ class GServInstance {
         JmxBuilder jmx = new JmxBuilder(mbs)
         def connection = jmx.server(port: 8090)
 
-//        def beans = jmx.export {
-//            bean(jmxBean){
-//                attributes: "*"
-//            }
-//        }
         def beans = jmx.export(policy: "replace") {
             bean(
                     target: jmxBean,
@@ -94,13 +89,12 @@ class GServInstance {
         }
 
         this.mbean = (GroovyMBean) beans[0]
-//        println "JMX MBean: ${this.mbean}"
         this.mbean
     }
 
     def createInitFilter() {
         def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { requestContext, args ->
-            def requestId = requestContext.getAttribute(GServ.contextAttributes.requestId)
+            def requestId = requestContext.id()
             log.trace("initFilter(#${requestId} context: $requestContext")
             /// here we should check for a blank file name
             /// if file name is blank and we have a defaultResource then we use that.
@@ -237,7 +231,7 @@ class gServHttpsInstance extends GServInstance {
 
         // setup the HTTPS context and parameters
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-//SecureRandom
+
         server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext) {
 
             @Override
@@ -264,7 +258,6 @@ class gServHttpsInstance extends GServInstance {
             }
         });
         def context = server.createContext("/", _handler);
-        def requestId = 1L;
 
         ////////////////////////////////
         /// create and add the InitFilter
