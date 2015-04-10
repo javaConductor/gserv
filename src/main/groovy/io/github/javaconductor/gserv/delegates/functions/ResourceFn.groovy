@@ -24,9 +24,11 @@
 
 package io.github.javaconductor.gserv.delegates.functions
 
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.pathmatching.custom.AcceptsMatcher
 import io.github.javaconductor.gserv.pathmatching.custom.ContentTypeMatcher
+import io.github.javaconductor.gserv.pathmatching.custom.CustomActionMatcher
 import io.github.javaconductor.gserv.pathmatching.custom.HeaderMatcher
 
 /**
@@ -113,12 +115,19 @@ trait ResourceFn {
      * Declares a handler for an HTTP PUT request for the specified URL.
      *
      * @param url /example/:name/:age
-     * @param clozure clozure(inputStream, name, age )
+     * @param customerMatchers 0 or more custom matchers
+     * @param clozure clozure(input, name, age )
      * @return
      */
-    def put(url, clozure) {
+    def put(url, Object... matchersAndClosure) {
         log.trace("resourceFn: put url=$url")
+        def clozure = matchersAndClosure.last()
+        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
         def rte = _addUrlToPatternList("PUT", url, clozure)
+        if (rte && customMatchers) {
+            rte.customMatchers(customMatchers)
+
+        }
         //if(routeName) linkBuilder.add(routeName, rte)
         rte
     }
@@ -130,9 +139,14 @@ trait ResourceFn {
      * @param clozure clozure(inputStream, name, age )
      * @return
      */
-    def post(url, clozure) {
+    def post(url, Object... matchersAndClosure) {
         log.trace("resourceFn: post url=$url")
-        _addUrlToPatternList("POST", url, clozure)
+        def clozure = matchersAndClosure.last()
+        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+        def action = _addUrlToPatternList("POST", url, clozure)
+        if (customMatchers) {
+            action.customMatchers(customMatchers)
+        }
     }
 
     /**
@@ -142,12 +156,17 @@ trait ResourceFn {
      * @param clozure clozure(name, age )
      * @return
      */
-    def delete(url, clozure) {
+    def delete(url, Object... matchersAndClosure) {
         log.trace("resourceFn: delete url=$url")
-        _addUrlToPatternList("DELETE", url, clozure)
+        def clozure = matchersAndClosure.last()
+        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+        def action = _addUrlToPatternList("DELETE", url, clozure)
+        if (customMatchers) {
+            action.customMatchers(customMatchers)
+        }
     }
 
-    def _addUrlToPatternList(method, url, clozure) {
+    private ResourceAction _addUrlToPatternList(method, url, clozure) {
         def absUrl = value("path") ?: "";
         if (url) {
             if (!url.startsWith("/")) {

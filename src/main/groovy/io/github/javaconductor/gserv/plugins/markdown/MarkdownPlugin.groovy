@@ -57,7 +57,7 @@ class MarkdownPlugin extends AbstractPlugin {
      */
     @Override
     List<ResourceAction> filters() {
-        [ResourceActionFactory.createAfterFilter("MarkdownPluginFilter", "GET", "/*", [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true]) { e, data ->
+        [ResourceActionFactory.createAfterFilter("MarkdownPluginFilter", "GET", "/*", [(FilterOptions.MatchedActionsOnly): true]) { e, data ->
             handleAfter(e, data)
         }]
     }

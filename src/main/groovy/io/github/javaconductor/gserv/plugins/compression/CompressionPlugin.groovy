@@ -133,7 +133,8 @@ class CompressionPlugin extends AbstractPlugin {
 
             case "get":
             case "GET":
-                [ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { context, data ->
+                [ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter",
+                        method, '/**', [(FilterOptions.MatchedActionsOnly): true], 10) { context, data ->
                     data = handleAfter(context, data) ?: data
 //                    println "CompressionPlugin: before GET doFilter()"
                     EventManager.instance().publish(Events.FilterProcessing, [

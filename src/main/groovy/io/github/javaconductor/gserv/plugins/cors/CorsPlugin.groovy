@@ -210,7 +210,7 @@ class CorsPlugin extends AbstractPlugin {
                     log.trace("CorsPlugin.decorateDelegate: cors(uri=$uri)")
                     try {
                         //    def before(name, url, method, options, order = 5, clozure) {
-                        before("CORSPlugin-" + cfg.mode, uri, "*", [passRouteParams: false], 5, corsFilter(cfg))
+                        before("CORSPlugin-" + cfg.mode, uri, "*", [:], 5, corsFilter(cfg))
                     } catch (Throwable e) {
                         e.printStackTrace(System.err)
                         log.error "CorsPlugin.decorateDelegate: Error calling filter function: ${e.message} ", e
