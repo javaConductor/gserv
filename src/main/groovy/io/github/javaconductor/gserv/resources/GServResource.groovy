@@ -1,5 +1,6 @@
 package io.github.javaconductor.gserv.resources
 
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.delegates.ResourceDelegate
 import io.github.javaconductor.gserv.utils.LinkBuilder
@@ -38,6 +39,7 @@ class GServResource {
         basePath = path
         actions = []
         linkBuilder = new LinkBuilder(path)
+
     }
 
     /**
@@ -57,6 +59,12 @@ class GServResource {
         definitionClosure()
         def actions = definitionClosure.delegate.actions()
         def linkBldr = definitionClosure.delegate.linkBuilder()
+        actions.each { ResourceAction action ->
+            linkBldr.linksFunctions().each { linkFn ->
+                action.addLinksFunction(linkFn.name, linkFn.linksFunction)
+            }
+        }
+
         return new GServResource(basePath, actions, linkBldr)
     }
 
@@ -83,6 +91,14 @@ class GServResource {
             target.actions = addActions(target.actions, definitionClosure.delegate.patterns())
             target.linkBuilder += definitionClosure.delegate.linkBuilder()
         }
+
+        ///add the 'links' function to the
+        target.actions.each { ResourceAction action ->
+            target.linkBuilder.linksFunctions().each { linkFn ->
+                action.addLinksFunction(linkFn.name, linkFn.linksFunction)
+            }
+        }
+
         target
     }
 

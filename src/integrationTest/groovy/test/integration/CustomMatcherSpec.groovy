@@ -44,6 +44,7 @@ class CustomMatcherSpec {
             write("text/plain", json)
         }
     }
+
     def instance = new GServ().http([:]) {
         resource res
     }
@@ -156,5 +157,4 @@ class CustomMatcherSpec {
             stopFn()
         }
     }
-
 }

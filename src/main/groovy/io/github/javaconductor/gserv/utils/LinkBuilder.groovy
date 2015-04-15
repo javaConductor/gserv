@@ -35,6 +35,7 @@ import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 class LinkBuilder {
     def prefix
     def actions = [:]
+    private def _linksFunctions = [:]
 
     def LinkBuilder(prefix = null) {
         this.prefix = prefix
@@ -51,8 +52,8 @@ class LinkBuilder {
      * @param lb LinkBuilder to merge
      * @return New LinkBuilder
      */
-    def plus(LinkBuilder lb) {
-        lb ? new LinkBuilder(prefix: prefix, actions: actions + lb.actions)
+    LinkBuilder plus(LinkBuilder lb) {
+        lb ? new LinkBuilder(prefix: prefix, actions: actions + lb.actions, _linksFunctions: _linksFunctions)
                 : this
     }
 
@@ -77,13 +78,30 @@ class LinkBuilder {
     def addLink(String name, ResourceAction action) {
         actions[name] = action
     }
+
+    /**
+     *
+     * @param name
+     * @param c
+     * @return
+     */
+    def addLinksFunction(String name, Closure c) {
+        _linksFunctions[name] = c
+    }
+
+    List linksFunctions() {
+        _linksFunctions.collect { name, fn ->
+            [name: name, linksFunction: fn]
+        }
+    }
+
     /**
      *
      * @param name Route name
      * @param data Data used to interpolate the resulting URL
      * @return URI to a named route
      */
-    def link(name, data) {
+    String link(name, data) {
         // find the action in actions
         ResourceAction action = actions[name]
         if (!action) {

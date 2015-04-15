@@ -79,4 +79,22 @@ class ResourceAction {
         _customMatchers << matcher
     }
 
+    Map<String, Closure> _linksFunctions = [:]
+
+    def linksFunctions(String name = "default") {
+        _linksFunctions[name]
+    }
+
+    Closure linksFunction(String name = "default") {
+        _linksFunctions[name]
+    }
+
+    def addLinksFunction(String name, Closure c) {
+        _linksFunctions[name] = c
+    }
+
+    def addLinksFunction(Closure c) {
+        addLinksFunction("default", c)
+    }
+
 }

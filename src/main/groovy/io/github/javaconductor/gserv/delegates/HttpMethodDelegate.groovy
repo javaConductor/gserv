@@ -39,7 +39,7 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
 class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
     RequestContext requestContext
     def serverConfig
-    def $this
+    ResourceAction $this
     def eventManager = EventManager.instance()
 
     def HttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {

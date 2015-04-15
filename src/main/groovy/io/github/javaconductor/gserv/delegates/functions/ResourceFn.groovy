@@ -193,6 +193,14 @@ trait ResourceFn {
         new HeaderMatcher(hdr, values)
     }
 
+    def links(String name, Closure c) {
+        value("linkBuilder").addLinksFunction(name ?: 'default', c)
+    }
+
+    def links(Closure c) {
+        links('', c)
+    }
+
     /*
     *
                 onlyHeader("X-MODE", "chill"),
