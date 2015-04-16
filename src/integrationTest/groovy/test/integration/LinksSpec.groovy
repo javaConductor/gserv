@@ -26,7 +26,7 @@ class LinksSpec {
             writeJson([msg: "Here is some JSON."] + [links: links(id)])
         }
 
-        delegate.put("/:id") { id ->
+        delegate.put("/:id") { data, id ->
             println "Called PUT /thing/$id"
             location("/thing/$id")
 
@@ -80,7 +80,7 @@ class LinksSpec {
 
     @Test
     public final void testEditLinks() {
-        def port = 59000
+        def port = 59001
         def stopFn = instance.start(port)
         try {
             Response r = getOf("http://localhost:$port/thing/21",
@@ -93,8 +93,36 @@ class LinksSpec {
             def theLink = links.links.find { lnk ->
                 lnk.rel == "edit"
             }
-            assertThat("This should be the put method.", theLink.method == "PUT")
-            println(theLink)
+            assertThat("This should be the 'PUT' method.", theLink.method == "PUT")
+            //println(theLink)
+
+        } finally {
+            stopFn()
+        }
+    }
+
+    @Test
+    public final void testCanCallEditLinks() {
+        def port = 59001
+        def stopFn = instance.start(port)
+        try {
+            Response r = getOf("http://localhost:$port/thing/21",
+                    withTimeout(5, TimeUnit.MINUTES))
+
+            assertThat(r, hasStatusCode(200))
+            assertThat(r.asJson(), hasJsonPath("links"))
+
+            def response = new JsonSlurper().parseText(new String(r.asBytes()))
+            def theLink = response.links.find { lnk ->
+                lnk.rel == "edit"
+            }
+            assertThat("This should be the 'PUT' method.", theLink.method == "PUT")
+            //println(theLink)
+
+            Response r2 = putOf("${theLink.href}",
+                    withTimeout(5, TimeUnit.MINUTES))
+            assertThat(r2, hasStatusCode(200))
+            assertThat(r2, hasHeader("Location"))
 
         } finally {
             stopFn()

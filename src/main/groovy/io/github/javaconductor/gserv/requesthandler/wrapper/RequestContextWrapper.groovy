@@ -66,7 +66,7 @@ class RequestContextWrapper extends AbstractRequestContext {
 
         this.remoteAddress = _context.remoteAddress
         this.localAddress = _context.localAddress
-
+        this.protocol = _context.protocol
         this.responseBody = _responseBody = outputStream
         log.trace("RequestContext(#${id()}) -> $_context ")
 

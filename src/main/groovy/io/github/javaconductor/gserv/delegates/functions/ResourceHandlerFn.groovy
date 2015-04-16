@@ -28,6 +28,8 @@ import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.exceptions.TemplateException
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 /**
@@ -54,8 +56,9 @@ trait ResourceHandlerFn {
         // call the linkFn defined inside the Action
 
         def fn = ((ResourceAction) $this).linksFunction()
-        fn ? fn.call(*stuff)
+        def ret = fn ? fn.call(*stuff)
                 : [links: []]
+        LinkBuilder.fixHrefs(requestContext, ret)
     }
 
     /**

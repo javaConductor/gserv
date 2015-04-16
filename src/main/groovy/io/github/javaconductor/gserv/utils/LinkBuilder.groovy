@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.utils
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.actions.ActionPathElement
 import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**
  * A LinkBuilder is used to create URLs to resources
@@ -139,4 +140,34 @@ class LinkBuilder {
         }
         link
     }
+
+    static List fixHrefs(RequestContext rc, List links) {
+        def protocol = rc.protocol
+        def host = rc.localAddress.hostName
+        def port = rc.localAddress.port
+
+        links.collect { link ->
+            def href = link.href
+            href = fixHref(protocol, host, port, href)
+            [
+                    href  : href,
+                    method: link.method,
+                    rel   : link.rel
+            ]
+        }
+
+    }
+
+    static def fixHref(String protocol, String host, int port, String href) {
+
+        URI uri = new URI(href)
+        def newProtocol = uri.scheme ?: protocol.split('/')[0]
+        def newHost = uri.host ?: host
+        def newPort = uri.port > 0 ? uri.port : port
+        //def (newPath,newQry) = uri.path.split("\\?")
+        def newPath = "${uri.path}?${uri.query ?: ''}"
+
+        new URL(newProtocol, newHost, newPort, newPath).toExternalForm()
+    }
+
 }
