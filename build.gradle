@@ -28,11 +28,14 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven'
 
-mainClass = 'io.github.javaconductor.gserv.Main'
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
 version = "0.9.9"
 sourceCompatibility = 1.6
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
 
 sourceSets {
     integrationTest {

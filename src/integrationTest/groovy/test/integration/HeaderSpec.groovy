@@ -57,8 +57,8 @@ class HeaderSpec {
                     header("Accept", "text/plain"),
                     withTimeout(5, TimeUnit.MINUTES))
 
-            assertThat(r, hasHeader("Content-Type", "text/plain"))
             assertThat(r, hasStatusCode(200))
+            assertThat(r, hasHeader("Content-Type", "text/plain"))
         } finally {
             stopFn()
         }
@@ -72,8 +72,8 @@ class HeaderSpec {
             Response r = getOf("http://localhost:$port/",
                     withTimeout(5, TimeUnit.MINUTES))
 
-            assertThat(r, hasHeader("Content-Type", "application/json"))
             assertThat(r, hasStatusCode(200))
+            assertThat(r, hasHeader("Content-Type", "application/json"))
         } finally {
             stopFn()
         }
@@ -86,7 +86,6 @@ class HeaderSpec {
         try {
             Response r = getOf("http://localhost:$port/3",
                     withTimeout(30, TimeUnit.SECONDS))
-
 
             assertThat(r, hasStatusCode(200))
             assertThat(r, hasHeader("Location", "/2"))
