@@ -38,6 +38,11 @@ class HeaderSpec {
                 writeJson([msg: "Here is some JSON."])
         }
 
+        delegate.get('/3') {
+            location("/2")
+            write "text/plain", ""
+        }
+
     }
     def instance = new GServ().http([:]) {
         resource res
@@ -47,25 +52,47 @@ class HeaderSpec {
     public final void testAcceptHeader() {
         def port = 51000
         def stopFn = instance.start(port)
-        Response r = getOf("http://localhost:$port/",
-                header("Accept", "text/plain"),
-                withTimeout(5, TimeUnit.MINUTES))
+        try {
+            Response r = getOf("http://localhost:$port/",
+                    header("Accept", "text/plain"),
+                    withTimeout(5, TimeUnit.MINUTES))
 
-        assertThat(r, hasHeader("Content-Type", "text/plain"))
-        assertThat(r, hasStatusCode(200))
-        stopFn()
+            assertThat(r, hasHeader("Content-Type", "text/plain"))
+            assertThat(r, hasStatusCode(200))
+        } finally {
+            stopFn()
+        }
     }
 
     @Test
     public final void testAcceptHeader2() {
         def port = 51009
         def stopFn = instance.start(port)
-        Response r = getOf("http://localhost:$port/",
-                withTimeout(5, TimeUnit.MINUTES))
+        try {
+            Response r = getOf("http://localhost:$port/",
+                    withTimeout(5, TimeUnit.MINUTES))
 
-        assertThat(r, hasHeader("Content-Type", "application/json"))
-        assertThat(r, hasStatusCode(200))
-        stopFn()
+            assertThat(r, hasHeader("Content-Type", "application/json"))
+            assertThat(r, hasStatusCode(200))
+        } finally {
+            stopFn()
+        }
+    }
+
+    @Test
+    public final void testLocation() {
+        def port = 51010
+        def stopFn = instance.start(port)
+        try {
+            Response r = getOf("http://localhost:$port/3",
+                    withTimeout(30, TimeUnit.SECONDS))
+
+
+            assertThat(r, hasStatusCode(200))
+            assertThat(r, hasHeader("Location", "/2"))
+        } finally {
+            stopFn()
+        }
     }
 
 }

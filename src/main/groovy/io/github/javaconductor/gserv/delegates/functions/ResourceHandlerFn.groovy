@@ -228,7 +228,8 @@ trait ResourceHandlerFn {
      * @param headerValues List of strings
      */
     void responseHeaders(String headerName, List headerValues) {
-        this.requestContext.setResponseHeaders(headerName, headerValues);
+        log.trace("#${requestContext.id()} Header[$headerName] = $headerValues")
+        this.requestContext.setResponseHeaders([(headerName): headerValues]);
     }
 
     /**
@@ -236,7 +237,7 @@ trait ResourceHandlerFn {
      * @param uri
      */
     void location(String uri) {
-        this.requestContext.getResponseHeaders().put("Location", [uri]);
+        responseHeaders("Location", [uri]);
     }
 
     /**

@@ -79,6 +79,21 @@ class LinksSpec {
     }
 
     @Test
+    public final void testLinksWithQry() {
+        def port = 59000
+        def stopFn = instance.start(port)
+        try {
+            Response r = getOf("http://localhost:$port/thing/21",
+                    withTimeout(5, TimeUnit.MINUTES))
+
+            assertThat(r, hasStatusCode(200))
+            assertThat(r.asJson(), hasJsonPath("links"))
+        } finally {
+            stopFn()
+        }
+    }
+
+    @Test
     public final void testEditLinks() {
         def port = 59001
         def stopFn = instance.start(port)
@@ -103,7 +118,7 @@ class LinksSpec {
 
     @Test
     public final void testCanCallEditLinks() {
-        def port = 59001
+        def port = 59002
         def stopFn = instance.start(port)
         try {
             Response r = getOf("http://localhost:$port/thing/21",
@@ -117,7 +132,7 @@ class LinksSpec {
                 lnk.rel == "edit"
             }
             assertThat("This should be the 'PUT' method.", theLink.method == "PUT")
-            //println(theLink)
+            println(theLink)
 
             Response r2 = putOf("${theLink.href}",
                     withTimeout(5, TimeUnit.MINUTES))

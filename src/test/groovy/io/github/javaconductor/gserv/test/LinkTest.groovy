@@ -90,4 +90,20 @@ public class LinkTest {
         l.addLink("test2", pat)
         assert "/books/1970/10/all?foo=theQueryParam" == l.link("test2", [year: 1970, rank: 10, foo: "theQueryParam"])
     }
+
+    @Test
+    public final void testLinkBuilderFixHrefs() {
+        def nuHref = LinkBuilder.fixHref("http", "me.com", 8080, "/thing/21")
+        assert nuHref.startsWith("http")
+        assert nuHref.startsWith("http://me.com:8080")
+    }
+
+    @Test
+    public final void testLinkBuilderFixHrefsWithQry() {
+        def nuHref = LinkBuilder.fixHref("http", "me.com", 8080, "/thing/21?page=5")
+        assert nuHref.startsWith("http")
+        assert nuHref.startsWith("http://me.com:8080")
+        assert nuHref.contains("page=5")
+    }
+
 }
