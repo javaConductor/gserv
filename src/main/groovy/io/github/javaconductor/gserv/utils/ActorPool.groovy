@@ -24,6 +24,9 @@
 
 package io.github.javaconductor.gserv.utils
 
+import groovyx.gpars.actor.Actor
+import groovyx.gpars.group.PGroup
+
 /**
  * Created by javaConductor on 5/4/2014.
  */
@@ -32,9 +35,9 @@ class ActorPool {
     def nextIdx = 0;
     def nuActorFn
     def min, max
-    def pGroup
+    PGroup pGroup
 
-    def ActorPool(min, max, pGroup, nuActorFn) {
+    def ActorPool(int min, int max, PGroup pGroup, Closure nuActorFn) {
         this.nuActorFn = nuActorFn
         this.min = min
         this.max = max
@@ -42,7 +45,7 @@ class ActorPool {
         initList(actorList, min)
     }
 
-    private def initList(actorList, min) {
+    private def initList(List actorList, int min) {
         if (actorList.size() < min) {
             def diff = min - actorList.size();
             diff.times {
@@ -51,11 +54,11 @@ class ActorPool {
         }
     }
 
-    synchronized def next() {
+    synchronized Actor next() {
         if (actorList.empty) {
             throw new IllegalStateException("No actors in pool.")
         }
-        def ret = actorList[nextIdx]
+        Actor ret = actorList[nextIdx]
         nextIdx = ((nextIdx + 1) >= actorList.size()) ? 0 : ++nextIdx;
         ret
     }
@@ -66,7 +69,7 @@ class ActorPool {
         add(nuActor)
     }
 
-    synchronized def add(actor) {
+    synchronized def add(Actor actor) {
         actor.setParallelGroup(pGroup)
         actor.start()
         actorList.add(actor)

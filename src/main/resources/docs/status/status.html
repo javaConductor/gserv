@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title><%= appName %> Status Page </title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th colspan="2"><%= appName %></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Total Memory</th>
+        <td><%= totalMemory %></td>
+    </tr>
+    <tr>
+        <th>Memory Usage</th>
+        <td><%= memoryUsage %></td>
+    </tr>
+    <tr>
+        <th>Up Time</th>
+        <td><%= upTime %></td>
+    </tr>
+    <tr>
+        <th>Requests</th>
+        <td><%= requests %></td>
+    </tr>
+    <tr>
+        <th>Failed</th>
+        <td><%= failed %></td>
+    </tr>
+    <tr>
+        <th>Total Memory</th>
+        <td><%= maxConcurrentConnections %></td>
+    </tr>
+    <tr>
+        <th colspan="2">Actions</th>
+    </tr>
+    <% actions.each { action -> %>
+    <tr>
+        <td colspan="2"><%= action %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>
+
+</body>
+</html>

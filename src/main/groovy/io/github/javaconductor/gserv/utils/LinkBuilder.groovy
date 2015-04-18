@@ -38,11 +38,11 @@ class LinkBuilder {
     def actions = [:]
     private def _linksFunctions = [:]
 
-    def LinkBuilder(prefix = null) {
+    def LinkBuilder(String prefix = null) {
         this.prefix = prefix
     }
 
-    def LinkBuilder(prefix, actions) {
+    def LinkBuilder(String prefix, Map actions) {
         this(prefix)
         this.actions = actions
     }
@@ -102,7 +102,7 @@ class LinkBuilder {
      * @param data Data used to interpolate the resulting URL
      * @return URI to a named route
      */
-    String link(name, data) {
+    String link(String name, Map data) {
         // find the action in actions
         ResourceAction action = actions[name]
         if (!action) {
@@ -141,14 +141,14 @@ class LinkBuilder {
         link
     }
 
-    static List fixHrefs(RequestContext rc, List links) {
+    static List expandLinksIfNeeded(RequestContext rc, List links) {
         def protocol = rc.protocol
         def host = rc.localAddress.hostName
         def port = rc.localAddress.port
 
         links.collect { link ->
             def href = link.href
-            href = fixHref(protocol, host, port, href)
+            href = expandLinkIfNeeded(protocol, host, port, href)
             [
                     href  : href,
                     method: link.method,
@@ -158,13 +158,11 @@ class LinkBuilder {
 
     }
 
-    static def fixHref(String protocol, String host, int port, String href) {
-
+    static def expandLinkIfNeeded(String protocol, String host, int port, String href) {
         URI uri = new URI(href)
         def newProtocol = uri.scheme ?: protocol.split('/')[0]
         def newHost = uri.host ?: host
         def newPort = uri.port > 0 ? uri.port : port
-        //def (newPath,newQry) = uri.path.split("\\?")
         def newPath = "${uri.path}?${uri.query ?: ''}"
 
         new URL(newProtocol, newHost, newPort, newPath).toExternalForm()

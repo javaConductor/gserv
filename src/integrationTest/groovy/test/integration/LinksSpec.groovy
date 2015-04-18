@@ -135,7 +135,7 @@ class LinksSpec {
             println(theLink)
 
             Response r2 = putOf("${theLink.href}",
-                    withTimeout(5, TimeUnit.MINUTES))
+                    withTimeout(30, TimeUnit.SECONDS))
             assertThat(r2, hasStatusCode(200))
             assertThat(r2, hasHeader("Location"))
 

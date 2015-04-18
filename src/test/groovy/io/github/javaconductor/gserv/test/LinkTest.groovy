@@ -93,14 +93,14 @@ public class LinkTest {
 
     @Test
     public final void testLinkBuilderFixHrefs() {
-        def nuHref = LinkBuilder.fixHref("http", "me.com", 8080, "/thing/21")
+        def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21")
         assert nuHref.startsWith("http")
         assert nuHref.startsWith("http://me.com:8080")
     }
 
     @Test
     public final void testLinkBuilderFixHrefsWithQry() {
-        def nuHref = LinkBuilder.fixHref("http", "me.com", 8080, "/thing/21?page=5")
+        def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21?page=5")
         assert nuHref.startsWith("http")
         assert nuHref.startsWith("http://me.com:8080")
         assert nuHref.contains("page=5")
