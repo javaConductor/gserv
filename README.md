@@ -12,9 +12,11 @@
                 <li>Container Free
                 <li>Serve static files
                 <li>Serve Groovy script as REST resources
+                <li><a href="https://github.com/javaConductor/gserv/wiki/gServ-HATEOAS"> HATEOAS Support</a>
+                <li>Easy Content Negotiation
                 <li>Plugin API
-                <li>Embeddable
-                <li>Standalone Mode
+                <li><a href="https://github.com/javaConductor/gserv/wiki/gServ-Framework">Embeddable</a>
+                <li><a href="https://github.com/javaConductor/gserv/wiki/gServ-Standalone">Standalone Mode</a>
                 <li>CORS support
                 <li>Compression support
                 <li>ETag support
@@ -33,7 +35,7 @@
             <tr><td>Action</td>      <td>HTTP request handler for a particular path/query/method combination.  </td></tr>
             <tr><td>Resources</td>      <td>Resources define actions for a particular root path (eg. /books) and its sub-resources (eg. /books/bestSellers). </td></tr>
             <tr><td>Server Config</td><td>The config encapsulates any resources, actions, filters, and plugins. </td></tr>
-            <tr><td>Server Instance</td><td>This is the actual server that will listen to the specified port and handle
+            <tr><td>Server Instance</td><td>This is the actual server instance that will listen to the specified port and handle
                 requests based on its configuration.</td></tr>
         </table>
     </div>
