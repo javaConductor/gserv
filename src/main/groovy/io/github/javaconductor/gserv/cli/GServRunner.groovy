@@ -59,6 +59,8 @@ class GServRunner {
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.n(longOpt: 'appName', 'The name of the Application', args: 1, required: false)
         cli.v(longOpt: 'version', 'Prints the current gServ version', args: 0, required: false)
+        cli.g(longOpt: 'no-status-page', 'Disables the status page.', args: 0, required: false)
+        cli.t(longOpt: 'status-path', 'Path to use for the status page.', args: 0, required: false)
     }
 
     /**
@@ -89,6 +91,8 @@ class GServRunner {
             return;
         }
 
+        def statusPage
+        def statusPath
         def configs
         def configFile
         def configFilename = options.c;
@@ -106,6 +110,8 @@ class GServRunner {
                 instanceScript = options.i;
                 def appName = options.n;
                 classpath = options.js;
+                statusPath = options.t
+                statusPage = !options.g
                 configs = factory.createConfigs(
                         staticRoot ?: "",
                         bindAddress ?: "",
@@ -113,7 +119,10 @@ class GServRunner {
                         defaultResource ?: "",
                         instanceScript ?: "",
                         resourceScripts ?: [],
-                        classpath ?: [], appName ?: null);
+                        statusPage,
+                        statusPath ?: "",
+                        classpath ?: [],
+                        appName ?: null);
             } else {   // use ONLY the config file and ignore everything else on the cmdLine
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {

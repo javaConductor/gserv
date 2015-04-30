@@ -222,7 +222,6 @@ trait ServerConfigFn {
 
     def getBasicAuthUserPswd(requestContext) {
         def basic = requestContext.requestHeaders.get("Authorization");
-        //println "basic: $basic"
         if (!basic)
             return null;
         basic = basic[0];// we get a list as response but we only need the first one
@@ -298,4 +297,21 @@ trait ServerConfigFn {
     def conversion(Class c, Closure fn) {
         value('inputStreamTypeConverter').add(c, fn)
     }
+
+    void statusPage(boolean b) {
+        value("statusPage", b)
+    }
+
+    boolean statusPage() {
+        value("statusPage")
+    }
+
+    void statusPath(String s) {
+        value("statusPath", s)
+    }
+
+    String statusPath() {
+        value("statusPath")
+    }
+
 }

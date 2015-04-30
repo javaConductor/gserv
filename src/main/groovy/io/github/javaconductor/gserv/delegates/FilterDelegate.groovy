@@ -31,6 +31,7 @@ import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceHandlerFn
 import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.templating.TemplateManager
 
 /**
  *
@@ -43,7 +44,6 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
  */
 @Log4j
 class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
-    //def exchange
     def $this
     def requestContext
 
@@ -57,6 +57,8 @@ class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, Fil
         value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
         value("to", serverConfig.inputStreamTypeConverter.converters);
         value("serverConfig", serverConfig);
+        value("tmgr", new TemplateManager());
+
         value('$this', filter);
 
         this.requestContext = requestContext

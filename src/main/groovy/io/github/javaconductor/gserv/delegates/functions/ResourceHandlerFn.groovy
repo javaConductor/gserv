@@ -38,7 +38,6 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
 
 trait ResourceHandlerFn {
 
-    //LinkBuilder linkBuilder = new LinkBuilder()
     /**
      *  Create URI for the named Route
      *  NOTE: Route must be  known by the LinkBuilder
@@ -47,6 +46,7 @@ trait ResourceHandlerFn {
      * @param data
      * @return String
      */
+
     def link(name, data) {
         linkBuilder.link(name, data)
     }
@@ -229,6 +229,22 @@ trait ResourceHandlerFn {
     void responseHeaders(String headerName, List headerValues) {
         log.trace("#${requestContext.id()} Header[$headerName] = $headerValues")
         this.requestContext.setResponseHeaders([(headerName): headerValues]);
+    }
+
+    /**
+     *
+     * @param mimeTypes
+     * @return true if the list of intersects the list of values for the Accept header
+     */
+    boolean accepts(String... mimeTypes) {
+        boolean ret = (mimeTypes as List).any { mimeType ->
+            requestHeaders("Accept").any { mtype ->
+                log.debug("accepts: Comparing ${mtype.toUpperCase()} to ${mimeType.toUpperCase()}")
+                println("accepts: Comparing ${mtype.toUpperCase()} to ${mimeType.toUpperCase()}")
+                mtype.toUpperCase() == mimeType.toUpperCase()
+            }
+        }
+        return ret;
     }
 
     /**

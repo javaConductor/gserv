@@ -20,6 +20,12 @@ class FilterRunner {
         _serverConfig = config
     }
 
+/**
+ *
+ * @param filters
+ * @param c
+ * @return
+ */
     RequestContext runFilters(List<Filter> filters, RequestContext c) {
         RequestContext context = c
         for (Filter f : filters) {
@@ -35,6 +41,12 @@ class FilterRunner {
         context
     }
 
+/**
+ *
+ * @param rc
+ * @param bytes
+ * @return
+ */
     byte[] runAfterFilters(RequestContext rc, byte[] bytes) {
         def requestId = rc.id()
         log.trace "Running ppList for ${rc.getRequestURI().path} - req #${requestId}"
@@ -52,6 +64,12 @@ class FilterRunner {
         bytes
     }
 
+    /**
+     *
+     * @param theFilter
+     * @param requestContext
+     * @return
+     */
     RequestContext runFilter(Filter theFilter, RequestContext requestContext) {
 
         switch (theFilter.filterType) {
@@ -85,6 +103,12 @@ class FilterRunner {
         }//switch
     }
 
+    /**
+     *
+     * @param theFilter
+     * @param context
+     * @return
+     */
     RequestContext process(Filter theFilter, RequestContext context) {
         Closure cl = theFilter.requestHandler()//_handler
         FilterDelegate dgt = prepareDelegate(theFilter, context)
@@ -111,6 +135,13 @@ class FilterRunner {
         ret
     }
 
+/**
+ *
+ * @param filter
+ * @param requestContext
+ * @param templateEngineName
+ * @return
+ */
     private def prepareDelegate(filter, requestContext, templateEngineName = "") {
         new FilterDelegate(filter, requestContext, _serverConfig, templateEngineName)
     }

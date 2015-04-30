@@ -29,7 +29,6 @@ import io.github.javaconductor.gserv.plugins.PluginMgr
 import io.github.javaconductor.gserv.plugins.caching.CachingPlugin
 import io.github.javaconductor.gserv.plugins.compression.CompressionPlugin
 import io.github.javaconductor.gserv.plugins.eventLogger.EventLoggerPlugin
-import io.github.javaconductor.gserv.plugins.markdown.MarkdownPlugin
 import io.github.javaconductor.gserv.utils.Encoder
 
 def gmongo = new GMongo('localhost:27017')
@@ -39,7 +38,6 @@ def pluginMgr = PluginMgr.instance()
 pluginMgr.register("eventLogger", EventLoggerPlugin.class)
 pluginMgr.register("compression", CompressionPlugin.class)
 pluginMgr.register("caching", CachingPlugin.class)
-pluginMgr.register("markdown", MarkdownPlugin.class)
 
 def gserv = new GServ();
 gserv.plugins {

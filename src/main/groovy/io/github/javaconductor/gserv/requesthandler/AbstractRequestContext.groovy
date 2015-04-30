@@ -33,6 +33,10 @@ abstract class AbstractRequestContext implements RequestContext {
         return requestHeaders
     }
 
+    List getRequestHeaders(String header) {
+        requestHeaders[header] ?: []
+    }
+
     @Override
     String getRequestHeader(String header) {
         requestHeaders[header] ? requestHeaders[header][0] : null
@@ -48,6 +52,10 @@ abstract class AbstractRequestContext implements RequestContext {
 
     String getResponseHeader(String header) {
         responseHeaders[header] ? responseHeaders[header][0] : null
+    }
+
+    List getResponseHeaders(String header) {
+        responseHeaders[header] ?: []
     }
 
     void setResponseHeaders(Map<String, List<String>> responseHeaders) {

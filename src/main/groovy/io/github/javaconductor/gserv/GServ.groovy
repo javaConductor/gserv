@@ -171,6 +171,7 @@ class GServ {
         def templateEngineName
         def lBuilder
         def defaultRes
+        def statusPg, statusPth
         InputStreamTypeConverter inputStreamTypeConverter
         (instanceDefinition.delegate).with {
             //// Gather data from the closure we just ran
@@ -183,12 +184,17 @@ class GServ {
             lBuilder = linkBuilder()
             inputStreamTypeConverter = converter()
             defaultRes = defaultResource()
+            statusPg = statusPage()
+            statusPth = statusPath()
+
         }
 
         /// add this info to the config
         cfg.addServerIP(options.serverIP)
                 .addFilters(tmpFilters)
                 .addStaticRoots(tmpStaticRoots)
+                .statusPath(statusPth)
+                .statusPage(statusPg)
                 .addActions(tmpActions)
                 .useResourceDocs(_useResourceDocs)
                 .templateEngineName(templateEngineName)

@@ -45,6 +45,7 @@ import javax.net.ssl.*
 import java.lang.management.ManagementFactory
 import java.security.KeyStore
 import java.security.SecureRandom
+import java.text.NumberFormat
 
 /**
  * An HTTP Server Instance.  Pass a port number to the start() method to start the instance on that port.
@@ -111,6 +112,88 @@ class GServInstance {
         }
         initFilter
     }
+
+    def createStatusFilter() {
+        def filter = ResourceActionFactory.createBeforeFilter("gServStatus", "GET", _cfg.statusPath() ?: '/status', [:], 0) { RequestContext requestContext, args ->
+            def requestId = requestContext.id()
+
+            log.trace("statusFilter(#${requestId} context: $requestContext")
+            def totalMemory = Runtime.runtime.totalMemory()
+            def freeMemory = Runtime.runtime.freeMemory()
+            def maxMemory = Runtime.runtime.maxMemory()
+            def requestCount = requestContext.id() as long
+
+            String page = """
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>${_cfg.name()} Status Page </title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th colspan="2">${_cfg.name()}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Total Memory</th>
+        <td>${NumberFormat.getNumberInstance(Locale.US).format(totalMemory)} bytes</td>
+    </tr>
+
+    <tr>
+        <th>Free Memory</th>
+        <td>${NumberFormat.getNumberInstance(Locale.US).format(freeMemory)} bytes</td>
+    </tr>
+
+    <tr>
+        <th>Memory Used</th>
+        <td>${NumberFormat.getNumberInstance(Locale.US).format(totalMemory - freeMemory)} bytes</td>
+    </tr>
+
+    <tr>
+        <th>Max Memory</th>
+        <td>${NumberFormat.getNumberInstance(Locale.US).format(maxMemory)} bytes</td>
+    </tr>
+
+    <tr>
+        <th>Requests</th>
+        <td>${NumberFormat.getNumberInstance(Locale.US).format(requestCount)}</td>
+    </tr>
+
+    <tr>
+        <th colspan="2">Actions</th>
+    </tr>""" +
+                    _cfg.actions().collect { action ->
+                        """
+    <tr>
+        <td colspan="2">$action</td>
+    </tr>
+"""
+                    }.join('\n') +
+                    """</tbody>
+</table>
+
+</body>
+</html>
+"""
+//
+//            template("text/html", "/status/status.html", [
+//                    appName  : _cfg.name(),
+//                    totalMemory : totalMemory//,
+//                    //applicationVersion: appInfo.applicationVersion,
+//                    //buildBy           : appInfo.buildBy,
+//                    //buildDate         : appInfo.buildDate
+//            ])
+            write "text/html", page
+            requestContext
+        }
+        filter
+    }
     /**
      * This method will start the server on 'port'.
      *
@@ -134,6 +217,10 @@ class GServInstance {
         def initFilter = createInitFilter()
         _filters = _filters ?: []
         _filters.add(initFilter);
+
+        if (_cfg.statusPage()) {
+            _filters.add(createStatusFilter())
+        }
 
         _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
         context.authenticator = _authenticator;
@@ -264,8 +351,14 @@ class gServHttpsInstance extends GServInstance {
         ////////////////////////////////
         def initFilter = createInitFilter()
 
+
+
         _filters = _filters ?: []
         _filters.add(initFilter);
+        //TODO ADD Status Filter
+        /// If  (_cfg .statusPage)  then create/add StatusFilter
+        // _filters.add ( createStatusFilter( cfg, statusPath) )
+
 
         _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
         context.authenticator = _authenticator;

@@ -120,7 +120,10 @@ class GServFactory {
      */
     List<GServConfig> createConfigs(String staticRoot, String bindAddress,
                                     int port, String defaultResource, String instanceScript,
-                                    List<String> resourceScripts, List<String> classpath,
+                                    List<String> resourceScripts,
+                                    boolean statusPage,
+                                    String statusPath,
+                                    List<String> classpath,
                                     displayName = "gServ Application") {
         GServConfig cfg
         def resources = []
@@ -128,9 +131,11 @@ class GServFactory {
         ScriptLoader scriptLoader = new ScriptLoader()
 
         try {
+            /// if there is an instance script then use it to create the config
             if (instanceScript) {
                 cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
             }
+            // if we didn't get one from the instance then create one
             cfg = cfg ?: createGServConfig()
             if (resourceScripts) {
                 resources = scriptLoader.loadResources(resourceScripts, classpath)
@@ -141,7 +146,7 @@ class GServFactory {
             throw ex
         }
 
-        createConfigs(staticRoot, bindAddress, port, defaultResource, cfg, resources, classpath, displayName)
+        createConfigs(staticRoot, bindAddress, port, defaultResource, cfg, resources, statusPage, statusPath, classpath, displayName)
 
     }//createConfigs
     /**
@@ -154,7 +159,12 @@ class GServFactory {
      * @param resources List<GServResource>
      * @return list of configs (containing one config)
      */
-    def createConfigs(String staticRoot, String bindAddress, int port, String defaultResource, GServConfig cfg, List<GServResource> resources, List<String> classpath, displayName = "gServ Application") {
+    def createConfigs(String staticRoot, String bindAddress,
+                      int port, String defaultResource,
+                      GServConfig cfg, List<GServResource> resources,
+                      boolean statusPage,
+                      String statusPath,
+                      List<String> classpath, displayName = "gServ Application") {
         cfg = cfg ?: createGServConfig()
         if (resources) {
             cfg.addResources(resources)
@@ -177,6 +187,9 @@ class GServFactory {
             cfg.name(displayName)
         }
 
+        cfg.statusPath(statusPath)
+        cfg.statusPage(statusPage)
+
         [cfg
                  .port(port)
         ];
@@ -191,6 +204,11 @@ class GServFactory {
     RequestContext createRequestContext(String method, URI uri, Map headers) {
         def context = new AbstractRequestContext(null) {
             boolean closed = false
+
+            @Override
+            void setResponseHeaders(Map<String, List> responseHeaders) {
+
+            }
 
             @Override
             void sendResponseHeaders(int responseCode, long size) {

@@ -71,6 +71,8 @@ class GServConfig {
     def linkBuilder
     Matcher matcher = new Matcher()
     def serverIPs = []
+    def _statusPage = true
+    String _statusPath = "/status"
     InputStreamTypeConverter inputStreamTypeConverter = new InputStreamTypeConverter()
 
     GServConfig() {
@@ -320,4 +322,23 @@ class GServConfig {
         this.inputStreamTypeConverter = inputStreamTypeConverter
         this
     }
+
+    boolean statusPage() {
+        _statusPage
+    }
+
+    GServConfig statusPage(boolean b) {
+        _statusPage = b
+        this
+    }
+
+    String statusPath() {
+        _statusPath
+    }
+
+    GServConfig statusPath(String s) {
+        _statusPath = s
+        this
+    }
+
 }

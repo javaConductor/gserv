@@ -35,7 +35,7 @@
     </appender>
 
     <logger name="io.github.javaconductor.gserv">
-        <level value="trace"/>
+        <level value="error"/>
     </logger>
 
     <root>

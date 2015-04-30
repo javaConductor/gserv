@@ -47,6 +47,8 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
     }
     def filters = { -> value("filterList") }
     def staticRoots = { value("staticRoots") }
+    def statusPage = { value("statusPage") }
+    def statusPath = { value("statusPath") }
 
     def linkBuilder = { value("linkBuilder") }
     def converter = { value("inputStreamTypeConverter") }
@@ -58,6 +60,8 @@ class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn
         value("actionList", [])
         value("filterList", [])
         value("staticRoots", [])
+        value("statusPage", true)
+        value("statusPath", '/status')
         value("defaultResource", "")
 
         value("useResourceDocs", [])
