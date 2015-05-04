@@ -24,8 +24,8 @@
 
 package io.github.javaconductor.gserv.templating
 
+import groovy.text.GStringTemplateEngine
 import io.github.javaconductor.gserv.exceptions.TemplateException
-import groovy.text.SimpleTemplateEngine
 
 /**
  *
@@ -35,8 +35,9 @@ import groovy.text.SimpleTemplateEngine
 class TemplateManager {
     def getTemplateEngine(name) {
         if (name == "default") {
-            return new SimpleTemplateEngine();
+            return new GStringTemplateEngine();
         }
+
         throw new TemplateException(null, null, "Template engine [$name] is not supported.")
     }
 }

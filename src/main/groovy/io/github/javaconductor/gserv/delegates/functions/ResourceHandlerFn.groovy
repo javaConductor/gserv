@@ -79,7 +79,7 @@ trait ResourceHandlerFn {
      * @param templatePath
      * @param data
      */
-    void template(templatePath, data) {
+    void template(String templatePath, data) {
         template(null, templatePath, data);
     }
 
@@ -92,13 +92,13 @@ trait ResourceHandlerFn {
      * @param templatePath
      * @param data
      */
-    void template(contentType, templatePath, data) {
+    void template(String contentType, String templatePath, data) {
         InputStream is = getFile(templatePath)
+        if (!is)
+            throw new TemplateException(templatePath, data, "Template $templatePath not found.  Check static_root definitions.")
         if (!contentType)
             contentType = URLConnection.guessContentTypeFromStream(istream)
 
-        if (!is)
-            throw new TemplateException(templatePath, data, "Template $templatePath not found.  Check static_root definitions.")
         def templateText = new DataInputStream(is).readLines().join("\n")
 
         def tmgr = value("tmgr")
@@ -131,7 +131,7 @@ trait ResourceHandlerFn {
      *
      */
     void write(String data) {
-        write(data.getBytes())
+        write(data.bytes)
     }
 
     /**
@@ -168,7 +168,7 @@ trait ResourceHandlerFn {
      * @param data
      */
     void write(String contentTyp, String data) {
-        write(contentTyp, data.getBytes())
+        write(contentTyp, data.bytes)
     }
 
     /**
@@ -227,28 +227,27 @@ trait ResourceHandlerFn {
      * @param headerValues List of strings
      */
     void responseHeaders(String headerName, List headerValues) {
-        log.trace("#${requestContext.id()} Header[$headerName] = $headerValues")
+        //log.trace("#${requestContext.id()} Header[$headerName] = $headerValues")
         this.requestContext.setResponseHeaders([(headerName): headerValues]);
     }
 
     /**
      *
      * @param mimeTypes
-     * @return true if the list of intersects the list of values for the Accept header
+     * @return true if mimeTypes intersects the list of values for the Accept request header
      */
     boolean accepts(String... mimeTypes) {
-        boolean ret = (mimeTypes as List).any { mimeType ->
+        (mimeTypes as List).any { mimeType ->
             requestHeaders("Accept").any { mtype ->
                 log.debug("accepts: Comparing ${mtype.toUpperCase()} to ${mimeType.toUpperCase()}")
                 println("accepts: Comparing ${mtype.toUpperCase()} to ${mimeType.toUpperCase()}")
                 mtype.toUpperCase() == mimeType.toUpperCase()
             }
         }
-        return ret;
     }
 
     /**
-     *
+     * Set the
      * @param uri
      */
     void location(String uri) {
@@ -269,6 +268,7 @@ trait ResourceHandlerFn {
     void writeJSON(Map dataMap) {
         writeJson(dataMap)
     }
+
     /**
      *  Formats a List of data into a JSON string and writes the string to the
      *  outputStream. Sets contentType to application/json

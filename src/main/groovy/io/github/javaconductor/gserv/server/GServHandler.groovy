@@ -76,7 +76,15 @@ class GServHandler implements HttpHandler {
         def r = new Long(requestId.addAndGet(1L))
         context.setAttribute(GServ.contextAttributes.requestId, r)
         log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$r")
-        def currentReqId
+        def currentReqId = r
+
+        EventManager.instance().publish(Events.RequestRecieved, [
+                when     : new Date(),
+                requestId: currentReqId,
+                method   : context.requestMethod,
+                uri      : context.requestURI,
+                headers  : context.requestHeaders])
+
         try {
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: Finding filters... ")
             context.setAttribute(GServ.contextAttributes.serverConfig, _cfg)
