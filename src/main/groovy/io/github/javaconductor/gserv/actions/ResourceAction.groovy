@@ -81,6 +81,7 @@ class ResourceAction {
 
     Map<String, Closure> _linksFunctions = [:]
 
+    @Deprecated
     def linksFunctions(String name = "default") {
         _linksFunctions[name]
     }
@@ -97,4 +98,13 @@ class ResourceAction {
         addLinksFunction("default", c)
     }
 
+    @Override
+    int hashCode() {
+        return ( method() + pathElements().join('/')).hashCode()
+    }
+
+    @Override
+    boolean equals(Object obj) {
+        hashCode() == obj.hashCode()
+    }
 }

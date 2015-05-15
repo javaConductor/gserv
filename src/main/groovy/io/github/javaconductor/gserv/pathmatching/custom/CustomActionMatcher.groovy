@@ -1,6 +1,7 @@
 package io.github.javaconductor.gserv.pathmatching.custom
 
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.exceptions.HttpErrorException
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 /**

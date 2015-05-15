@@ -155,7 +155,7 @@ class AsyncDispatcher extends DynamicDispatchActor {
 //                                                        actionPath: context.requestURI.path, method: context.getRequestMethod()])
 
         ////TODO Externalize this message!!!!!!!
-        def msg = "No such thang: ${context.requestURI}";
+        def msg = "No such resource: ${context.requestURI}";
         context.sendResponseHeaders(404, msg.getBytes().size())
         context.responseBody.write(msg.getBytes())
         context.responseBody.close()

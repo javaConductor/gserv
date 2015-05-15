@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpExchange
 import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.events.Events
 
 /**
  * Created by lcollins on 12/26/2014.
@@ -34,7 +36,6 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _closed
     }
 
-
     void sendResponseHeaders(int responseCode, long size) {
         if (!_closed) {
             _exchange.responseHeaders.putAll(responseHeaders)
@@ -56,13 +57,14 @@ class Jdk16RequestContext extends AbstractRequestContext {
         if (!_closed) {
             _exchange.close()
             _exchange.setAttribute(GServ.contextAttributes.requestContext, null)
+
+            EventManager.instance().publish(Events.ResourceProcessed, [
+                    requestId: id(),
+                    requestContext: this,
+                    when     : new Date()])
         }
         _closed = true
     }
-
-//    GServConfig config(){
-//        _config
-//    }
 
     String dump() {
         ""

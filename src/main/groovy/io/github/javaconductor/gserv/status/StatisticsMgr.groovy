@@ -1,6 +1,8 @@
 package io.github.javaconductor.gserv.status
 
 import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -17,6 +19,7 @@ import java.util.concurrent.atomic.AtomicLong
 @Log4j
 class StatisticsMgr {
 
+    GServConfig cfg
 
     def StatisticsMgr() {
         listenUp()
@@ -26,6 +29,7 @@ class StatisticsMgr {
      * @return The Status Filter
      */
     Filter createStatusFilter(GServConfig cfg) {
+        this.cfg = cfg
         def filter = ResourceActionFactory.createBeforeFilter("gServStatus", "GET", cfg.statusPath() ?: '/status', [:], 0) { RequestContext requestContext, args ->
             def requestId = requestContext.id()
 
@@ -35,21 +39,26 @@ class StatisticsMgr {
             def maxMemory = Runtime.runtime.maxMemory()
             //def reqCount = this.requestCount.get()
 
+            def createActionStats = { action ->
+                def actionStats = getActionStats(action)
+                def start = "<tr><td colspan='2'><ul>"
+                def end = "</ul></td></tr>"
+                start + actionStats.keySet().collect { k ->
+                    "<li>$k - ${actionStats[k]}</li>".toString()
+                }.join(' ') + end
+            }
+
             def actionRows = """
             <tr>
                 <th colspan="2" style="text-align: center;" >Actions</th>
             </tr>""" +
                     cfg.actions().collect { action ->
-                        """
-                <tr>
-                    <td colspan="2" >$action</td>
-                </tr>
-                """
+                        """<tr><td colspan="2" >$action</td></tr>""" + createActionStats(action)
                     }.join('\n');
 
             def statsRows = """<tr>
             <th colspan='2' style="text-align: center;"  > Statistics </th>
-    </tr>
+            </tr>
 
                     """ +
                     getStats().keySet().collect { k ->
@@ -61,6 +70,7 @@ class StatisticsMgr {
                 """
 
                     }.join('\n')
+
 
             String page = """
 <!DOCTYPE html>
@@ -128,10 +138,21 @@ class StatisticsMgr {
             new AvgMinMaxReqTime()
     ]
 
+    def actionStatRecorders = [
+            new ActionSuccessFailure()
+         //   new ActionAvgMinMaxReqTime()
+    ]
+
     def handleEvent(topic, data) {
         log.debug("Statistics: $topic => $data")
         statRecorders.each { statRec ->
             statRec.recordEvent(topic, data)
+        }
+
+        actionStatRecorders.each {ActionStatRecorder actionStatRec ->
+            ResourceAction action = cfg.matchAction(data.requestContext)
+            if(action)
+                actionStatRec.recordEvent(action, topic, data)
         }
 
     }
@@ -140,6 +161,14 @@ class StatisticsMgr {
         def theStats = [:]
         statRecorders.each { statRec ->
             theStats += statRec.reportStat()
+        }
+        theStats
+    }
+
+    def getActionStats(ResourceAction action) {
+        def theStats = [:]
+        actionStatRecorders.each { actionStatRec ->
+            theStats += actionStatRec.reportStat(action)
         }
         theStats
     }

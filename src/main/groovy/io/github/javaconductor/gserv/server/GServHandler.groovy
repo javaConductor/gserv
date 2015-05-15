@@ -9,6 +9,7 @@ import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.exceptions.HttpErrorException
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.pathmatching.FilterMatcher
@@ -81,6 +82,7 @@ class GServHandler implements HttpHandler {
         EventManager.instance().publish(Events.RequestRecieved, [
                 when     : new Date(),
                 requestId: currentReqId,
+                requestContext: context,
                 method   : context.requestMethod,
                 uri      : context.requestURI,
                 headers  : context.requestHeaders])
@@ -106,11 +108,6 @@ class GServHandler implements HttpHandler {
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
             //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
             currentReqId = context.id()
-            EventManager.instance().publish(Events.RequestRecieved, [
-                    requestId: currentReqId,
-                    method   : context.requestMethod,
-                    uri      : context.requestURI,
-                    headers  : context.requestHeaders])
             def start = cal.getTimeInMillis();
             _handle(context)
             EventManager.instance().publish(Events.RequestDispatched, [
@@ -118,6 +115,20 @@ class GServHandler implements HttpHandler {
                     method   : context.requestMethod,
                     uri      : context.requestURI,
                     headers  : context.requestHeaders])
+        } catch (HttpErrorException e) {
+            def msg = e.message
+            log.error(msg, e)
+            EventManager.instance().publish(Events.RequestProcessingError, [
+                    requestId: currentReqId,
+                    error    : e.message,
+                    statusCode : e.httpStatusCode,
+                    method   : context.requestMethod,
+                    uri      : context.requestURI,
+                    headers  : context.requestHeaders])
+            context.sendResponseHeaders(e.httpStatusCode, msg.bytes.size())
+            context.responseBody.write(msg.bytes)
+            context.responseBody.close()
+            context.close()
         } catch (Throwable e) {
             def msg = "Error req #${currentReqId} ${e.message ?: e.class.name} "
             log.error(msg, e)

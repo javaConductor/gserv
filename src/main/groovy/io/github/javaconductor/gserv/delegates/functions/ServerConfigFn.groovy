@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv.delegates.functions
 
 import io.github.javaconductor.gserv.GServ
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.resources.ResourceObject
@@ -209,7 +210,7 @@ trait ServerConfigFn {
                     (requestContext).responseHeaders.put("WWW-Authenticate", ["Basic realm=$realm".toString()])
                     error(401, "Authentication Required")
                 } else {
-                    def bAuthenticated = _authenticated(userPswd[0], userPswd[1], requestContext, challengeFn)
+                    def bAuthenticated = this._authenticated(userPswd[0], userPswd[1], requestContext, challengeFn)
                     log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!")
                     if (!bAuthenticated) {
                         error(403, "Bad credentials for path ${requestContext.requestURI.path}.")
@@ -231,7 +232,7 @@ trait ServerConfigFn {
         return authString.split(':')
     }
 
-    private boolean _authenticated(user, pswd, requestContext, challengeFn) {
+     boolean _authenticated(String user, String pswd, RequestContext requestContext, Closure challengeFn) {
         return (challengeFn(user, pswd, requestContext));
     }
 

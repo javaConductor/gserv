@@ -139,9 +139,9 @@ class ActionRunner {
                 context
             }
             finally {
-                EventManager.instance().publish(Events.ResourceProcessed, [
-                        requestId: currentReqId,
-                        uri      : context.requestURI.path, msg: 'Resource processing done.'])
+//                EventManager.instance().publish(Events.ResourceProcessed, [
+//                        requestId: currentReqId,
+//                        uri      : context.requestURI.path, msg: 'Resource processing done.'])
             }
         })(cl, args);
 

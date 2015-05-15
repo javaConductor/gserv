@@ -28,6 +28,7 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven'
 
+defaultTasks 'test', 'integrationTest'
 mainClassName = 'io.github.javaconductor.gserv.Main'
 group = "io.github.javaconductor"
 version = "0.9.9"
@@ -67,7 +68,7 @@ dependencies {
     compile 'log4j:log4j:1.2.17'
 
     /// groovy stuff
-    compile 'org.codehaus.groovy:groovy-all:2.4.0'
+    compile 'org.codehaus.groovy:groovy-all:2.4.1'
     compile('org.codehaus.gpars:gpars:1.1.0')
 
     /// apache commons
@@ -83,7 +84,7 @@ dependencies {
     /// Test deps
     testCompile 'com.github.rest-driver:rest-server-driver:1.1.42'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.spockframework:spock-core:1.0-groovy-2.3'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 
     testCompile 'cglib:cglib-nodep:3.1'
     testCompile 'org.objenesis:objenesis:1.2'

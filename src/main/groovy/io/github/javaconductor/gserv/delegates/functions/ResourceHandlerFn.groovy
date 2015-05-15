@@ -53,10 +53,9 @@ trait ResourceHandlerFn {
 
     List links(Object... stuff) {
         // call the linkFn defined inside the Action
-
         def fn = ((ResourceAction) $this).linksFunction()
         def ret = fn ? fn.call(*stuff)
-                : [links: []]
+                : []
         LinkBuilder.expandLinksIfNeeded(requestContext, ret)
     }
 
@@ -306,9 +305,22 @@ trait ResourceHandlerFn {
      * @param url
      */
     void redirect(url) {
+        redirect(url, 302)
+    }
+
+    /**
+     * Sends a HTTP Redirect w/ updated 'Location' header
+     *
+     * @param url
+     * @param statusCode
+     */
+    void redirect(url, statusCode) {
+        if (! [302,303,307].contains(statusCode)){
+            throw IllegalArgumentException("Status code for HTTP redirect must be 302, 303, or 307.")
+        }
         def message = "Resource has moved to: $url"
         requestContext.getHeaders().add("Location", url)
-        requestContext.sendResponseHeaders(302, message.bytes.size() as long)
+        requestContext.sendResponseHeaders(statusCode, message.bytes.size() as long)
         requestContext.getResponseBody().write(message)
         requestContext.getResponseBody().close()
         requestContext.close()
