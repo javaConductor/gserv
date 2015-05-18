@@ -226,7 +226,7 @@ trait ResourceHandlerFn {
      * @param headerValues List of strings
      */
     void responseHeaders(String headerName, List headerValues) {
-        //log.trace("#${requestContext.id()} Header[$headerName] = $headerValues")
+        //log.trace("#${requestContext.id()} Set Header[$headerName] = $headerValues")
         this.requestContext.setResponseHeaders([(headerName): headerValues]);
     }
 
@@ -253,6 +253,16 @@ trait ResourceHandlerFn {
         responseHeaders("Location", [uri]);
     }
 
+    Map asMap(Object thing) {
+        thing.class.declaredFields { !it.synthetic }.collectEntries {
+            [(it.name): thing."$it.name"]
+        }
+    }
+
+    void writeJson(Object bean) {
+        writeJson(asMap(bean))
+    }
+
     /**
      *  Formats a Map of data into a JSON string and writes the string to the
      *  outputStream. Sets contentType to application/json
@@ -264,6 +274,7 @@ trait ResourceHandlerFn {
         write("application/json", json.getBytes())
     }
 
+    @Deprecated
     void writeJSON(Map dataMap) {
         writeJson(dataMap)
     }
@@ -279,6 +290,7 @@ trait ResourceHandlerFn {
         write("application/json", json.getBytes())
     }
 
+    @Deprecated
     void writeJSON(List dataList) {
         writeJson(dataList)
     }
@@ -339,7 +351,6 @@ trait ResourceHandlerFn {
     }
 
     def to = (value("to")) //serverConfig.inputStreamTypeConverter.converters
-
 
 }
 
