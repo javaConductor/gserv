@@ -54,7 +54,9 @@ class LinkBuilder {
      * @return New LinkBuilder
      */
     LinkBuilder plus(LinkBuilder lb) {
-        lb ? new LinkBuilder(prefix: prefix, actions: actions + lb.actions, _linksFunctions: _linksFunctions)
+        lb ? new LinkBuilder(prefix: prefix,
+                actions: actions + lb.actions,
+                _linksFunctions: _linksFunctions + lb._linksFunctions)
                 : this
     }
 
@@ -143,7 +145,7 @@ class LinkBuilder {
 
     static List expandLinksIfNeeded(RequestContext rc, List links) {
         def protocol = rc.protocol
-        def host = rc.localAddress.hostName
+        def host = rc.localAddress.hostName == '0:0:0:0:0:0:0:1' ? 'localhost' : rc.localAddress.hostName
         def port = rc.localAddress.port
 
         links.collect { link ->

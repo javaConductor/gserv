@@ -1,6 +1,7 @@
 package io.github.javaconductor.gserv.resources
 
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.delegates.DelegatesMgr
 import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.delegates.ResourceDelegate
 import io.github.javaconductor.gserv.utils.LinkBuilder
@@ -85,10 +86,11 @@ class GServResource {
         target.resourceDefinitions.each { definitionClosure ->
 
             def dgt = new ResourceDelegate(basePath);
+
             definitionClosure.delegate = dgt
             definitionClosure.resolveStrategy = Closure.DELEGATE_FIRST
             definitionClosure()
-            target.actions = addActions(target.actions, definitionClosure.delegate.patterns())
+            target.actions = addActions(target.actions, definitionClosure.delegate.actions())
             target.linkBuilder += definitionClosure.delegate.linkBuilder()
         }
 
@@ -100,6 +102,10 @@ class GServResource {
         }
 
         target
+    }
+
+    static def prepareDelegate(delegate) {
+        new DelegatesMgr()
     }
 
 }

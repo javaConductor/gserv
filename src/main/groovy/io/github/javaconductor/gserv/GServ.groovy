@@ -141,6 +141,9 @@ class GServ {
      * @return GServInstance
      */
     def http(Map options, Closure instanceDefinition, https = false) {
+        if (!options.https && https) {
+            throw new IllegalStateException("No HTTPS configuration found.")
+        }
         def tmpActions = []
         def tmpFilters = []
         def tmpStaticRoots = []
@@ -163,7 +166,13 @@ class GServ {
         }
 
         /// get the delegate
-        instanceDefinition.delegate = cfg.delegateMgr.createHttpDelegate();
+        if (https) {
+            instanceDefinition.delegate = cfg.delegateMgr.createHttpsDelegate();
+
+        } else {
+            instanceDefinition.delegate = cfg.delegateMgr.createHttpDelegate();
+        }
+
         instanceDefinition.resolveStrategy = Closure.DELEGATE_FIRST
         // run the config closure
         instanceDefinition()

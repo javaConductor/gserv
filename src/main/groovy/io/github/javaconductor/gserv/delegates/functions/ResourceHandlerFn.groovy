@@ -28,6 +28,7 @@ import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.exceptions.TemplateException
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
@@ -254,8 +255,8 @@ trait ResourceHandlerFn {
     }
 
     Map asMap(Object thing) {
-        thing.class.declaredFields { !it.synthetic }.collectEntries {
-            [(it.name): thing."$it.name"]
+        (thing.class.declaredFields as List).findAll { !it.synthetic }.collectEntries {
+            thing."$it.name" ? [(it.name): thing."$it.name"] : [:]
         }
     }
 
@@ -330,10 +331,11 @@ trait ResourceHandlerFn {
         if (! [302,303,307].contains(statusCode)){
             throw IllegalArgumentException("Status code for HTTP redirect must be 302, 303, or 307.")
         }
-        def message = "Resource has moved to: $url"
-        requestContext.getHeaders().add("Location", url)
+        def message = "Resource has moved to: $url".toString()
+        //RequestContext requestContext
+        requestContext.setResponseHeader("Location", url)
         requestContext.sendResponseHeaders(statusCode, message.bytes.size() as long)
-        requestContext.getResponseBody().write(message)
+        requestContext.getResponseBody().write(message.bytes)
         requestContext.getResponseBody().close()
         requestContext.close()
     }

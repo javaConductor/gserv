@@ -35,10 +35,11 @@ class DefaultDelegates {
      * @return Map ( delegateType: delegateMetaClass )
      */
     static def getDelegates() {
-        ["httpMethod": HttpMethodDelegate.metaClass,
-         "filter"    : FilterDelegate.metaClass,
-         "http"      : ServerInstanceDelegate.metaClass,
-         "resource"  : ResourceDelegate.metaClass
+        [(DelegateTypes.HttpMethod): HttpMethodDelegate.metaClass,
+         (DelegateTypes.Filter)    : FilterDelegate.metaClass,
+         (DelegateTypes.Http)      : ServerInstanceDelegate.metaClass,
+         (DelegateTypes.Https)     : ServerInstanceDelegate.metaClass,
+         (DelegateTypes.Resource)  : ResourceDelegate.metaClass
         ]
     }
 }

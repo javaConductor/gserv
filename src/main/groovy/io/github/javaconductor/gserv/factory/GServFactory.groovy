@@ -58,8 +58,11 @@ class GServFactory {
         orig.clone()
     }
 
-    GServInstance createHttpInstance(cfg) {
+    GServInstance createHttpInstance(GServConfig cfg) {
         log.debug("$cfg is ${(cfg.https()) ? 'HTTPS' : 'HTTP'}")
+        if (!cfg.httpsConfig() && cfg.https()) {
+            throw new IllegalStateException("HTTPS configuration is required in ServerConfig!")
+        }
         cfg.https() ? new gServHttpsInstance(cfg)
                 : new GServInstance(cfg)
     }
@@ -81,7 +84,7 @@ class GServFactory {
      *
      * @param cfgFile
      * @return GServConfig instances that were created from the parsing.
-     \   */
+     */
     List<GServConfig> createConfigs(File cfgFile) {
         assert cfgFile
         try {
@@ -97,7 +100,7 @@ class GServFactory {
      *
      * @param cfgScriptFile
      * @return GServConfig .
-     \    */
+     */
     GServConfig createConfig(File cfgScriptFile) {
         assert cfgScriptFile
         try {
@@ -137,6 +140,7 @@ class GServFactory {
             }
             // if we didn't get one from the instance then create one
             cfg = cfg ?: createGServConfig()
+            // if there are resoucrs scripts - load them
             if (resourceScripts) {
                 resources = scriptLoader.loadResources(resourceScripts, classpath)
             }
@@ -146,9 +150,11 @@ class GServFactory {
             throw ex
         }
 
-        createConfigs(staticRoot, bindAddress, port, defaultResource, cfg, resources, statusPage, statusPath, classpath, displayName)
+        createConfigs(staticRoot, bindAddress, port, defaultResource,
+                cfg, resources, statusPage, statusPath, classpath, displayName)
 
     }//createConfigs
+
     /**
      * Creates a gserv Config
      *
