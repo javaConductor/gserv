@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014 Lee Collins
+ * Copyright (c) 2014-2015 Lee Collins
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,11 @@
 
 package io.github.javaconductor.gserv.cli
 
-import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
+import groovy.util.logging.Log4j
 import io.github.javaconductor.gserv.exceptions.ConfigException
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
-import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resourceloader.ResourceScriptException
-import groovy.util.logging.Log4j
 import org.apache.commons.cli.Option
 
 /**
@@ -39,8 +37,6 @@ import org.apache.commons.cli.Option
 @Log4j
 class GServRunner {
     def factory = new GServFactory();
-    //def scriptLoader = new ScriptLoader();
-    //def resourceLoader = new ResourceLoader();
     def version = getGServVersion()
     CliBuilder cli = new CliBuilder(
             usage: 'gserv [options]',
@@ -132,15 +128,12 @@ class GServRunner {
             }
         } catch (ResourceScriptException ex) {
             log.trace("Could not start app.", ex)
-            //System.exit(GServ.returnCodes.ResourceCompilationError)
             throw ex;
         } catch (InstanceScriptException ex) {
             log.trace("Could not start app.", ex)
-            //System.exit(GServ.returnCodes.InstanceCompilationError)
             throw ex;
         } catch (Throwable ex) {
             log.trace("Could not start app.", ex)
-            //System.exit(GServ.returnCodes.GeneralError)
             throw ex;
         }
 

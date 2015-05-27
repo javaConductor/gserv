@@ -41,6 +41,7 @@ import groovy.transform.AutoCloneStyle
 class HttpsConfig {
     def keyManagerAlgorithm = 'SunX509'
     def trustManagerAlgorithm = 'SunX509'
+    ///TODO change to current user name
     def keyStoreFilePath = "/Users/lcollins/gserv.keystore"
     def keyStoreImplementation = "JKS"
     def password

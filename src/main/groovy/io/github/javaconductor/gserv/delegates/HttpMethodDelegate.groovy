@@ -49,7 +49,6 @@ class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn 
         value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
         value('to', serverConfig.inputStreamTypeConverter.converters);
         value("templateEngineName", serverConfig.templateEngineName());
-        //value("to", new InputStreamTypeConverter().converters);
         // $this inside the closure will be the currently processing action
         to = value('to')
         $this = action

@@ -28,7 +28,6 @@ import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.exceptions.TemplateException
-import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 
@@ -313,6 +312,16 @@ trait ResourceHandlerFn {
         }
     }
 
+    void done(int code) {
+        if (-1 != code)
+            requestContext.responseCode = code
+        requestContext.close()
+    }
+
+    void done() {
+        done(-1)
+    }
+
     /**
      * Sends a HTTP Redirect (302) w/ updated 'Location' header
      * @param url
@@ -325,7 +334,7 @@ trait ResourceHandlerFn {
      * Sends a HTTP Redirect w/ updated 'Location' header
      *
      * @param url
-     * @param statusCode
+     * @param statusCode One of: 302,303,307
      */
     void redirect(url, statusCode) {
         if (! [302,303,307].contains(statusCode)){

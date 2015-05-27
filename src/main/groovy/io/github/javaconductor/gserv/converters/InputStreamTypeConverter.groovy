@@ -33,7 +33,6 @@ import org.apache.commons.io.IOUtils
  * User: lcollins
  * Date: 1/5/14
  * Time: 4:10 AM
- * To change this template use File | Settings | File Templates.
  */
 class InputStreamTypeConverter {
     def converters

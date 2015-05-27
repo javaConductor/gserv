@@ -50,7 +50,6 @@ class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, Fil
     def FilterDelegate(Filter filter, RequestContext requestContext,
                        GServConfig serverConfig, String templateEngineName) {
         assert requestContext
-//        value("chain", chain);
         value("linkBuilder", serverConfig.linkBuilder());
         value("staticRoots", serverConfig.staticRoots());
         value("templateEngineName", serverConfig.templateEngineName());

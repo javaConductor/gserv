@@ -7,7 +7,6 @@ import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
  */
 class ActionPathQuery {
 
-    // we need to string - in order
     // which are the keys to the queryValues that are mapped
 
     private String _queryString = ""

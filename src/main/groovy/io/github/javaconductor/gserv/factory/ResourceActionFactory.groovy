@@ -55,7 +55,6 @@ class ResourceActionFactory {
         def u2 = new java.net.URI(uri)
         def paths = u2.path.split("/")
         paths = paths.findAll { p -> p }
-        //println "paths -> "+paths.toString()
         def pathPatterns = paths.collect { t ->
             new ActionPathElement(t, PathMatchingUtils.isMatchingPattern(t))
         }
