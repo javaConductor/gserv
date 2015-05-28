@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.delegates
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.functions.FilterFn
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
@@ -42,7 +42,7 @@ import io.github.javaconductor.gserv.templating.TemplateManager
  * Time: 2:19 AM
 
  */
-@Log4j
+@Slf4j
 class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
     def $this
     def requestContext

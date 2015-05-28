@@ -26,7 +26,6 @@ package io.github.javaconductor.gserv.status
 
 import io.github.javaconductor.gserv.events.Events
 
-import javax.xml.datatype.Duration
 import java.util.concurrent.atomic.AtomicLong
 
 /**

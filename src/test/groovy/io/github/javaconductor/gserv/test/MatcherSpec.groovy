@@ -24,11 +24,10 @@
 
 package io.github.javaconductor.gserv.test
 
-import io.github.javaconductor.gserv.factory.GServFactory
-import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.factory.ResourceActionFactory
-import io.github.javaconductor.gserv.test.tester.TestRequestContext
+import io.github.javaconductor.gserv.pathmatching.Matcher
 import spock.lang.Specification
 
 public class MatcherSpec extends Specification {

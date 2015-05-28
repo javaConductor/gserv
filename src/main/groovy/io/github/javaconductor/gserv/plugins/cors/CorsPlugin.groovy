@@ -24,10 +24,10 @@
 
 package io.github.javaconductor.gserv.plugins.cors
 
-import io.github.javaconductor.gserv.plugins.AbstractPlugin
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
+import io.github.javaconductor.gserv.plugins.AbstractPlugin
 
 class CORSMode {
     static final String SameHost = "SameHost"
@@ -41,7 +41,7 @@ class CORSMode {
  * Created by javaConductor on 1/13/14.
  *
  */
-@Log4j
+@Slf4j
 class CorsPlugin extends AbstractPlugin {
 
     def allowAllHandler = { CORSConfig corsConfig, requestContext, args ->

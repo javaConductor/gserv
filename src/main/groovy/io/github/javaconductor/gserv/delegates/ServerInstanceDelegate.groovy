@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.delegates
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.delegates.functions.ServerConfigFn
@@ -36,7 +36,7 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
  * Delegate for Server Configuration Closure
  *
  */
-@Log4j
+@Slf4j
 @Mixin([StaticFileHandler])
 class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
 

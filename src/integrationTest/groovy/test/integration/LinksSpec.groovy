@@ -7,9 +7,7 @@ import org.junit.Test
 
 import java.util.concurrent.TimeUnit
 
-import static com.github.restdriver.serverdriver.Matchers.hasHeader
-import static com.github.restdriver.serverdriver.Matchers.hasJsonPath
-import static com.github.restdriver.serverdriver.Matchers.hasStatusCode
+import static com.github.restdriver.serverdriver.Matchers.*
 import static com.github.restdriver.serverdriver.RestServerDriver.*
 import static org.hamcrest.MatcherAssert.assertThat
 

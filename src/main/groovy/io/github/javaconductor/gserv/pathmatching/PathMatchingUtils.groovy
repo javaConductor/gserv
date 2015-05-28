@@ -32,9 +32,7 @@ import io.github.javaconductor.gserv.pathmatching.types.NumberType
 import io.github.javaconductor.gserv.pathmatching.types.PathElementType
 import io.github.javaconductor.gserv.pathmatching.types.RegExType
 
-import java.util.regex.Pattern
-
-import static io.github.javaconductor.gserv.utils.TextUtils.*
+import static io.github.javaconductor.gserv.utils.TextUtils.stripBackTicks
 
 /**
  * Misc PathMatchingUtils for Pattern matching

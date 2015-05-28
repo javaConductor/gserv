@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.cli
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.exceptions.ConfigException
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
@@ -34,7 +34,7 @@ import org.apache.commons.cli.Option
 /**
  * Runs instances of gserv  as specified by the command-line args.
  */
-@Log4j
+@Slf4j
 class GServRunner {
     def factory = new GServFactory();
     def version = getGServVersion()

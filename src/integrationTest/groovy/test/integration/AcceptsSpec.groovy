@@ -1,7 +1,7 @@
 package test.integration
 
 import com.github.restdriver.serverdriver.http.response.Response
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
 import org.junit.Test
 
@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 /**
  * Created by javaConductor on 4/29/2015.
  */
-@Log4j
+@Slf4j
 class AcceptsSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 

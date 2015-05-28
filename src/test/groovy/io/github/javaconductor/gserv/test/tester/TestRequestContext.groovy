@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.test.tester
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import groovyx.gpars.dataflow.Promise
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.factory.GServFactory
@@ -33,7 +33,7 @@ import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 /**
  * Context Wrapper used for unit testing.
  */
-@Log4j
+@Slf4j
 class TestRequestContext extends AbstractRequestContext {
     OutputStream _responseBody
     def _wasClosed = false

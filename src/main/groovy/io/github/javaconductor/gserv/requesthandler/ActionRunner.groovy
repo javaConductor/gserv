@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.requesthandler
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.actions.ResourceAction
@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * Created by lcollins on 12/16/2014.
  */
-@Log4j
+@Slf4j
 class ActionRunner {
     GServConfig _cfg
     private AtomicLong reqId = new AtomicLong(0L)

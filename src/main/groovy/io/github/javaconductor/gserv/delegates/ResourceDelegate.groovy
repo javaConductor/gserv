@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.delegates
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.delegates.functions.ResourceFn
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.utils.LinkBuilder
@@ -33,7 +33,7 @@ import io.github.javaconductor.gserv.utils.LinkBuilder
  *  This class contains all the functions available inside a Resource definition closure
  */
 //@Mixin([ResourceFunctions])
-@Log4j
+@Slf4j
 class ResourceDelegate extends DelegateFunctions implements ResourceFn {
 //    Map _properties = [:]
 

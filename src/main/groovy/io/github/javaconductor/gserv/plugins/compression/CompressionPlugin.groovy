@@ -24,13 +24,11 @@
 
 package io.github.javaconductor.gserv.plugins.compression
 
-import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.GServ
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.actions.ResourceAction
-import io.github.javaconductor.gserv.cli.GServRunner
-import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
 import io.github.javaconductor.gserv.requesthandler.RequestContext
@@ -43,7 +41,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Compression plugin
  */
-@Log4j
+@Slf4j
 class CompressionPlugin extends AbstractPlugin {
     @Override
     def init(Object options) {

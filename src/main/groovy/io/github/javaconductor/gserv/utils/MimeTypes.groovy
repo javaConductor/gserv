@@ -24,13 +24,13 @@
 
 package io.github.javaconductor.gserv.utils
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 
 /**
  * Map file extensions to MIME types. Based on the Apache mime.types file.
  * http://www.iana.org/assignments/media-types/
  */
-@Log4j
+@Slf4j
 public class MimeTypes {
 
     public static final String MIME_APPLICATION_OCTET_STREAM = "application/octet-stream";

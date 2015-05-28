@@ -24,18 +24,17 @@
 
 package io.github.javaconductor.gserv.configuration
 
-import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.factory.GServFactory
-import io.github.javaconductor.gserv.exceptions.ConfigException
-import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
+import io.github.javaconductor.gserv.exceptions.ConfigException
+import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.plugins.PluginMgr
-import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 
 /**
  * Created by javaConductor on 8/14/2014.
  */
-@Log4j
+@Slf4j
 class GServConfigFile {
     ResourceLoader resourceLoader = new ResourceLoader()
     GServFactory factory = new GServFactory()

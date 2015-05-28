@@ -24,18 +24,18 @@
 
 package io.github.javaconductor.gserv.configuration
 
+import groovy.transform.AutoClone
+import groovy.transform.AutoCloneStyle
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
 import io.github.javaconductor.gserv.delegates.DefaultDelegates
 import io.github.javaconductor.gserv.delegates.DelegatesMgr
-import io.github.javaconductor.gserv.pathmatching.Matcher
-import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.filters.Filter
+import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
-import groovy.transform.AutoClone
-import groovy.transform.AutoCloneStyle
 
 //@AutoClone(style = AutoCloneStyle.COPY_CONSTRUCTOR)
 class HttpsConfig {

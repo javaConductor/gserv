@@ -2,16 +2,15 @@ package test.integration
 
 import com.github.restdriver.serverdriver.http.response.Response
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.cli.GServRunner
 import org.junit.Test
 
-import static com.github.restdriver.serverdriver.Matchers.hasHeader
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import java.util.concurrent.TimeUnit
 
+import static com.github.restdriver.serverdriver.Matchers.hasHeader
 import static com.github.restdriver.serverdriver.Matchers.hasStatusCode
-import static com.github.restdriver.serverdriver.RestServerDriver.*
+import static com.github.restdriver.serverdriver.RestServerDriver.put
+import static com.github.restdriver.serverdriver.RestServerDriver.withTimeout
+import static org.hamcrest.MatcherAssert.assertThat
 
 /**
  * Created by javaConductor on 10/5/2014.

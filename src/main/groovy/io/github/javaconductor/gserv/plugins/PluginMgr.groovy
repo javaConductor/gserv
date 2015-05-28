@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.plugins
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.plugins.caching.CachingPlugin
@@ -34,7 +34,7 @@ import io.github.javaconductor.gserv.plugins.cors.CorsPlugin
 /**
  * Created by javaConductor on 1/24/14.
  */
-@Log4j
+@Slf4j
 class PluginMgr {
 
     private static final INSTANCE = new PluginMgr()

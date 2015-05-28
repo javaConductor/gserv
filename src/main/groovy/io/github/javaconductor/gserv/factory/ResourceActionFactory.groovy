@@ -1,11 +1,11 @@
 package io.github.javaconductor.gserv.factory
 
-import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.actions.ActionPathElement
 import io.github.javaconductor.gserv.actions.ActionPathQuery
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.filters.Filter
 import io.github.javaconductor.gserv.filters.FilterType
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.utils.ParseUtils
 
 /**

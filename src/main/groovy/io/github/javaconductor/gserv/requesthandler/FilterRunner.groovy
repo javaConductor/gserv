@@ -1,18 +1,19 @@
 package io.github.javaconductor.gserv.requesthandler
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.delegates.FilterDelegate
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.filters.Filter
-import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.filters.FilterType
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 
 /**
  * Created by lcollins on 1/11/2015.
  */
-@Log4j
+@Slf4j
 class FilterRunner {
     def _serverConfig
 
@@ -57,8 +58,14 @@ class FilterRunner {
                 log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
                 bytes = fn(rc, bytes) ?: bytes
             } catch (Throwable ex) {
-                log.error("FilterError: ${ex.message}")
-                ex.printStackTrace(System.err)
+                log.warn("FilterError: ${ex.message}")
+                EventManager.instance().publish(Events.FilterError, [
+                        requestId : requestId,
+                        error     : ex.message,
+                        statusCode: 500,
+                        method    : rc.requestMethod,
+                        uri       : rc.requestURI,
+                        headers   : rc.requestHeaders])
             }
         }
         bytes

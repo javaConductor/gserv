@@ -24,17 +24,14 @@
 
 package io.github.javaconductor.gserv.utils
 
-import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.events.EventManager
-import io.github.javaconductor.gserv.events.Events
+import groovy.util.logging.Slf4j
 import org.apache.commons.io.IOUtils
 
 /**
  * Created by javaConductor on 1/13/14.
  * Code for manipulating static files
  */
-@Log4j
+@Slf4j
 class StaticFileHandler {
     def fileFn(contentType, filePath) {
         file(contentType, filePath)

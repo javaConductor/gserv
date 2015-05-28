@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.events
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsPool
 import groovyx.gpars.actor.Actors
 
@@ -46,7 +46,7 @@ class _broadcast {
 /**
  * Manages the Pub/Sub subSystem
  */
-@Log4j
+@Slf4j
 class EventManager {
     private def EventManager() {
     }

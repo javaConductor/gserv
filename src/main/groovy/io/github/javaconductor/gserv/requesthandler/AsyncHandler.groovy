@@ -24,12 +24,11 @@
 
 package io.github.javaconductor.gserv.requesthandler
 
-import io.github.javaconductor.gserv.GServ
+import groovy.util.logging.Slf4j
+import groovyx.gpars.actor.DynamicDispatchActor
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
-import groovy.util.logging.Log4j
-import groovyx.gpars.actor.DynamicDispatchActor
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +36,7 @@ import groovyx.gpars.actor.DynamicDispatchActor
  * Date: 1/5/14
  * Time: 10:13 PM
  */
-@Log4j
+@Slf4j
 class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
     EventManager _evtMgr = EventManager.instance()
     private def _cfg
@@ -51,11 +50,11 @@ class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
         _seq = ++Seq
     }
 
-/** This method is called when this Actor receives a message
- *
- * @param request
- * @return void
- */
+    /** This method is called when this Actor receives a message
+     *
+     * @param request
+     * @return void
+     */
     def onMessage(request) {
         RequestContext context = request.requestContext
         def currentReqId = context.id()

@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.requesthandler.wrapper
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -36,7 +36,7 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
 /**
  * Exchange Wrapper usually used for Filters
  */
-@Log4j
+@Slf4j
 class RequestContextWrapper extends AbstractRequestContext {
     RequestContext _context
     int _code

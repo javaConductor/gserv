@@ -24,9 +24,9 @@
 
 package io.github.javaconductor.gserv.pathmatching.custom
 
+import groovy.transform.CompileStatic
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.requesthandler.RequestContext
-import groovy.transform.CompileStatic
 
 /**
  * Created by lcollins on 4/5/2015.

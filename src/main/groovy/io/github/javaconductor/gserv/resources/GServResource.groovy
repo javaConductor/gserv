@@ -26,8 +26,8 @@ package io.github.javaconductor.gserv.resources
 
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.delegates.DelegatesMgr
-import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.delegates.ResourceDelegate
+import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
 import io.github.javaconductor.gserv.utils.LinkBuilder
 
 /**

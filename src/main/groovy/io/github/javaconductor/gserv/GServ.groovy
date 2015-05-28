@@ -24,20 +24,21 @@
 
 package io.github.javaconductor.gserv
 
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.converters.InputStreamTypeConverter
+import io.github.javaconductor.gserv.delegates.DelegatesMgr
+import io.github.javaconductor.gserv.delegates.PluginsDelegate
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.resources.ResourceObject
 import io.github.javaconductor.gserv.server.GServPlugins
 import io.github.javaconductor.gserv.utils.LinkBuilder
-import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.delegates.*
 
 /**
  * gServ main class
  */
-@Log4j
+@Slf4j
 class GServ {
     def factory = new GServFactory();
     static def contextAttributes = [

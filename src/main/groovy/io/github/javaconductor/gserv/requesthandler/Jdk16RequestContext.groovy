@@ -1,7 +1,7 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import com.sun.net.httpserver.HttpExchange
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -10,7 +10,7 @@ import io.github.javaconductor.gserv.events.Events
 /**
  * Created by lcollins on 12/26/2014.
  */
-@Log4j
+@Slf4j
 class Jdk16RequestContext extends AbstractRequestContext {
 
     HttpExchange _exchange
@@ -36,6 +36,11 @@ class Jdk16RequestContext extends AbstractRequestContext {
         _closed
     }
 
+    /**
+     *
+     * @param responseCode
+     * @param size
+     */
     void sendResponseHeaders(int responseCode, long size) {
         if (!_closed) {
             _exchange.responseHeaders.putAll(responseHeaders)

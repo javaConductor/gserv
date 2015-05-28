@@ -25,25 +25,25 @@
 package io.github.javaconductor.gserv.factory
 
 import com.sun.net.httpserver.HttpExchange
-import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
-import io.github.javaconductor.gserv.server.GServInstance
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
-import io.github.javaconductor.gserv.server.gServHttpsInstance
+import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
 import io.github.javaconductor.gserv.requesthandler.Jdk16RequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resources.GServResource
+import io.github.javaconductor.gserv.server.GServInstance
+import io.github.javaconductor.gserv.server.gServHttpsInstance
 import io.github.javaconductor.gserv.utils.ActorPool
 
 /**
  *
  * @author javaConductor
  */
-@Log4j
+@Slf4j
 class GServFactory {
 
     GServConfig createGServConfig() {

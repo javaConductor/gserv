@@ -26,8 +26,6 @@ package io.github.javaconductor.gserv.test
 
 import io.github.javaconductor.gserv.plugins.cors.CORSConfig
 import io.github.javaconductor.gserv.plugins.cors.CORSMode
-import org.junit.Before
-import org.junit.Test
 import spock.lang.Specification
 
 public class CorsSpec extends Specification {

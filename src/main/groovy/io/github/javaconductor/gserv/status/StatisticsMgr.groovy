@@ -24,7 +24,7 @@
 
 package io.github.javaconductor.gserv.status
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -38,7 +38,7 @@ import java.text.NumberFormat
 /**
  * Created by lcollins on 4/30/2015.
  */
-@Log4j
+@Slf4j
 class StatisticsMgr {
 
     GServConfig cfg
@@ -144,6 +144,10 @@ class StatisticsMgr {
         filter
     }
 
+    /**
+     *
+     * @return
+     */
     def listenUp() {
         def eventHandler = { topic, data ->
             handleEvent(topic, data)
@@ -157,6 +161,7 @@ class StatisticsMgr {
 
     def statRecorders = [
             new SuccessFailure(),
+            new MaxCurrentConnections(),
             new AvgMinMaxReqTime()
     ]
 
@@ -166,7 +171,7 @@ class StatisticsMgr {
     ]
 
     def handleEvent(topic, data) {
-        log.debug("Statistics: $topic => $data")
+        log.trace("Statistics: $topic => $data")
         statRecorders.each { statRec ->
             statRec.recordEvent(topic, data)
         }
@@ -179,6 +184,10 @@ class StatisticsMgr {
 
     }
 
+    /**
+     *
+     * @return
+     */
     def getStats() {
         def theStats = [:]
         statRecorders.each { statRec ->
@@ -187,6 +196,11 @@ class StatisticsMgr {
         theStats
     }
 
+    /**
+     *
+     * @param action
+     * @return
+     */
     def getActionStats(ResourceAction action) {
         def theStats = [:]
         actionStatRecorders.each { actionStatRec ->

@@ -24,15 +24,15 @@
 
 package io.github.javaconductor.gserv.configuration.scriptloader
 
-import groovy.util.logging.Log4j
-import io.github.javaconductor.gserv.server.GServInstance
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
+import io.github.javaconductor.gserv.server.GServInstance
 
 /**
  * Created by javaConductor on 8/26/2014.
  */
-@Log4j
+@Slf4j
 class ScriptLoader {
 
     ResourceLoader resourceLoader = new ResourceLoader();

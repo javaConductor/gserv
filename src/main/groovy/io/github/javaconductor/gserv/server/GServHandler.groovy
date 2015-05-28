@@ -26,9 +26,8 @@ package io.github.javaconductor.gserv.server
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.ResizeablePool
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -42,14 +41,13 @@ import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.utils.ActorPool
 
-import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * This is the Handler that is called for each request by the Java 1.6 HttpServer
  *
  */
-@Log4j
+@Slf4j
 class GServHandler implements HttpHandler {
     private def _factory = new GServFactory();
     private def _actions
@@ -62,6 +60,7 @@ class GServHandler implements HttpHandler {
     Long reqId = 1;
     FilterMatcher m = new FilterMatcher()
     FilterRunner filterRunner
+
     /**
      * Create a handler with a specific configuration
      *
@@ -126,8 +125,11 @@ class GServHandler implements HttpHandler {
             def t = "${(context.isClosed() ? ' Context CLOSED!' : '')}"
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path})  #$requestId: After filters $t ")
 
-            if (context.isClosed())
+            if (context.isClosed()) {
+                EventManager.instance().publish(Events.RequestProcessed, [
+                        requestId: currentReqId])
                 return;
+            }
 
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
             //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")

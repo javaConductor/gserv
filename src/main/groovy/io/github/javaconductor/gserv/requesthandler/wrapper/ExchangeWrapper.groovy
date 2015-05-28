@@ -28,7 +28,7 @@ import com.sun.net.httpserver.Headers
 import com.sun.net.httpserver.HttpContext
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpPrincipal
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -37,7 +37,7 @@ import io.github.javaconductor.gserv.filters.FilterByteArrayOutputStream
 /**
  * Exchange Wrapper usually used for Filters
  */
-@Log4j
+@Slf4j
 class ExchangeWrapper extends HttpExchange {
     HttpExchange _exchange
     Headers _requestHdrs, _responseHdrs

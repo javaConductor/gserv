@@ -22,8 +22,7 @@ package test.integration.instanceloader
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-import io.github.javaconductor.gserv.*
+import io.github.javaconductor.gserv.GServ
 
 
 new GServ().http {

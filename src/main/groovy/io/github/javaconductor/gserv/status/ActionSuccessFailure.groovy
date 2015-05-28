@@ -26,7 +26,6 @@ package io.github.javaconductor.gserv.status
 
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.events.Events
-import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap

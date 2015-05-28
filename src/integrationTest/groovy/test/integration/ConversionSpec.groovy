@@ -7,7 +7,6 @@ import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.server.GServInstance
 import io.github.javaconductor.gserv.test.tester.InstanceTester
-import io.github.javaconductor.gserv.test.tester.ResourceTester
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals

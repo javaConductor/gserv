@@ -26,8 +26,8 @@ package io.github.javaconductor.gserv.delegates
 
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
-import io.github.javaconductor.gserv.server.GServPlugins
 import io.github.javaconductor.gserv.plugins.PluginMgr
+import io.github.javaconductor.gserv.server.GServPlugins
 
 /**
  * Delegate for the plugin definitions of a ServerInstance

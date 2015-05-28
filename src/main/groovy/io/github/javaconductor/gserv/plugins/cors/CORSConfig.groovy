@@ -24,12 +24,12 @@
 
 package io.github.javaconductor.gserv.plugins.cors
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 
 /**
  * Created by javaConductor on 1/13/14.
  */
-@Log4j
+@Slf4j
 class CORSConfig {
     def maxAge
     String mode
@@ -124,7 +124,7 @@ class CORSConfig {
 /**
  * Represents the configuration for ONE Host
  */
-@Log4j
+@Slf4j
 class HostConfig {
     String host
     List methods

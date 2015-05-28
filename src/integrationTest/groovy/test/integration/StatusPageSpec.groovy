@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit
 
 import static com.github.restdriver.serverdriver.Matchers.hasHeader
 import static com.github.restdriver.serverdriver.Matchers.hasStatusCode
-import static com.github.restdriver.serverdriver.RestServerDriver.*
+import static com.github.restdriver.serverdriver.RestServerDriver.getOf
+import static com.github.restdriver.serverdriver.RestServerDriver.withTimeout
 import static org.hamcrest.MatcherAssert.assertThat
 
 /**

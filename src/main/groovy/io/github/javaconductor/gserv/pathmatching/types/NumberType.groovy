@@ -24,8 +24,6 @@
 
 package io.github.javaconductor.gserv.pathmatching.types
 
-import java.util.regex.Pattern
-
 import static io.github.javaconductor.gserv.utils.TextUtils.isNumber
 
 /**

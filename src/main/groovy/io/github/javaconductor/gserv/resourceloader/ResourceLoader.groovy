@@ -24,17 +24,17 @@
 
 package io.github.javaconductor.gserv.resourceloader
 
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
-import io.github.javaconductor.gserv.server.GServInstance
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
-import groovy.util.logging.Log4j
+import io.github.javaconductor.gserv.server.GServInstance
+import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 
 /**
  * Created by javaConductor on 8/14/2014.
  */
-@Log4j
+@Slf4j
 class ResourceLoader {
     static def resourceCache = [:]
 

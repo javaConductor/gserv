@@ -24,14 +24,13 @@
 
 package io.github.javaconductor.gserv.plugins.eventLogger
 
+import groovy.util.logging.Log
 import io.github.javaconductor.gserv.actions.ResourceAction
-import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.events.EventManager
-import io.github.javaconductor.gserv.filters.FilterOptions
+import io.github.javaconductor.gserv.factory.ResourceActionFactory
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
 import io.github.javaconductor.gserv.utils.DateUtils
 import io.github.javaconductor.gserv.utils.StaticFileHandler
-import groovy.util.logging.Log
 
 @Mixin(DateUtils)
 /**

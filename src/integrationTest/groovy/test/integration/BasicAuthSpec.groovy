@@ -2,7 +2,6 @@ package test.integration
 
 import groovyx.net.http.HTTPBuilder
 import io.github.javaconductor.gserv.cli.GServRunner
-import io.github.javaconductor.gserv.utils.Encoder
 import org.junit.Test
 
 import static groovyx.net.http.ContentType.TEXT

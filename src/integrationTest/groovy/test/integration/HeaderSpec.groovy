@@ -1,7 +1,6 @@
 package test.integration
 
 import com.github.restdriver.serverdriver.http.response.Response
-import io.github.javaconductor.gserv.cli.GServRunner
 import io.github.javaconductor.gserv.GServ
 import org.junit.Test
 

@@ -24,23 +24,20 @@
 
 package io.github.javaconductor.gserv.requesthandler
 
+import groovy.util.logging.Slf4j
+import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.group.DefaultPGroup
 import io.github.javaconductor.gserv.GServ
-import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
+import io.github.javaconductor.gserv.pathmatching.Matcher
 import io.github.javaconductor.gserv.utils.ActorPool
 import io.github.javaconductor.gserv.utils.Filename
 import io.github.javaconductor.gserv.utils.MimeTypes
 import io.github.javaconductor.gserv.utils.StaticFileHandler
-import groovy.util.logging.Log4j
-import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.scheduler.ResizeablePool
 import org.apache.commons.io.IOUtils
-
-import java.util.concurrent.ForkJoinPool
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,7 +45,7 @@ import java.util.concurrent.ForkJoinPool
  * Date: 1/5/14
  * Time: 10:13 PM
  */
-@Log4j
+@Slf4j
 class AsyncDispatcher extends DynamicDispatchActor {
     private def _matcher = new Matcher()
     private def _handler

@@ -1,20 +1,22 @@
 package test.integration
 
 import com.github.restdriver.serverdriver.http.response.Response
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.GServ
 import org.junit.Test
 
 import java.util.concurrent.TimeUnit
-import static com.github.restdriver.serverdriver.Matchers.*
-import static com.github.restdriver.serverdriver.RestServerDriver.*
-import static org.hamcrest.CoreMatchers.*
+
+import static com.github.restdriver.serverdriver.Matchers.hasStatusCode
+import static com.github.restdriver.serverdriver.RestServerDriver.getOf
+import static com.github.restdriver.serverdriver.RestServerDriver.withTimeout
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.MatcherAssert.assertThat
 
 /**
  * Created by javaConductor on 4/29/2015.
  */
-@Log4j
+@Slf4j
 class TemplateSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 
