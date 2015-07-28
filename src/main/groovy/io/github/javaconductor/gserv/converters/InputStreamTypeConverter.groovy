@@ -53,9 +53,13 @@ class InputStreamTypeConverter {
         String contentType = context.getRequestHeader("Content-Type")
 
         //check the contentType - should be "multipart/form-data"
-        if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
+        if (!contentType.toLowerCase().startsWith("multipart/form-data") && !contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")) {
             throw new ConversionException("No form data found : $contentType found instead.")
         }
+
+        boolean isMultipart = contentType.toLowerCase().startsWith("multipart/form-data")
+        boolean urlEncoded = contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")
+
 
         new FormDataUtils().getFormData(inputStream.bytes, contentType)
     }

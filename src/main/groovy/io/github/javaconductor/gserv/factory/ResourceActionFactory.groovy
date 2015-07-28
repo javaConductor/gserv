@@ -25,8 +25,8 @@ class ResourceActionFactory {
     static def createAction(name, method, uri, options, clozure) {
         def qry
         /// Example: /Thing/:id:Number/?page=:pg&chapter=:chpt
-        def paths = new ParseUtils().parsePath(uri);//u2.path.split("/")
-        if (paths?.last()?.startsWith("?")) {
+        List paths = new ParseUtils().parsePath(uri);//u2.path.split("/")
+        if (!paths.empty && paths?.last()?.startsWith("?")) {
             qry = paths.last(); qry = qry.substring(1)
             paths = paths.subList(0, paths.size() - 1)
 

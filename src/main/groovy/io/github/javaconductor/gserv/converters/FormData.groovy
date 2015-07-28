@@ -7,6 +7,27 @@ class FormData {
     List<ValueElement> values
     List<FileElement> files
 
+    /**
+     *
+     * @param key
+     * @return the first matching value
+     */
+    FormElement getValue(key) {
+        values.find { v ->
+            v.name == key
+        }
+
+    }
+    /**
+     *
+     * @param key
+     * @return all values for that key
+     */
+    List<FormElement> getValues(key) {
+        values.findAll { v ->
+            v.name == key
+        }
+    }
 }
 
 enum ElementType {

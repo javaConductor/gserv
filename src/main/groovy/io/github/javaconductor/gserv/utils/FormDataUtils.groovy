@@ -15,23 +15,47 @@ class FormDataUtils {
 
     FormData getFormData(byte[] bytes, String contentType) {
 
-        String boundaryMarker
-        try {
-            boundaryMarker = contentType.split(';')[1].split('=')[1]
-        } catch (Exception e) {
-            throw new ConversionException("Boundary not found : [$contentType].")
+        boolean isMultipart = contentType.toLowerCase().startsWith("multipart/form-data")
+        boolean urlEncoded = contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")
+
+        if (urlEncoded) {
+            // get the data
+            /// do some url-decode
+            /// for each kv pair
+            //// create ValueElement
+
+            String urlEncodedData = new String(bytes);
+            String decoded = URLDecoder.decode(urlEncodedData, "UTF-8")
+            String[] pairs = decoded.split('&')
+
+            def values = pairs.collect { kvPair ->
+                String[] both = kvPair.split('=')
+                String name = both[0]
+                String value = both[1] ?: true
+                new ValueElement(value: value, name: name)
+            }
+
+            new FormData(values: values, files: [])
+
+        } else {
+            String boundaryMarker
+            try {
+                boundaryMarker = contentType.split(';')[1].split('=')[1]
+            } catch (Exception e) {
+                throw new ConversionException("Boundary not found : [$contentType].")
+            }
+
+            List<byte[]> parts = new ByteUtils().splitBytes(bytes, boundaryMarker)
+
+            List<FormElement> elements = parts.collect { partBytes ->
+                partBytes.size() < boundaryMarker.bytes.size() ? [] : getFormElements(partBytes)
+            }.flatten()
+
+            def groups = elements.groupBy({ element -> element.type })
+
+            new FormData(values: groups[ElementType.Value],
+                    files: groups[ElementType.File])
         }
-
-        List<byte[]> parts = new ByteUtils().splitBytes(bytes, boundaryMarker)
-
-        List<FormElement> elements = parts.collect { partBytes ->
-            partBytes.size() < boundaryMarker.bytes.size() ? [] : getFormElements(partBytes)
-        }.flatten()
-
-        def groups = elements.groupBy({ element -> element.type })
-
-        new FormData(values: groups[ElementType.Value],
-                files: groups[ElementType.File])
     }
 
     List<FormElement> getFormElements(byte[] bytes) {
