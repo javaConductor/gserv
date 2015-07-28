@@ -55,12 +55,18 @@ class StatisticsMgr {
         def filter = ResourceActionFactory.createBeforeFilter("gServStatus", "GET", cfg.statusPath() ?: '/status', [:], 0) { RequestContext requestContext, args ->
             def requestId = requestContext.id()
 
+            def doReset = requestContext.requestURI.query?.contains("reset=true")
+
+
             log.trace("statusFilter(#${requestId} context: $requestContext")
             def totalMemory = Runtime.runtime.totalMemory()
             def freeMemory = Runtime.runtime.freeMemory()
             def maxMemory = Runtime.runtime.maxMemory()
             //def reqCount = this.requestCount.get()
 
+            if (doReset) {
+                reset()
+            }
             def createActionStats = { action ->
                 def actionStats = getActionStats(action)
                 def start = "<tr><td colspan='2'><ul>"
@@ -182,6 +188,15 @@ class StatisticsMgr {
                 actionStatRec.recordEvent(action, topic, data)
         }
 
+    }
+
+    def reset() {
+        statRecorders.each { statRec ->
+            statRec.reset()
+        }
+        actionStatRecorders.each { actionStatRec ->
+            actionStatRec.reset()
+        }
     }
 
     /**

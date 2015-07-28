@@ -72,7 +72,7 @@ class BasicAuthSpec {
                 }
             }
         }
-        catch (Throwable e){
+        catch (Throwable e) {
             assert "${e.message}", false
         }
     }

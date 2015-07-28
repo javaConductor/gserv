@@ -21,7 +21,7 @@ class DefaultResourceSpec {
         def f = new File(dir)
         // f.absolutePath
         def args = ["-p", port,
-                    "-s",   f.absolutePath,
+                    "-s", f.absolutePath,
                     "-d", "index.html"
         ]
         def stopFn = new GServRunner().start(args);
@@ -35,7 +35,7 @@ class DefaultResourceSpec {
                 //stop the server
                 stopFn()
             }
-            response.failure = {resp ->
+            response.failure = { resp ->
                 assert false, "HTTP Error: Status: ${resp.statusLine}"
                 println '500 Error'
                 //stop the server

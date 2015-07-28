@@ -32,4 +32,6 @@ interface StatRecorder {
     def recordEvent(String topic, Map eventData)
 
     Map reportStat() // Map [statDisplayName] : value
+
+    def reset()
 }

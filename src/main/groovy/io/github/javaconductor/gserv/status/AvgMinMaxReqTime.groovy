@@ -96,4 +96,11 @@ class AvgMinMaxReqTime implements StatRecorder {
         ]
     }
 
+    synchronized def reset() {
+        stats.MaxRequestTime.set(0)
+        stats.MinRequestTime.set(0)
+        stats.AvgRequestTime.set(0)
+
+    }
+
 }

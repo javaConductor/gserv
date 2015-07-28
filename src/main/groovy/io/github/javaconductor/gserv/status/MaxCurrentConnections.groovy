@@ -35,7 +35,8 @@ class MaxCurrentConnections implements StatRecorder {
 
     AtomicLong startedRequests = new AtomicLong(0)
     AtomicLong endedRequests = new AtomicLong(0)
-
+    AtomicLong maxConcurrentRequests = new AtomicLong(0)
+    Date maxConcurrentDate
     @Override
     def recordEvent(String topic, Map eventData) {
 
@@ -51,14 +52,29 @@ class MaxCurrentConnections implements StatRecorder {
                 endedRequests.incrementAndGet()
                 break
         }
+        calcMax()
+    }
 
+    synchronized def calcMax() {
+        def concurrentRequests = Math.max(0, startedRequests.get() - endedRequests.get() - 1)
+        if (concurrentRequests > maxConcurrentRequests.get()) {
+            maxConcurrentRequests.set(concurrentRequests)
+            maxConcurrentDate = new Date()
+        }
     }
 
     @Override
     Map reportStat() {
         [
-                'Max Concurrent Requests': startedRequests.get() - endedRequests.get()
+                'Max Concurrent Requests': maxConcurrentRequests.get(),
+                'Max Concurrent Time'    : maxConcurrentDate ? maxConcurrentDate.format("yyyy-MM-dd hh:mm:ss") : "None"
         ]
     }
+
+    def reset() {
+        maxConcurrentRequests.set(0)
+        maxConcurrentDate = null
+    }
+
 
 }

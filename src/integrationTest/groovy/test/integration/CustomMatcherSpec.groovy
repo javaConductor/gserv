@@ -64,7 +64,7 @@ class CustomMatcherSpec {
         finally {
             stopFn()
         }
-        }
+    }
 
     @Test
     public final void testOnlyIfAcceptsFail() {
@@ -79,11 +79,11 @@ class CustomMatcherSpec {
         } finally {
             stopFn()
         }
-        }
+    }
 
     @Test
     public final void testOnlyIfHeader() {
-        def port = 51007
+        def port = 51070
         def stopFn = instance.start(port)
         try {
             Response r = getOf("http://localhost:$port/2",
@@ -127,21 +127,21 @@ class CustomMatcherSpec {
         }
     }
 
-    @Test
-    public final void testOnlyIfContentTypeWith2() {
-        def port = 51010
-        def stopFn = instance.start(port)
-        try {
-            Response r = putOf("http://localhost:$port/3",
-                    body('{"msg": "Some JSON"}', "application/json"),
-                    header("Accept", "text/plain"),
-                    withTimeout(5, TimeUnit.MINUTES))
-            assertThat(r, hasHeader("Content-Type", "text/plain"))
-            assertThat(r, hasStatusCode(200))
-        } finally {
-            stopFn()
-        }
-    }
+//    @Test
+//    public final void testOnlyIfContentTypeWith2() {
+//        def port = 51010
+//        def stopFn = instance.start(port)
+//        try {
+//            Response r = putOf("http://localhost:$port/3",
+//                    body('{"msg": "Some JSON"}', "application/json"),
+//                    header("Accept", "text/plain"),
+//                    withTimeout(5, TimeUnit.MINUTES))
+//            assertThat(r, hasHeader("Content-Type", "text/plain"))
+//            assertThat(r, hasStatusCode(200))
+//        } finally {
+//            stopFn()
+//        }
+//    }
 
     @Test
     public final void testOnlyIfContentTypeWith2Fail() {

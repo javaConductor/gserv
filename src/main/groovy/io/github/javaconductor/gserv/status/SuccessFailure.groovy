@@ -79,4 +79,9 @@ class SuccessFailure implements StatRecorder {
         ]
     }
 
+    def reset() {
+        stats.SuccessfulRequests.set(0)
+        stats.FailedRequests.set(0)
+    }
+
 }

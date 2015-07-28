@@ -96,10 +96,15 @@ class ActionAvgMinMaxReqTime implements ActionStatRecorder {
     @Override
     Map reportStat(ResourceAction action) {
         def actionStats = createActionStats(action)
+        actionStats ?
         [
                 ('Avg Request Time') : actionStats.AvgRequestTime.get(),
                 ('Min Request Time') : actionStats.MinRequestTime.get(),
                 ('Max Request Time') : actionStats.MaxRequestTime.get()
-        ]
+        ] : [:]
+    }
+
+    def reset() {
+        statsByAction.clear()
     }
 }

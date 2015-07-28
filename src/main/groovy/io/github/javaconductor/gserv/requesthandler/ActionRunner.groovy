@@ -29,6 +29,7 @@ import groovy.util.slurpersupport.GPathResult
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
+import io.github.javaconductor.gserv.converters.FormData
 import io.github.javaconductor.gserv.delegates.HttpMethodDelegate
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -53,13 +54,17 @@ class ActionRunner {
         _cfg.delegateMgr.createHttpMethodDelegate(context, action, _cfg)
     }
 
-    private def convertStreamToType(InputStream instream, Class type) {
+    private def convertStreamToType(RequestContext context, InputStream instream, Class type) {
         if (type.equals(String.class)) {
             return _cfg.converter().to.text(instream)
         }
 
         if (type.equals(GPathResult.class)) {
             return _cfg.converter().to.xml(instream)
+        }
+
+        if (type.equals(FormData.class)) {
+            return _cfg.converter().to.formData(instream, context)
         }
 
         if (type.equals((new byte[0]).class)) {
@@ -69,7 +74,9 @@ class ActionRunner {
         _cfg.converter().to.type(type, instream)
     }
 
-    private def prepareArguments(URI uri, InputStream istream, ResourceAction action) {
+    private def prepareArguments(RequestContext context, ResourceAction action) {
+        URI uri = context.requestURI;
+        InputStream istream = context.requestBody
         def args = []
         def method = action.method()
         if (method == "PUT" || method == "POST") {
@@ -79,7 +86,7 @@ class ActionRunner {
             if (class1stArg && !class1stArg.name.contains("java.lang.Object")) {
                 def value
                 try {
-                    value = convertStreamToType(istream, class1stArg)
+                    value = convertStreamToType(context, istream, class1stArg)
                 } catch (Exception e) {
                     log.trace("Cannot convert input to class: ${class1stArg.name}", e)
                     throw new ConversionException("Cannot convert input to class: ${class1stArg.name}")
@@ -131,7 +138,7 @@ class ActionRunner {
         log.trace "ActionRunner.process() req#${currentReqId}."
 
         Closure cl = prepareClosure(context, action)
-        def args = prepareArguments(context.requestURI, context.requestBody, action)
+        def args = prepareArguments(context, action)
 //        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
         ({ clozure, argList ->
             try {

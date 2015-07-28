@@ -34,4 +34,6 @@ interface ActionStatRecorder {
     def recordEvent(ResourceAction action, String topic, Map eventData)
 
     Map reportStat(ResourceAction action) // Map [statDisplayName] : value
+
+    def reset()
 }

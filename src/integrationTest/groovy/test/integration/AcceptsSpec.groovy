@@ -29,7 +29,7 @@ class AcceptsSpec {
             }
         }
         delegate.get("/2") {
-            if (delegate.accepts("text/plain","text/csv")) {
+            if (delegate.accepts("text/plain", "text/csv")) {
                 write("text/plain", "Here is some plain text,")
             } else {
                 delegate.responseHeader("Content-Type", "application/json")

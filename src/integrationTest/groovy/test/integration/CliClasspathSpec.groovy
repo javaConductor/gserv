@@ -51,7 +51,7 @@ class CliClasspathSpec {
         def dir = baseDir + "cliClasspath"
         def args = ["-p", port,
                     "-r", dir + "/MathResource.groovy"
-         //          "-j", dir+"/CliMathService-1.0.jar"
+                    //          "-j", dir+"/CliMathService-1.0.jar"
         ]
         def stopFn
         try {
@@ -60,7 +60,7 @@ class CliClasspathSpec {
 //            assert  "Should throw exception.", false
             Assert.fail("Should NOT have gotten this far!!!")
         } catch (Exception ex) {
-            if(stopFn)
+            if (stopFn)
                 stopFn()
             assert ex.class.name.endsWith("ResourceScriptException")
         }

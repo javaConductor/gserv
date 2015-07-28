@@ -177,7 +177,14 @@ class GServHandler implements HttpHandler {
         try {
             _dispatcher << [requestContext: context]
         } catch (IllegalStateException e) {
+            int retryCnt = context.attributes["handlerRetry"] ?: 0
+            ++retryCnt
+            /// try it 4 times
+            if (retryCnt > 3)
+                throw e
+
             _dispatcher = _nuDispatcher()
+            context.attributes["handlerRetry"] = retryCnt + 1
             _handle(context)
         }
         log.trace("ServerHandler._handle(${context}) Sent to dispatcher.")

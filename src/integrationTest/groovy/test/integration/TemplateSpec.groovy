@@ -24,13 +24,13 @@ class TemplateSpec {
         useResourceDocs(true)
         delegate.get("/") {
             template("text/html", "/testTemplate.html", [
-                    title  : "Template Test",
+                    title: "Template Test",
                     page : 3
             ])
         }
         delegate.get("/json") {
             template("application/json", "/testTemplate.json", [
-                    title  : "Template JSON Test",
+                    title: "Template JSON Test",
                     page : 66
             ])
         }
@@ -62,10 +62,10 @@ class TemplateSpec {
                     withTimeout(5, TimeUnit.MINUTES))
 
             assertThat(r, hasStatusCode(200))
-            assertThat(r.asJson().findValue("page").asText(), equalTo("66") )
-            assertThat(r.asJson().findValue("page1").asText(), equalTo("66") )
-            assertThat(r.asJson().findValue("page2").asText(), equalTo("66") )
-       //     assertThat("Template should have produced the text",  r.asText().contains("<title>Template Test</title>"))
+            assertThat(r.asJson().findValue("page").asText(), equalTo("66"))
+            assertThat(r.asJson().findValue("page1").asText(), equalTo("66"))
+            assertThat(r.asJson().findValue("page2").asText(), equalTo("66"))
+            //     assertThat("Template should have produced the text",  r.asText().contains("<title>Template Test</title>"))
 
         } finally {
             stopFn()

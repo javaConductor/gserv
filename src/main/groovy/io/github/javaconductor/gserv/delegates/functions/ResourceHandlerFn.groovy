@@ -30,6 +30,7 @@ import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.exceptions.TemplateException
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
+import org.apache.commons.io.IOUtils
 
 /**
  *
@@ -155,6 +156,24 @@ trait ResourceHandlerFn {
             //     log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext ")
             requestContext.sendResponseHeaders(200, data.size() as long)
             requestContext.getResponseBody().write(data)
+            requestContext.getResponseBody().close()
+            requestContext.close()
+        }
+    }
+
+    /**
+     * Writes a byteArray and closes the output stream
+     *
+     * @param data The string
+     *
+     */
+    void writeFrom(InputStream is) {
+        if (!requestContext.isClosed()) {
+            //     log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext ")
+//            int size = is.available();
+
+            int size = IOUtils.copy(is, requestContext.getResponseBody())
+            requestContext.sendResponseHeaders(200, size)
             requestContext.getResponseBody().close()
             requestContext.close()
         }

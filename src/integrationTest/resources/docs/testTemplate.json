@@ -1,6 +1,6 @@
 {
-    "title": "${title}",
-    "page": "$page",
-    "page1": "<%= page %>",
-    "page2": "<% out.write(page.toString()) %>"
+  "title": "${title}",
+  "page": "$page",
+  "page1": "<%= page %>",
+  "page2": "<% out.write(page.toString()) %>"
 }

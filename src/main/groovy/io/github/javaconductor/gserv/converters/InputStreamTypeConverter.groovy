@@ -26,6 +26,8 @@ package io.github.javaconductor.gserv.converters
 
 import groovy.json.JsonSlurper
 import io.github.javaconductor.gserv.exceptions.ConversionException
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.utils.FormDataUtils
 import org.apache.commons.io.IOUtils
 
 /**
@@ -39,8 +41,23 @@ class InputStreamTypeConverter {
     def typeConverters
 
     def InputStreamTypeConverter() {
-        to = converters = ["text": readText, "json": readJson, "xml": readXml, "type": typeConverter]
+        to = converters = ["text"    : readText,
+                           "json"    : readJson,
+                           "xml"     : readXml,
+                           "type"    : typeConverter,
+                           "formData": formDataConverter]
         typeConverters = [:]
+    }
+
+    def formDataConverter = { InputStream inputStream, RequestContext context ->
+        String contentType = context.getRequestHeader("Content-Type")
+
+        //check the contentType - should be "multipart/form-data"
+        if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
+            throw new ConversionException("No form data found : $contentType found instead.")
+        }
+
+        new FormDataUtils().getFormData(inputStream.bytes, contentType)
     }
 
     /**

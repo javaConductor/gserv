@@ -31,10 +31,22 @@ class FilterRunner {
         RequestContext context = c
         for (Filter f : filters) {
             log.trace("FilterRunner() running $f on $context")
-            context = runFilter(f, context) ?: context
-            if (context.isClosed()) {
-                log.trace("FilterRunner() filter $f closed context")
-                return context
+            try {
+                context = runFilter(f, context) ?: context
+                if (context.isClosed()) {
+                    log.trace("FilterRunner() filter $f closed context")
+                    return context
+                }
+            } catch (Throwable e) {
+                log.warn("FilterError: ${ex.message}")
+                EventManager.instance().publish(Events.FilterError, [
+                        requestId : rc.id(),
+                        error     : e.message,
+                        statusCode: 500,
+                        filterName: f.name,
+                        method    : rc.requestMethod,
+                        uri       : rc.requestURI,
+                        headers   : rc.requestHeaders])
             }
 //            log.trace("FilterRunner() running $f on $context")
         }
@@ -63,6 +75,7 @@ class FilterRunner {
                         requestId : requestId,
                         error     : ex.message,
                         statusCode: 500,
+                        filterName: fn.delegate.$this.name,
                         method    : rc.requestMethod,
                         uri       : rc.requestURI,
                         headers   : rc.requestHeaders])

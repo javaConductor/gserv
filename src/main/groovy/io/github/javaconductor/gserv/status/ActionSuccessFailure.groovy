@@ -85,9 +85,14 @@ class ActionSuccessFailure implements ActionStatRecorder {
     @Override
     Map reportStat(ResourceAction action) {
         def actionStats = createActionStats(action)
+        actionStats ?
         [
                 ('Successful Requests') : actionStats.SuccessfulRequests.get(),
                 ('Failed Requests')     : actionStats.FailedRequests.get()
-        ]
+        ] : [:]
+    }
+
+    def reset() {
+        statsByAction.clear()
     }
 }

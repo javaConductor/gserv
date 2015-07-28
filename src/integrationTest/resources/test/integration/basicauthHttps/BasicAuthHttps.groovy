@@ -23,11 +23,11 @@ gserv.https((Map) [
         ok
     }
 
-    get "/",  { ->
+    get "/", { ->
         write "text/plain", "You MUST be authorized!!"
     }
 
-    get "/hello",  { ->
+    get "/hello", { ->
         write "text/plain", "You SHOULD HAVE BEEN authorized!!"
 
     }
