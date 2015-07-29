@@ -84,6 +84,9 @@ dependencies {
     /// http builder
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
+    /// Google Guava
+    compile 'com.google.guava:guava:18.0'
+
     /// Test deps
     testCompile 'com.github.rest-driver:rest-server-driver:1.1.42'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

@@ -68,7 +68,7 @@ class GServConfig {
     private HttpsConfig _https
     def delegateTypeMap
     boolean bUseResourceDocs
-    def delegateMgr
+    DelegatesMgr delegateMgr
     def linkBuilder
     Matcher matcher = new Matcher()
     def serverIPs = []

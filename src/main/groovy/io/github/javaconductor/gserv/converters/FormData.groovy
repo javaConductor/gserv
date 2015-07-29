@@ -4,9 +4,8 @@ package io.github.javaconductor.gserv.converters
  * Created by lcollins on 7/24/2015.
  */
 class FormData {
-    List<ValueElement> values
-    List<FileElement> files
-
+    List<ValueElement> values = []
+    List<FileElement> files = []
     /**
      *
      * @param key
@@ -16,7 +15,6 @@ class FormData {
         values.find { v ->
             v.name == key
         }
-
     }
     /**
      *
@@ -30,13 +28,13 @@ class FormData {
     }
 }
 
-enum ElementType {
+public enum ElementType {
     Value,
     File
 }
 
 class FormElement {
-    ElementType type = ElementType.File
+    ElementType type;
     String name;
 }
 

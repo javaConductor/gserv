@@ -1,20 +1,34 @@
 package io.github.javaconductor.gserv.utils
 
+import groovy.util.logging.Slf4j
+
 /**
  * Created by lcollins on 7/27/2015.
  */
+@Slf4j
 class ByteUtils {
 
     List<byte[]> splitBytes(byte[] buffer, String boundary) {
         def parts = []
         def start = 0
+        log.trace("Buffer as text ${new String(buffer)}")
         for (int currentPosition = 0; currentPosition != (buffer.length - boundary.bytes.length); ++currentPosition) {
             if (compareBytes(buffer, currentPosition, boundary.bytes)) {
-                if (currentPosition > 0)
+                if (currentPosition > 0) {
+                    def end = currentPosition - 1
+                    // check for \r\n
+                    if (buffer[currentPosition - 1] == '\n' && buffer[currentPosition - 2] == '\r') {
+                        end = currentPosition - 3
+                    }
+                    // check for  just \n
+                    else if (buffer[currentPosition - 1] == '\n') {
+                        end = currentPosition - 2
+                    }
                     parts.add([
                             start: start,
-                            end  : buffer[currentPosition - 1] == '\n' ? (currentPosition - 2) : (currentPosition - 1)
+                            end: end
                     ]);
+                }
                 start = currentPosition;
             }
             if (compareBytes(buffer, currentPosition, (boundary + '--').bytes)) {

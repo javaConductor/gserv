@@ -24,6 +24,10 @@
 
 package io.github.javaconductor.gserv.delegates
 
+import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.configuration.GServConfig
+import io.github.javaconductor.gserv.requesthandler.RequestContext
+
 /**
  * Manages Delegates for an application
  */
@@ -70,7 +74,7 @@ class DelegatesMgr {
      * @param serverConfig
      * @return
      */
-    def createHttpMethodDelegate(requestContext, action, serverConfig) {
+    def createHttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
         createDelegate(DelegateTypes.HttpMethod, [requestContext, action, serverConfig])
     }
 

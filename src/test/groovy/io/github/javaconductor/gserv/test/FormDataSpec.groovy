@@ -44,7 +44,7 @@ B File content
     public void "should parse file values"() {
 
         given:
-        def boundary = "-----------------------------287032381131322"
+        def boundary = "---------------------------287032381131322"
         def testdata = """-----------------------------287032381131322
 Content-Disposition: form-data; name="datafile1"; filename="r.txt"
 Content-Type: text/plain
@@ -63,7 +63,7 @@ B File content
 -----------------------------287032381131322--"""
         when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "Content-Type: multipart/form-data; boundary=$boundary")
+        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
         then:
         fdata.files.size() == 3
@@ -72,7 +72,7 @@ B File content
     public void "should parse form data value"() {
 
         given:
-        def boundary = "-----------------------------287032381131322"
+        def boundary = "---------------------------287032381131322"
         def testdata = """-----------------------------287032381131322
 Content-Disposition: form-data; name="datafile1"; filename="r.txt"
 Content-Type: text/plain
@@ -95,24 +95,24 @@ B File content
 -----------------------------287032381131322--"""
         when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "Content-Type: multipart/form-data; boundary=$boundary")
+        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
         then:
-        fdata.files.size() == 3
-        fdata.values.size() == 1
+        fdata?.files?.size() == 3
+        fdata?.values?.size() == 1
     }
 
     public void "should parse multipart mixed request"() {
 
         given:
-        def boundary = "--AaB03x"
+        def boundary = "AaB03x"
         def testdata = """--AaB03x
 Content-Disposition: form-data; name="submit-name"
 
 Larry
 --AaB03x
 Content-Disposition: form-data; name="files"
-Content-Type: multipart/mixed; boundary=--BbC04y
+Content-Type: multipart/mixed; boundary=BbC04y
 
 --BbC04y
 Content-Disposition: file; filename="file1.txt"
@@ -129,7 +129,7 @@ Content-Transfer-Encoding: binary
 --AaB03x--"""
         when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "Content-Type: multipart/form-data; boundary=$boundary")
+        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
         then:
         fdata.files.size() == 2
