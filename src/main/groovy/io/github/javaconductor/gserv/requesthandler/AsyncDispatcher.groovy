@@ -25,15 +25,14 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Slf4j
-import groovyx.gpars.actor.DynamicDispatchActor
-import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.group.PGroup
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.pathmatching.Matcher
-import io.github.javaconductor.gserv.utils.ActorPool
 import io.github.javaconductor.gserv.utils.Filename
 import io.github.javaconductor.gserv.utils.MimeTypes
 import io.github.javaconductor.gserv.utils.StaticFileHandler
@@ -46,39 +45,40 @@ import org.apache.commons.io.IOUtils
  * Time: 10:13 PM
  */
 @Slf4j
-class AsyncDispatcher extends DynamicDispatchActor {
+class AsyncDispatcher {//extends DynamicDispatchActor {
     private def _matcher = new Matcher()
-    private def _handler
     private def _staticFilehandler = new StaticFileHandler()
-    private def _actorPool
     private GServConfig _config
+    private DataflowQueue _handlerQ
 
-    def AsyncDispatcher(ActorPool actorPool, GServConfig config) {
-        this.setParallelGroup(new DefaultPGroup(2))
-        _actorPool = actorPool
+    def AsyncDispatcher(
+            GServConfig config,
+            PGroup dispPGroup,
+            DataflowQueue dispatchQ,
+            DataflowQueue handlerQ) {
         _config = config;
+        _handlerQ = handlerQ
+
+//        dispatchQ.whenBound( dispPGroup, this.dispatch )
+
+        Thread.start("AsyncDispatcher") {
+            while (true) {
+                def val = dispatchQ.getVal()
+                log.trace("$this got message: $val : ${new Date().getTime()}")
+                dispPGroup.execute({
+                    run:
+                    {
+                        dispatch val
+                    }
+                } as Runnable)
+            }
+        }
     }
 
-    ////// Actor Pool /////////
-    /**
-     * Sets the pool of actors for this dispatcher.
-     *
-     * @param pool
-     * @return
-     */
-    void actorPool(pool) {
-        _actorPool = pool
-        this.setParallelGroup(new DefaultPGroup(1))
-    }
-
-    ActorPool actorPool() {
-        _actorPool
-    }
-
-    void onMessage(Map request) {
-        log.trace "AsyncDispatcher.onMessage $request: Processing"
+    def dispatch = { Map request ->
+        log.trace "AsyncDispatcher.dispatch $request: Processing"
         process(request.requestContext)
-        log.trace "AsyncDispatcher.onMessage $request: Done"
+        log.trace "AsyncDispatcher.dispatch $request: Done"
     }
 
     def evtMgr = EventManager.instance()
@@ -86,21 +86,18 @@ class AsyncDispatcher extends DynamicDispatchActor {
     def process(RequestContext context) {
         def currentReqId = context.id()
         //log.trace "AsyncDispatcher.process($currentReqId) "
-        log.debug "AsyncDispatcher.process($currentReqId)  "
+        //log.debug "AsyncDispatcher.process($currentReqId)  "
         ResourceAction action = _matcher.matchAction(_config.actions(), context)
         if (action) {
             context.setAttribute(GServ.contextAttributes.matchedAction, action)
             evtMgr.publish(Events.RequestMatchedDynamic, [requestId : currentReqId,
-                                                          actionPath: action.toString(), method: context.getRequestMethod()])
+                                                          actionPath: action.toString(), method: context.requestMethod])
             context.setAttribute(GServ.contextAttributes.currentAction, action)
-            def actr
             try {
                 //// here we use the next actor
-                actr = (_actorPool.next())
-                log.trace "Processing request(${currentReqId}) dispatching to $action"
+                log.trace "Processing request(${currentReqId}) dispatching $action"
                 //log.trace "Processing request(${currentReqId}) requestContext has ${ context.requestBody } bytes to read."
-
-                actr << [requestContext: context, action: action]
+                _handlerQ << [requestContext: context, action: action]
             } catch (IllegalStateException e) {
                 log.trace "Error Processing request(${currentReqId}) dispatching to $action: ${e.message}", e
                 evtMgr.publish(Events.RequestProcessingError, [
@@ -112,9 +109,10 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 if (e.message.startsWith("The actor cannot accept messages at this point.")) {
                     //TODO needs new handler
                     log.warn "Actor in bad state: replacing."
-                    _actorPool.replaceActor(actr)
+//                    _handlerActorPool.replaceActor(actr)
+                    //_theHandlerActor = _handlerActorPool.next()
                     log.warn "Actor in bad state: replaced and reprocessed!"
-                    process(context)
+                    return process(context)
                 } else {
                     evtMgr.publish(Events.RequestProcessingError, [
                             requestId   : currentReqId,
@@ -123,6 +121,9 @@ class AsyncDispatcher extends DynamicDispatchActor {
                             method      : context.requestMethod])
                 }
             }
+            finally {
+                log.trace "Processed request(${currentReqId}) dispatched $action!"
+            }
             //println "AsyncDispatcher.process(): action $action sent to processor."
             return
         }
@@ -130,14 +131,16 @@ class AsyncDispatcher extends DynamicDispatchActor {
         //// if its a GET then try to match it to a static resource
         //
         if (context.requestMethod == "GET") {
-            InputStream istream = _staticFilehandler.resolveStaticResource(context.requestURI.path, _config.staticRoots(), _config.useResourceDocs())
+            InputStream istream = _staticFilehandler.resolveStaticResource(
+                    context.requestURI.path,
+                    _config.staticRoots(),
+                    _config.useResourceDocs())
             if (istream) {
                 //TODO test this well!!
                 def mimeType = MimeTypes.getMimeType(fileExtensionFromPath(context.requestURI.path))
-                //header("Content-Type", mimeType)
-                context.getResponseHeaders().put("Content-Type", [mimeType])
+                context.responseHeaders.put("Content-Type", [mimeType])
                 evtMgr.publish(Events.RequestMatchedStatic, [requestId : currentReqId,
-                                                             actionPath: context.requestURI.path, method: context.getRequestMethod()])
+                                                             actionPath: context.requestURI.path, method: context.requestMethod])
 //                println "AsyncDispatcher.process(): Found static resource: ${httpExchange.requestURI.path}: seems to be ${istream.available()} bytes."
                 context.sendResponseHeaders(200, istream.available())
                 sendStream(istream, context.responseBody)
@@ -147,14 +150,11 @@ class AsyncDispatcher extends DynamicDispatchActor {
                 return
             }
         }
-//        println "AsyncDispatcher.process(): No matching static resource for: ${httpExchange.requestURI}"
-//        evtMgr.publish(Events.RequestNotMatchedStatic, [requestId: context.getAttribute(GServ.contextAttributes.requestId),
-//                                                        actionPath: context.requestURI.path, method: context.getRequestMethod()])
 
         ////TODO Externalize this message!!!!!!!
         def msg = "No such resource: ${context.requestURI}";
-        context.sendResponseHeaders(404, msg.getBytes().size())
-        context.responseBody.write(msg.getBytes())
+        context.sendResponseHeaders(404, msg.bytes.size())
+        context.responseBody.write(msg.bytes)
         context.responseBody.close()
         context.close()
         //println "AsyncDispatcher.process(): ALL done for action: ${httpExchange.requestURI}"
@@ -173,5 +173,15 @@ class AsyncDispatcher extends DynamicDispatchActor {
     def sendStream(inStream, outStream) {
         IOUtils.copy(inStream, outStream)
     }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    String toString() {
+        return "AsyncDispatcher(${Thread.currentThread().name})"
+    }
+
 }
 

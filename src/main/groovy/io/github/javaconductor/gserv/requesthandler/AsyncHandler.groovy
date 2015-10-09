@@ -26,6 +26,9 @@ package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Slf4j
 import groovyx.gpars.actor.DynamicDispatchActor
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
 import io.github.javaconductor.gserv.events.Events
@@ -37,17 +40,34 @@ import io.github.javaconductor.gserv.events.Events
  * Time: 10:13 PM
  */
 @Slf4j
-class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
+class AsyncHandler {// extends DynamicDispatchActor {//implements TypeUtils {
     EventManager _evtMgr = EventManager.instance()
     private def _cfg
     private def _seq
     ActionRunner r
     static long Seq = 0;
 
-    def AsyncHandler(GServConfig cfg) {
+    def AsyncHandler(GServConfig cfg, PGroup pGroup, DataflowQueue handlerQ) {
         _cfg = cfg
+
         r = new ActionRunner(_cfg)
         _seq = ++Seq
+        Thread.start("AsyncHandler") {
+            while (true) {
+                def val = handlerQ.getVal()
+                log.trace("$this got message: $val : ${new Date().getTime()}")
+                pGroup.execute([
+                        run: {
+                            handler val
+                        }
+                ] as Runnable)
+            }
+        }
+        log.debug("Created $this ")
+    }
+
+    def handler = { Map request ->
+        onMessage(request)
     }
 
     /** This method is called when this Actor receives a message
@@ -58,12 +78,11 @@ class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
     def onMessage(request) {
         RequestContext context = request.requestContext
         def currentReqId = context.id()
-        //log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
+        // log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
         def action
         try {
             action = request.action
-//            println "$this recieved req #${exchange.getAttribute(GServ.contextAttributes.requestId)} ${exchange.requestURI.path}"
-            log.trace "$this received req #$currentReqId ${context.requestURI.path}"
+            log.trace "$this  received req #$currentReqId ${context.requestURI.path}"
             //log.trace "$this received req #$currentReqId bytes from input: ${context.requestBody.bytes.size()} "
             r.process(context, action)
         } catch (Throwable e) {
@@ -71,7 +90,10 @@ class AsyncHandler extends DynamicDispatchActor {//implements TypeUtils {
                     [requestId: currentReqId,
                      path     : action.toString(),
                      error    : e.message])
-            log.error("AsyncHandler($_seq) req #$currentReqId: Error processing request: ${e.message} ", e)
+            log.error("$this req #$currentReqId: Error processing request: ${e.message} ", e)
+        }
+        finally {
+            log.trace "$this  processed req #$currentReqId ${context.requestURI.path}"
         }
     }
 

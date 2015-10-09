@@ -30,14 +30,12 @@ import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.configuration.GServConfigFile
 import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
-import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
 import io.github.javaconductor.gserv.requesthandler.Jdk16RequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.server.GServInstance
 import io.github.javaconductor.gserv.server.gServHttpsInstance
-import io.github.javaconductor.gserv.utils.ActorPool
 
 /**
  *
@@ -67,17 +65,10 @@ class GServFactory {
                 : new GServInstance(cfg)
     }
 
-    AsyncDispatcher createDispatcher(ActorPool actors,
-                                     List actions,
-                                     List staticRoots,
-                                     String templateEngineName,
-                                     boolean bUseResourceDocs) {
-        new AsyncDispatcher(actors, actions, staticRoots, templateEngineName, bUseResourceDocs);
-    }
-
-    AsyncDispatcher createDispatcher(ActorPool actors, GServConfig cfg) {
-        new AsyncDispatcher(actors, cfg);
-    }
+//
+//    AsyncDispatcher createDispatcher( GServConfig cfg, Closure getHandlerFn) {
+//        new AsyncDispatcher(cfg, getHandlerFn)
+//    }
 
     /**
      * Parses a gserv Config file
@@ -95,21 +86,21 @@ class GServFactory {
         }
     }//createConfigs
 
-    /**
-     * Loads a gserv config file from a Groovy script file
-     *
-     * @param cfgScriptFile
-     * @return GServConfig .
-     */
-    GServConfig createConfig(File cfgScriptFile) {
-        assert cfgScriptFile
-        try {
-            new ResourceLoader().loadInstance(cfgScriptFile, [])
-        } catch (Throwable ex) {
-            log.error("Could not create application from gservconfig script: ${cfgScriptFile.absolutePath}: ${ex.message}")
-            throw ex;
-        }
-    }//createConfigs
+//    /**
+//     * Loads a gserv config file from a Groovy script file
+//     *
+//     * @param cfgScriptFile
+//     * @return GServConfig .
+//     */
+//    GServConfig createConfig(File cfgScriptFile) {
+//        assert cfgScriptFile
+//        try {
+//            new ResourceLoader().loadInstanceConfig(cfgScriptFile, [])
+//        } catch (Throwable ex) {
+//            log.error("Could not create application from gserv config script: ${cfgScriptFile.absolutePath}: ${ex.message}")
+//            throw ex;
+//        }
+//    }//createConfigs
 
     /**
      * Creates a gserv Config
@@ -136,7 +127,7 @@ class GServFactory {
         try {
             /// if there is an instance script then use it to create the config
             if (instanceScript) {
-                cfg = resourceLoader.loadInstance(new File(instanceScript), classpath)
+                cfg = resourceLoader.loadInstanceConfig(new File(instanceScript), classpath)
             }
             // if we didn't get one from the instance then create one
             cfg = cfg ?: createGServConfig()
@@ -154,6 +145,58 @@ class GServFactory {
                 cfg, resources, statusPage, statusPath, classpath, displayName)
 
     }//createConfigs
+
+    GServInstance createInstance(String staticRoot, String bindAddress,
+                                 int port, String defaultResource, String instanceScript,
+                                 List<String> resourceScripts,
+                                 boolean statusPage,
+                                 String statusPath,
+                                 List<String> classpath,
+                                 displayName = "gServ Application") {
+        GServConfig cfg
+        def resources = []
+        ResourceLoader resourceLoader = new ResourceLoader()
+        ScriptLoader scriptLoader = new ScriptLoader()
+
+        try {
+            /// if there is an instance script then use it to create the config
+            GServInstance instance = resourceLoader.loadInstance(new File(instanceScript), classpath)
+            instance.config().port(port)
+            if (resourceScripts) {
+                resources = scriptLoader.loadResources(resourceScripts, classpath)
+                instance.config().addResources(resources)
+            }
+
+            if (staticRoot) {
+                instance.config().addStaticRoots([staticRoot])
+            }
+
+            if (bindAddress) {
+                instance.config().bindAddress(new InetSocketAddress(bindAddress, port))
+            }
+
+            if (defaultResource) {
+                instance.config().defaultResource(defaultResource)
+            }
+
+            if (statusPage) {
+                instance.config().statusPage(statusPage)
+                if (statusPath)
+                    instance.config().statusPath(statusPath)
+            }
+            if (displayName) {
+                instance.config().name(displayName)
+            }
+
+            instance
+            // if we didn't get one from the instance then create one
+        } catch (Throwable ex) {
+            log.error("Could not load resource script: ${ex.message}")
+            println ex.message
+            throw ex
+        }
+
+    }//createInstance
 
     /**
      * Creates a gserv Config

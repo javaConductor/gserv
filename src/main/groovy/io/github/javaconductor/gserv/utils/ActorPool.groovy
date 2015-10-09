@@ -33,15 +33,13 @@ import groovyx.gpars.group.PGroup
 class ActorPool {
     def actorList = []
     def nextIdx = 0;
-    def nuActorFn
-    def min, max
-    PGroup pGroup
+    def nuHandlerActorFn
+    def min
+//    PGroup pGroup
 
-    def ActorPool(int min, int max, PGroup pGroup, Closure nuActorFn) {
-        this.nuActorFn = nuActorFn
+    def ActorPool(int min, Closure nuHandlerActorFn) {
+        this.nuHandlerActorFn = nuHandlerActorFn
         this.min = min
-        this.max = max
-        this.pGroup = pGroup
         initList(actorList, min)
     }
 
@@ -49,7 +47,7 @@ class ActorPool {
         if (actorList.size() < min) {
             def diff = min - actorList.size();
             diff.times {
-                add(nuActorFn())
+                add(nuHandlerActorFn())
             }
         }
     }
@@ -65,24 +63,18 @@ class ActorPool {
 
     synchronized def replaceActor(actor) {
         remove(actor)
-        def nuActor = nuActorFn()
+        def nuActor = nuHandlerActorFn()
         add(nuActor)
     }
 
     synchronized def add(Actor actor) {
-        actor.setParallelGroup(pGroup)
         actor.start()
         actorList.add(actor)
     }
 
-    synchronized def remove(actor) {
+    synchronized def remove(Actor actor) {
         actor.stop()
         actorList.remove(actor)
-    }
-
-    def setParallelGroup(pGroup) {
-        this.pGroup = pGroup
-        actorList.each { it.setParallelGroup(pGroup) }
     }
 
     def start() {

@@ -25,6 +25,7 @@
 package io.github.javaconductor.gserv.cli
 
 import groovy.util.logging.Slf4j
+import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.exceptions.ConfigException
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
@@ -92,6 +93,7 @@ class GServRunner {
         def configs
         def configFile
         def configFilename = options.c;
+        def nuInstance
         try {
             if (!configFilename) {
                 def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
@@ -108,17 +110,31 @@ class GServRunner {
                 classpath = options.js;
                 statusPath = options.t
                 statusPage = !options.g
-                configs = factory.createConfigs(
-                        staticRoot ?: "",
-                        bindAddress ?: "",
-                        port,
-                        defaultResource ?: "",
-                        instanceScript ?: "",
-                        resourceScripts ?: [],
-                        statusPage,
-                        statusPath ?: "",
-                        classpath ?: [],
-                        appName ?: null);
+                if (instanceScript) {
+                    nuInstance = factory.createInstance(
+                            staticRoot ?: "",
+                            bindAddress ?: "",
+                            port,
+                            defaultResource ?: "",
+                            instanceScript ?: "",
+                            resourceScripts ?: [],
+                            statusPage,
+                            statusPath ?: "",
+                            classpath ?: [],
+                            appName ?: null)
+                } else {
+                    configs = factory.createConfigs(
+                            staticRoot ?: "",
+                            bindAddress ?: "",
+                            port,
+                            defaultResource ?: "",
+                            instanceScript ?: "",
+                            resourceScripts ?: [],
+                            statusPage,
+                            statusPath ?: "",
+                            classpath ?: [],
+                            appName ?: null);
+                }
             } else {   // use ONLY the config file and ignore everything else on the cmdLine
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {
@@ -136,10 +152,15 @@ class GServRunner {
             log.trace("Could not start app.", ex)
             throw ex;
         }
-
-        def stopFns = configs.collect { cfg ->
-            def instance = factory.createHttpInstance(cfg);
-            instance.start(cfg.port())
+        def stopFns
+        if (nuInstance) {
+            stopFns = [nuInstance.start(nuInstance.config().port())]
+        } else {
+            stopFns = configs.collect { cfg ->
+                log.debug("Creating HTTP Instance")
+                def inst = factory.createHttpInstance(cfg);
+                inst.start(cfg.port())
+            }
         }
         Thread.sleep(300)
         return ({ ->

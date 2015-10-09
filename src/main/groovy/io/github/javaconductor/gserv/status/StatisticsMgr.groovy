@@ -57,8 +57,7 @@ class StatisticsMgr {
 
             def doReset = requestContext.requestURI.query?.contains("reset=true")
 
-
-            log.trace("statusFilter(#${requestId} context: $requestContext")
+            //log.trace("statusFilter(#${requestId} context: $requestContext")
             def totalMemory = Runtime.runtime.totalMemory()
             def freeMemory = Runtime.runtime.freeMemory()
             def maxMemory = Runtime.runtime.maxMemory()
@@ -177,7 +176,7 @@ class StatisticsMgr {
     ]
 
     def handleEvent(topic, data) {
-        log.trace("Statistics: $topic => $data")
+        //log.trace("Statistics: $topic => $data")
         statRecorders.each { statRec ->
             statRec.recordEvent(topic, data)
         }

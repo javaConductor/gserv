@@ -37,7 +37,7 @@ class ResourceAction {
 
     //returns Closure passed to method function
     def requestHandler() {
-        _handler
+        _handler.clone()
     }
 
     def method() { _method }

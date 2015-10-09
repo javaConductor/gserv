@@ -123,6 +123,7 @@ class ActionRunner {
         def cl = action.requestHandler()//_handler
         HttpMethodDelegate dgt = prepareDelegate(context, action)
         cl.delegate = dgt
+        log.debug("$context setting delegate to ${dgt.hashCode()}")
         cl.resolveStrategy = Closure.DELEGATE_FIRST
         cl
     }
@@ -135,11 +136,12 @@ class ActionRunner {
         }
 
         //log.trace "ActionRunner.process() req#${currentReqId} requestContext has ${context.requestBody.bytes.size()} bytes to read."
-        log.trace "ActionRunner.process() req#${currentReqId}."
+        log.trace "ActionRunner.process() #$context."
 
         Closure cl = prepareClosure(context, action)
         def args = prepareArguments(context, action)
 //        println "AsyncHandler.process(): Calling errorHandlingWrapper w/ args: $args"
+        //cl.delegate.requestContext = context
         ({ clozure, argList ->
             try {
                 EventManager.instance().publish(Events.ResourceProcessing, [
@@ -147,7 +149,7 @@ class ActionRunner {
                         uri      : context.requestURI.path,
                         msg      : "Resource Processing."])
                 //println "AsyncHandler.process(): closureWrapper: Calling request handler w/ args: $argList"
-                log.trace "ActionRunner: Running req#${currentReqId} ${context.requestURI.path}"
+                log.trace "ActionRunner: Running req#${currentReqId} $context  ${context.id()}  ${context.hashCode()}  ${context.requestURI.path} - delegate ${cl.delegate.hashCode()} : context: ${cl.delegate.requestContext}  "
                 clozure(*argList)
                 log.trace "ActionRunner: req#${currentReqId} ${context.requestURI.path} - Finished."
             } catch (ConversionException e) {

@@ -153,11 +153,13 @@ trait ResourceHandlerFn {
      */
     void write(byte[] data) {
         if (!requestContext.isClosed()) {
-            //     log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext ")
+            log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext  - ${requestContext.id()}  - ${requestContext.hashCode()} ")
             requestContext.sendResponseHeaders(200, data.size() as long)
             requestContext.getResponseBody().write(data)
             requestContext.getResponseBody().close()
             requestContext.close()
+        } else {
+            log.trace("write(): Writing data to closed context.")
         }
     }
 

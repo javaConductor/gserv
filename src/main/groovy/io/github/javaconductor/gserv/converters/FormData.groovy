@@ -11,19 +11,35 @@ class FormData {
      * @param key
      * @return the first matching value
      */
-    FormElement getValue(key) {
+    FormElement getElement(key) {
         values.find { v ->
             v.name == key
         }
     }
+
+    String getValue(key) {
+        getElement(key)?.value
+    }
+
     /**
      *
      * @param key
      * @return all values for that key
      */
-    List<FormElement> getValues(key) {
+    List<FormElement> getElements(key) {
         values.findAll { v ->
             v.name == key
+        }
+    }
+
+    /**
+     *
+     * @param key
+     * @return all values for that key
+     */
+    List<String> getValues(key) {
+        getElements(key).collect { v ->
+            v.value
         }
     }
 }

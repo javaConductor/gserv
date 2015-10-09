@@ -38,7 +38,7 @@ public class InstanceLoaderSpec extends Specification {
 
         when:
         resourceLoader = new ResourceLoader()
-        GServConfig cfg = resourceLoader.loadInstance(new File(uri), [])
+        GServConfig cfg = resourceLoader.loadInstanceConfig(new File(uri), [])
 
         then:
         cfg.name() == "AppName"

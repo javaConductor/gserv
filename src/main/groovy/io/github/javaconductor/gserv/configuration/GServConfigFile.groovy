@@ -105,7 +105,7 @@ class GServConfigFile {
                 if (!f.exists()) {
                     throw new ConfigException("Instance script: $instanceScript not found.")
                 }
-                config = resourceLoader.loadInstance(f, classpath)
+                config = resourceLoader.loadInstanceConfig(f, classpath)
             }
 
             try {

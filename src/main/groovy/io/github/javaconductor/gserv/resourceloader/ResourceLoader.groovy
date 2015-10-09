@@ -73,13 +73,16 @@ class ResourceLoader {
      * @param instanceScriptFile
      * @return GServConfig
      */
-    GServConfig loadInstance(File instanceScriptFile, classpath) {
+    GServInstance loadInstance(File instanceScriptFile, classpath) {
         if (!(instanceScriptFile?.exists()))
             return null;
-        classpath = classpath ?: []
-        GroovyShell groovyShell = createGroovyShell(classpath)
+        GroovyShell groovyShell = createGroovyShell(classpath ?: [])
         GServInstance instance = groovyShell.evaluate(instanceScriptFile)
-        instance ? instance.config() : null
+        instance
+    }
+
+    GServConfig loadInstanceConfig(File instanceScriptFile, classpath) {
+        loadInstance()?.config()
     }
 
     def createGroovyShell(classpath) {

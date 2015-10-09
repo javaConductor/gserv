@@ -45,6 +45,6 @@ def setupLoggers() {
 
     logger("groovyx.net.http", WARN, ["FILE"])
     logger("org.apache.http", ERROR, ["FILE"])
-    logger("io.github.javaconductor.gserv", WARN, ["FILE"]) // gServ
-    root(TRACE, ["CONSOLE", "FILE"])
+    logger("io.github.javaconductor.gserv", DEBUG, ["FILE"]) // gServ
+    root(DEBUG, ["CONSOLE", "FILE"])
 }

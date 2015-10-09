@@ -28,6 +28,7 @@ import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 
 import java.security.Principal
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by lcollins on 12/26/2014.
@@ -35,7 +36,7 @@ import java.security.Principal
 abstract class AbstractRequestContext implements RequestContext {
 
     Map<String, List> requestHeaders = [:]
-    Map<String, List> responseHeaders = [:]
+    Map<String, List> responseHeaders = new ConcurrentHashMap<>()//[:]
     InputStream requestBody
     OutputStream responseBody
     Map attributes = [:]

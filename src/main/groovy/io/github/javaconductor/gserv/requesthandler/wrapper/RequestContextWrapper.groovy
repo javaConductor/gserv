@@ -136,7 +136,7 @@ class RequestContextWrapper extends AbstractRequestContext {
             //_context.responseHeaders.putAll this.responseHeaders
             _context.setResponseHeaders(nuHdr)
             try {
-                log.trace("Read headers wrapper $responseHeaders for req #$currentReqId )")
+//                log.trace("Read headers wrapper $responseHeaders for req #$currentReqId )")
                 log.trace("Writing headers $nuHdr for req #$currentReqId )")
                 _context.sendResponseHeaders(_code ?: 200, bytes.size())
                 originalOutputStream().write(bytes)
@@ -159,13 +159,10 @@ class RequestContextWrapper extends AbstractRequestContext {
                     message  : "Can't Write Bytes - already closed!"])
         }
     }// writeIt
+
     @Override
     GServConfig config() {
         super.config()
     }
-
-//    def id() {
-//        return attributes[GServ.contextAttributes.requestId]
-//    }
 
 }//

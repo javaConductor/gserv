@@ -27,7 +27,11 @@ package io.github.javaconductor.gserv.server
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import groovy.util.logging.Slf4j
+import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
+import groovyx.gpars.group.PGroup
+import groovyx.gpars.scheduler.DefaultPool
+import groovyx.gpars.scheduler.FJPool
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -36,6 +40,7 @@ import io.github.javaconductor.gserv.exceptions.HttpErrorException
 import io.github.javaconductor.gserv.factory.GServFactory
 import io.github.javaconductor.gserv.filters.FilterOptions
 import io.github.javaconductor.gserv.pathmatching.FilterMatcher
+import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
 import io.github.javaconductor.gserv.requesthandler.AsyncHandler
 import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
@@ -53,13 +58,14 @@ class GServHandler implements HttpHandler {
     private def _actions
     private def _staticRoots
     private def _templateEngineName
-    private def _dispatcher, _handler
     private GServConfig _cfg
     private def _nuHandler, _nuDispatcher
     Calendar cal = new GregorianCalendar();
     Long reqId = 1;
     FilterMatcher m = new FilterMatcher()
     FilterRunner filterRunner
+    def handlerQ = new DataflowQueue();
+    def dispatchQ = new DataflowQueue();
 
     /**
      * Create a handler with a specific configuration
@@ -74,20 +80,21 @@ class GServHandler implements HttpHandler {
         this._staticRoots = cfg.staticRoots()
         this._templateEngineName = cfg.templateEngineName()
 
-        _nuHandler = {
-            new AsyncHandler(cfg)
-        }
-        _handler = _nuHandler()
+        def handlerPGroup =
+//            new DefaultPGroup(new DefaultPool(true, 100))
+                new DefaultPGroup(new FJPool(1000))
+        def dispatcherPGroup = //new DefaultPGroup(3)
+                new DefaultPGroup(new FJPool(200))
+//                new DefaultPGroup(new DefaultPool(true, 10))
 
-        def actors = new ActorPool(1, 2, new DefaultPGroup(1), _nuHandler);
-        _nuDispatcher = {
-            _factory.createDispatcher(actors, _cfg);
-        }
-        _dispatcher = _nuDispatcher();
-        _dispatcher.start()
+        handlerQ = new DataflowQueue();
+        dispatchQ = new DataflowQueue();
+
+        new AsyncDispatcher(_cfg, dispatcherPGroup, dispatchQ, handlerQ)
+        new AsyncHandler(_cfg, handlerPGroup, handlerQ)
+
     }
 
-//    static Long requestId = 0L
     AtomicLong requestId = new AtomicLong(0L)
     /**
      * This method is called for each request
@@ -132,9 +139,7 @@ class GServHandler implements HttpHandler {
             }
 
             log.trace("ServerHandler.handle(${httpExchange.requestURI.path}) #$requestId: unharmed by filters. ")
-            //        log.debug("ServerHandler.handle(${httpExchange.requestURI.path}) instream: ${httpExchange.requestBody} outstream: ${httpExchange.responseBody}")
             currentReqId = context.id()
-            def start = cal.getTimeInMillis();
             _handle(context)
             EventManager.instance().publish(Events.RequestDispatched, [
                     requestId: currentReqId,
@@ -146,7 +151,7 @@ class GServHandler implements HttpHandler {
             log.error(msg, e)
             EventManager.instance().publish(Events.RequestProcessingError, [
                     requestId: currentReqId,
-                    error    : e.message,
+                    error: msg,
                     statusCode : e.httpStatusCode,
                     method   : context.requestMethod,
                     uri      : context.requestURI,
@@ -172,22 +177,18 @@ class GServHandler implements HttpHandler {
     }
 
     private void _handle(RequestContext context) {
-        log.trace("ServerHandler._handle(${context})")
+        log.trace("GServHandler._handle(${context})")
         //TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
+        def success = false
         try {
-            _dispatcher << [requestContext: context]
+            dispatchQ << [requestContext: context]
+            success = true
         } catch (IllegalStateException e) {
-            int retryCnt = context.attributes["handlerRetry"] ?: 0
-            ++retryCnt
-            /// try it 4 times
-            if (retryCnt > 3)
-                throw e
-
-            _dispatcher = _nuDispatcher()
-            context.attributes["handlerRetry"] = retryCnt + 1
-            _handle(context)
+            log.warn("GServHandler._handle(${context})", e)
+            throw e
         }
-        log.trace("ServerHandler._handle(${context}) Sent to dispatcher.")
+        if (success)
+            log.trace("GServHandler._handle(${context}) Sent to dispatcher.")
 
     }
 }

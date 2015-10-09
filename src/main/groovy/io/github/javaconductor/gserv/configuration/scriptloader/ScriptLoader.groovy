@@ -27,6 +27,7 @@ package io.github.javaconductor.gserv.configuration.scriptloader
 import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
+import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.server.GServInstance
 
 /**
@@ -37,17 +38,19 @@ class ScriptLoader {
 
     ResourceLoader resourceLoader = new ResourceLoader();
 
-    GServConfig loadInstance(instanceScript, classpath) {
+    GServInstance loadInstance(instanceScript, classpath) {
         def f = new File(instanceScript)
         if (!f.exists()) {
             System.err.println("No gserv instanceScript: ${f.absolutePath}")
             return null
         }
         /// script file exists - so run  it
-        return (resourceLoader.loadInstance(f, classpath) ?: null)
+        GServInstance instance = (resourceLoader.loadInstance(f, classpath) ?: null)
+
+
     }
 
-    List<GServInstance> loadResources(resourceScripts, classpath) {
+    List<GServResource> loadResources(resourceScripts, classpath) {
         (!resourceScripts) ? [] :
                 resourceScripts.collect { scriptFileName ->
                     def f = new File(scriptFileName)
@@ -55,13 +58,13 @@ class ScriptLoader {
                         System.err.println("No resourceScript: ${f.absolutePath}")
                         return []
                     }
-                    def instances
+                    def resources
                     try {
-                        instances = resourceLoader.loadResources(f, classpath)
+                        resources = resourceLoader.loadResources(f, classpath)
                     } catch (Throwable ex) {
                         throw ex
                     }
-                    return instances ?: []
+                    return resources ?: []
                 }.flatten()
     }
 }

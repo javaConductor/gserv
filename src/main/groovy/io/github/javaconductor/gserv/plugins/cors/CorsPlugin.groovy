@@ -28,6 +28,7 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.plugins.AbstractPlugin
+import io.github.javaconductor.gserv.requesthandler.RequestContext
 
 class CORSMode {
     static final String SameHost = "SameHost"
@@ -44,14 +45,16 @@ class CORSMode {
 @Slf4j
 class CorsPlugin extends AbstractPlugin {
 
-    def allowAllHandler = { CORSConfig corsConfig, requestContext, args ->
+    def allowAllHandler = { CORSConfig corsConfig, RequestContext requestContext, args ->
         switch (requestContext.requestMethod) {
 
             case "OPTIONS":
                 // add header Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Max-Age
                 requestContext.responseHeaders.put("Access-Control-Allow-Origin", ["*"])
                 requestContext.responseHeaders.put("Access-Control-Allow-Methods", ["OPTIONS,GET,PUT,POST,DELETE,HEAD"])
-                requestContext.responseHeaders.put("Access-Control-Allow-Headers", ["*"])
+                def neededHeader = requestContext.requestHeaders.get("Access-Control-Request-Headers", ['*'])
+                requestContext.responseHeaders.put("Access-Control-Allow-Headers", neededHeader)
+
                 requestContext.responseHeaders.put("Allow", ["OPTIONS,GET,PUT,POST,DELETE,HEAD"])
 
                 def entry //= getHostEntry( exchange.requestURI.host )
