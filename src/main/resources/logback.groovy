@@ -33,7 +33,6 @@ def setupAppenders() {
             pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{66} - %msg%n"
         }
     }
-
     appender("CONSOLE", ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
             pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{66} - %msg%n"

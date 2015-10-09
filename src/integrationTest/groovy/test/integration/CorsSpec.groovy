@@ -35,7 +35,7 @@ class CorsSpec {
 
     @Test
     public final void testCORSAllowAll() {
-        def port = 51001
+        def port = 51091
         def stopFn = new GServ().plugins {
             plugin("cors", [:])
         }.http {
@@ -56,7 +56,7 @@ class CorsSpec {
 
     @Test
     public final void testCORSWhiteList() {
-        def port = 51001
+        def port = 51031
 
         def stopFn = new GServ().plugins {
             plugin("cors", [:])
@@ -76,7 +76,7 @@ class CorsSpec {
 
     @Test
     public final void testCORSBlackList() {
-        def port = 51001
+        def port = 51061
 
         def stopFn = new GServ().plugins {
             plugin("cors", [:])

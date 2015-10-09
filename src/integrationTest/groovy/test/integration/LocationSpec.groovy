@@ -31,7 +31,7 @@ class LocationSpec {
 
     @Test
     public final void testLocation() {
-        def port = 51001
+        def port = 51071
         def stopFn = new GServ().http {
             resource testResource
         }.start(port)

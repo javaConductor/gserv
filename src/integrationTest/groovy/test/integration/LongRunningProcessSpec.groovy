@@ -79,12 +79,12 @@ class LongRunningProcessSpec {
                         def tm = (new Date().time - now)
 //                        log.debug("LongRunningProcess: Response $idx did not return in time.")
                         log.error("LongRunningProcess", e)
-                        assertFalse("LongRunningProcess: Response $idx did not return in time:  ${tm} msecs.", true)
+                        assertFalse("LongRunningProcess: Response $idx did not return in time: ${tm} msecs.", true)
                     }
                 }
             }
             def after = new Date().time
-//            log.debug("LongRunningProcess: Whole thing took too much time.")
+            log.debug("LongRunningProcess: Whole thing took ${(after - now)} msecs.")
             assertTrue("${(after - now)} msecs.", (after - now) < (50 * 1000))
         } finally {
             stopFn()

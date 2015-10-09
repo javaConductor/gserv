@@ -82,7 +82,7 @@ class ResourceLoader {
     }
 
     GServConfig loadInstanceConfig(File instanceScriptFile, classpath) {
-        loadInstance()?.config()
+        loadInstance(instanceScriptFile, classpath)?.config()
     }
 
     def createGroovyShell(classpath) {
