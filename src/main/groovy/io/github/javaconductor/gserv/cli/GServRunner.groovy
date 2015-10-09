@@ -142,12 +142,6 @@ class GServRunner {
                 }
                 configs = factory.createConfigs(configFile)
             }
-        } catch (ResourceScriptException ex) {
-            log.trace("Could not start app.", ex)
-            throw ex;
-        } catch (InstanceScriptException ex) {
-            log.trace("Could not start app.", ex)
-            throw ex;
         } catch (Throwable ex) {
             log.trace("Could not start app.", ex)
             throw ex;
