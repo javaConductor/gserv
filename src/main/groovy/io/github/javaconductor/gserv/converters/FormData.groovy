@@ -6,6 +6,7 @@ package io.github.javaconductor.gserv.converters
 class FormData {
     List<ValueElement> values = []
     List<FileElement> files = []
+
     /**
      *
      * @param key
@@ -17,10 +18,62 @@ class FormData {
         }
     }
 
-    String getValue(key) {
+    String getValue(String key) {
         getElement(key)?.value
+    };
+
+    boolean hasFiles() {
+        !files.empty
     }
 
+    boolean hasFields() {
+        !values.empty
+    }
+
+    boolean hasField(key) {
+        !getElement(key)
+    }
+    def fieldValue = new _values(this);
+    class _values {
+        FormData formData
+
+        def _values(FormData formData) {
+            List<ValueElement> elements
+            this.formData = formData
+        }
+
+        /**
+         *
+         * @param key
+         * @return all values for that key
+         */
+        List<FormElement> getElements(key) {
+            formData.values.findAll { v ->
+                v.name == key
+            }
+        }
+
+        /**
+         *
+         * @param key
+         * @return all values for that key
+         */
+        List<String> getValues(key) {
+            getElements(key).collect { v ->
+                v.value
+            }
+        }
+
+        String getValue(key) {
+            List l = getElements(key)
+            (l.empty) ? null : l[0].value
+        }
+
+        String getAt(String key) {
+            getValue(key)
+        }
+
+    }
     /**
      *
      * @param key
@@ -42,7 +95,9 @@ class FormData {
             v.value
         }
     }
+
 }
+
 
 public enum ElementType {
     Value,
