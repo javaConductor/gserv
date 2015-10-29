@@ -67,7 +67,6 @@ class GServInstance {
      */
     def GServInstance(cfg) {
         _cfg = cfg
-        _handler = new GServHandler(cfg);
         _authenticator = cfg.authenticator();
         _filters = cfg.filters();
         _templateEngineName = cfg.templateEngineName();
@@ -137,6 +136,7 @@ class GServInstance {
      */
     def start(port = null) {
         def actualPort = (port ?: _cfg.port())
+        def handler = new GServHandler(_cfg);
 
         exportMBean(actualPort,
                 new GServJMX()
@@ -144,7 +144,7 @@ class GServInstance {
 
         ///// Underlying Server Impl -
         HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
-        HttpContext context = server.createContext("/", _handler);
+        HttpContext context = server.createContext("/", handler);
 
         ////////////////////////////////
         /// create and add the InitFilter
@@ -232,6 +232,7 @@ class gServHttpsInstance extends GServInstance {
      */
     def start(port = null) {
         def actualPort = (port ?: _cfg.port())
+        def handler = new GServHandler(_cfg);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
@@ -291,7 +292,7 @@ class gServHttpsInstance extends GServInstance {
                 }
             }
         });
-        def context = server.createContext("/", _handler);
+        def context = server.createContext("/", handler);
 
         ////////////////////////////////
         /// create and add the InitFilter

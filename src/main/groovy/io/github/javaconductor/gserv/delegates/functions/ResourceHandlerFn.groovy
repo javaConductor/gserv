@@ -358,7 +358,7 @@ trait ResourceHandlerFn {
      * @param statusCode One of: 302,303,307
      */
     void redirect(url, statusCode) {
-        if (! [302,303,307].contains(statusCode)){
+        if (![302, 303, 307].contains(statusCode)) {
             throw IllegalArgumentException("Status code for HTTP redirect must be 302, 303, or 307.")
         }
         def message = "Resource has moved to: $url".toString()

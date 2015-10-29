@@ -46,8 +46,7 @@ class Jdk16RequestContext extends AbstractRequestContext {
             _exchange.responseHeaders.putAll(responseHeaders)
             log.trace("Sending headers ($this) : ${_exchange.responseHeaders} ")
             _exchange.sendResponseHeaders(responseCode, size)
-        }
-        else {
+        } else {
             log.warn("sendResponseHeaders() called twice.")
         }
     }

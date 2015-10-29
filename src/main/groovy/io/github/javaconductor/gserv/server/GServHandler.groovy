@@ -29,8 +29,6 @@ import com.sun.net.httpserver.HttpHandler
 import groovy.util.logging.Slf4j
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.group.DefaultPGroup
-import groovyx.gpars.group.PGroup
-import groovyx.gpars.scheduler.DefaultPool
 import groovyx.gpars.scheduler.FJPool
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.configuration.GServConfig
@@ -44,7 +42,6 @@ import io.github.javaconductor.gserv.requesthandler.AsyncDispatcher
 import io.github.javaconductor.gserv.requesthandler.AsyncHandler
 import io.github.javaconductor.gserv.requesthandler.FilterRunner
 import io.github.javaconductor.gserv.requesthandler.RequestContext
-import io.github.javaconductor.gserv.utils.ActorPool
 
 import java.util.concurrent.atomic.AtomicLong
 
@@ -81,12 +78,11 @@ class GServHandler implements HttpHandler {
         this._templateEngineName = cfg.templateEngineName()
 
         def handlerPGroup =
-//            new DefaultPGroup(new DefaultPool(true, 100))
-                new DefaultPGroup(new FJPool(1000))
-        def dispatcherPGroup = //new DefaultPGroup(3)
-                new DefaultPGroup(new FJPool(200))
-//                new DefaultPGroup(new DefaultPool(true, 10))
+                new DefaultPGroup(new FJPool(cfg.maxThreads()))
+        def dispatcherPGroup =
+                new DefaultPGroup(new FJPool(10))
 
+        log.debug("GServHandler: ${cfg.maxThreads()} handler threads.")
         handlerQ = new DataflowQueue();
         dispatchQ = new DataflowQueue();
 
@@ -150,12 +146,12 @@ class GServHandler implements HttpHandler {
             def msg = e.message
             log.error(msg, e)
             EventManager.instance().publish(Events.RequestProcessingError, [
-                    requestId: currentReqId,
-                    error: msg,
-                    statusCode : e.httpStatusCode,
-                    method   : context.requestMethod,
-                    uri      : context.requestURI,
-                    headers  : context.requestHeaders])
+                    requestId : currentReqId,
+                    error     : msg,
+                    statusCode: e.httpStatusCode,
+                    method    : context.requestMethod,
+                    uri       : context.requestURI,
+                    headers   : context.requestHeaders])
             context.sendResponseHeaders(e.httpStatusCode, msg.bytes.size())
             context.responseBody.write(msg.bytes)
             context.responseBody.close()

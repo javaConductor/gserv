@@ -41,8 +41,7 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
 class HttpsConfig {
     def keyManagerAlgorithm = 'SunX509'
     def trustManagerAlgorithm = 'SunX509'
-    ///TODO change to current user name
-    def keyStoreFilePath = "/Users/lcollins/gserv.keystore"
+    def keyStoreFilePath = System.getProperty("user.home") + "/gserv.keystore"
     def keyStoreImplementation = "JKS"
     def password
     def sslProtocol
@@ -60,8 +59,9 @@ class GServConfig {
 
     private def _name = 'gserv App';
     private def _actions = [];
-    private def _staticRoots = [], _filters = [], _authenticator,
-        _templateEngineName, _defaultPort
+    private def _staticRoots = [],
+                _filters = [], _authenticator,
+                _templateEngineName, _defaultPort
     private def _defaultResource
     private InetSocketAddress _bindAddress
     private StaticFileHandler _staticFileHandler = new StaticFileHandler()
@@ -80,10 +80,13 @@ class GServConfig {
         this.delegateManager(new DelegatesMgr(DefaultDelegates.getDelegates()))
     }
 
-    /**
-     *
-     * @return the BindAddress for Instances using this gServ Config
-     */
+    static int defaultMaxThreads() {
+        Runtime.runtime.availableProcessors() + 1;
+    }
+/**
+ *
+ * @return the BindAddress for Instances using this gServ Config
+ */
     InetSocketAddress bindAddress() {
         return _bindAddress;// ?: new Inet4Address('0.0.0.0', null)
     }
@@ -339,6 +342,17 @@ class GServConfig {
 
     GServConfig statusPath(String s) {
         _statusPath = s
+        this
+    }
+
+    int _maxThread = defaultMaxThreads();
+
+    int maxThreads() {
+        _maxThread
+    }
+
+    GServConfig maxThreads(int n) {
+        _maxThread = n
         this
     }
 

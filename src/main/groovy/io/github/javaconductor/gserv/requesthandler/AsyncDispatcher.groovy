@@ -43,6 +43,13 @@ import org.apache.commons.io.IOUtils
  * User: javaConductor
  * Date: 1/5/14
  * Time: 10:13 PM
+ *
+ * The AsyncDispatcher receives HTTP requests, determines whether an
+ * action needs to be called or to return a static resource.
+ * If an action matches the request URL then the request along with the
+ * action is  put in the AsyncHandler queue for processing..
+ * If no matching action is found in the configuration then it looks for a static resource that fits the description.
+ * If found then return it else return HTTP 404
  */
 @Slf4j
 class AsyncDispatcher {//extends DynamicDispatchActor {
@@ -107,11 +114,8 @@ class AsyncDispatcher {//extends DynamicDispatchActor {
                         method      : context.requestMethod])
 
                 if (e.message.startsWith("The actor cannot accept messages at this point.")) {
-                    //TODO needs new handler
-                    log.warn "Actor in bad state: replacing."
-//                    _handlerActorPool.replaceActor(actr)
-                    //_theHandlerActor = _handlerActorPool.next()
-                    log.warn "Actor in bad state: replaced and reprocessed!"
+                    //TODO use a retry count so we dont go forever
+                    log.warn "Processing request(${currentReqId}) Actor in bad state: reprocessing."
                     return process(context)
                 } else {
                     evtMgr.publish(Events.RequestProcessingError, [

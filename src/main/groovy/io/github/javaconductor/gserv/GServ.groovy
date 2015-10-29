@@ -158,6 +158,7 @@ class GServ {
                 .addStaticRoots(tmpStaticRoots)
                 .actions(tmpActions)
                 .addFilters(tmpFilters)
+
         /// each plugin is applied to the configuration
         cfg = serverPlugins.applyPlugins(cfg);
         if (options.https) {

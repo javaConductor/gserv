@@ -40,14 +40,14 @@ class ActionAvgMinMaxReqTime implements ActionStatRecorder {
     ConcurrentMap statsByAction = new ConcurrentHashMap()
     def runningReqs = [:] // RegId
 
-    Map createActionStats(ResourceAction action){
-        if (!statsByAction[action]){
+    Map createActionStats(ResourceAction action) {
+        if (!statsByAction[action]) {
             statsByAction[action] = [
                     MaxRequestTime: new AtomicLong(0),
                     MinRequestTime: new AtomicLong(0),
                     AvgRequestTime: new AtomicLong(0),
                     totalMilliseconds: new AtomicLong(0),
-                    totalRequests: new AtomicLong(0)
+                    totalRequests : new AtomicLong(0)
             ]
         }
         statsByAction[action]
@@ -97,11 +97,11 @@ class ActionAvgMinMaxReqTime implements ActionStatRecorder {
     Map reportStat(ResourceAction action) {
         def actionStats = createActionStats(action)
         actionStats ?
-        [
-                ('Avg Request Time') : actionStats.AvgRequestTime.get(),
-                ('Min Request Time') : actionStats.MinRequestTime.get(),
-                ('Max Request Time') : actionStats.MaxRequestTime.get()
-        ] : [:]
+                [
+                        ('Avg Request Time'): actionStats.AvgRequestTime.get(),
+                        ('Min Request Time'): actionStats.MinRequestTime.get(),
+                        ('Max Request Time'): actionStats.MaxRequestTime.get()
+                ] : [:]
     }
 
     def reset() {

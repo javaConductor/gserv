@@ -52,7 +52,7 @@ class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn 
         // $this inside the closure will be the currently processing action
         to = value('to')
         $this = action
-        log.debug("Created httpMethodDelegate : $requestContext  ${this.hashCode()}")
+        log.trace("Created httpMethodDelegate : $requestContext  ${this.hashCode()}")
         this.requestContext = requestContext
         this.serverConfig = serverConfig
     }

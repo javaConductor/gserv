@@ -37,6 +37,7 @@ class MaxCurrentConnections implements StatRecorder {
     AtomicLong endedRequests = new AtomicLong(0)
     AtomicLong maxConcurrentRequests = new AtomicLong(0)
     Date maxConcurrentDate
+
     @Override
     def recordEvent(String topic, Map eventData) {
 

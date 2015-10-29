@@ -121,6 +121,9 @@ class GServConfigFile {
             if (port) {
                 config.port(port)
             }
+            if (maxThreads) {
+                config.maxThreads(maxThreads as int)
+            }
             if (static_roots) {
                 config.addStaticRoots(static_roots)
             }

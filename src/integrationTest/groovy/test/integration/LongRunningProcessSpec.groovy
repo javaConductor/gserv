@@ -4,6 +4,8 @@ import com.github.restdriver.serverdriver.http.response.Response
 import groovy.util.logging.Slf4j
 import io.github.javaconductor.gserv.cli.GServRunner
 import org.junit.Test
+import spock.lang.Ignore
+
 import static org.junit.Assert.*
 
 import java.util.concurrent.TimeUnit
@@ -22,6 +24,7 @@ class LongRunningProcessSpec {
     def baseDir = "src/integrationTest/resources/test/integration/"
 
     @Test
+    @Ignore
     public final void test_10_secondRequests() {
         def port = 51038
         def dir = baseDir + "longrun"
@@ -47,7 +50,7 @@ class LongRunningProcessSpec {
                 }
             }
             def after = new Date().time
-            log.debug("LongRunningProcess: Whole thing took too much time.")
+            //log.debug("LongRunningProcess: Whole thing took too much time.")
             assertTrue((after - now) < (11 * 1000))
         } finally {
             stopFn()
@@ -55,10 +58,11 @@ class LongRunningProcessSpec {
     }
 
     @Test
+    @Ignore
     public final void test_many_10_secondRequests() {
         def port = 51039
         def dir = baseDir + "longrun"
-        def args = ["-p", "$port",
+        def args = ["-p", "$port", "-x", "1000",
                     "-i", dir + "/LongRun.groovy"]
         def stopFn = new GServRunner().start(args)
         try {
@@ -68,7 +72,7 @@ class LongRunningProcessSpec {
                 (1..1000).collectParallel { idx ->
 
                     try {
-                        Thread.currentThread().sleep(50)
+//                        Thread.currentThread().sleep(50)
                         log.debug("LongRunningProcess: Response $idx started.")
                         Response r = getOf("http://localhost:$port/", withTimeout(15, TimeUnit.SECONDS))
                         def tm = (new Date().time - now)

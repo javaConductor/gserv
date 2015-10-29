@@ -25,11 +25,9 @@
 package io.github.javaconductor.gserv.cli
 
 import groovy.util.logging.Slf4j
-import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
+import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.exceptions.ConfigException
 import io.github.javaconductor.gserv.factory.GServFactory
-import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
-import io.github.javaconductor.gserv.resourceloader.ResourceScriptException
 import org.apache.commons.cli.Option
 
 /**
@@ -55,6 +53,7 @@ class GServRunner {
         cli.j(longOpt: 'classpath', 'Classpath. Commas separated list of jars.', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.r(longOpt: 'resourceScripts', 'Resource Scripts', required: false, args: Option.UNLIMITED_VALUES, valueSeparator: ',')
         cli.n(longOpt: 'appName', 'The name of the Application', args: 1, required: false)
+        cli.x(longOpt: 'maxThreads', 'The max number of threads used to respond to requests', args: 1, required: false)
         cli.v(longOpt: 'version', 'Prints the current gServ version', args: 0, required: false)
         cli.g(longOpt: 'no-status-page', 'Disables the status page.', args: 0, required: false)
         cli.t(longOpt: 'status-path', 'Path to use for the status page.', args: 0, required: false)
@@ -66,6 +65,7 @@ class GServRunner {
      * @param options
      * @return
      */
+    //TODO do some data type validation
     def validateOptions(options) {
         def ok = (options.i && options.p) || (options.r && options.p) || (options.s && options.p) || options.c;
         ok
@@ -88,6 +88,7 @@ class GServRunner {
             return;
         }
 
+        def maxThreads
         def statusPage
         def statusPath
         def configs
@@ -108,6 +109,7 @@ class GServRunner {
                 instanceScript = options.i;
                 def appName = options.n;
                 classpath = options.js;
+                maxThreads = options.x;
                 statusPath = options.t
                 statusPage = !options.g
                 if (instanceScript) {
@@ -118,6 +120,7 @@ class GServRunner {
                             defaultResource ?: "",
                             instanceScript ?: "",
                             resourceScripts ?: [],
+                            maxThreads ? maxThreads as int : GServConfig.defaultMaxThreads(),
                             statusPage,
                             statusPath ?: "",
                             classpath ?: [],
@@ -130,6 +133,7 @@ class GServRunner {
                             defaultResource ?: "",
                             instanceScript ?: "",
                             resourceScripts ?: [],
+                            maxThreads ? maxThreads as int : GServConfig.defaultMaxThreads(),
                             statusPage,
                             statusPath ?: "",
                             classpath ?: [],

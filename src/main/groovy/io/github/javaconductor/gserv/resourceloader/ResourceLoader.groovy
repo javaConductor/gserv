@@ -55,6 +55,7 @@ class ResourceLoader {
         def resources
         try {
             resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
+            log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScriptFile.absolutePath}")
             resourceCache[resourceScriptFile.absolutePath] = resources
         } catch (MultipleCompilationErrorsException ex) {
             log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)

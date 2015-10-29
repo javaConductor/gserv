@@ -25,7 +25,6 @@
 package io.github.javaconductor.gserv.utils
 
 import groovyx.gpars.actor.Actor
-import groovyx.gpars.group.PGroup
 
 /**
  * Created by javaConductor on 5/4/2014.

@@ -46,7 +46,7 @@ class PluginMgr {
     }
 
     def initDefaultPlugins() {
-       // register('ldap', LdapPlugin.class)
+        // register('ldap', LdapPlugin.class)
         register('cors', CorsPlugin.class)
         register('caching', CachingPlugin.class)
         register('compression', CompressionPlugin.class)

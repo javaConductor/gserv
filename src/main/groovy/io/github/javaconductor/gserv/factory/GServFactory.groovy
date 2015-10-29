@@ -65,11 +65,6 @@ class GServFactory {
                 : new GServInstance(cfg)
     }
 
-//
-//    AsyncDispatcher createDispatcher( GServConfig cfg, Closure getHandlerFn) {
-//        new AsyncDispatcher(cfg, getHandlerFn)
-//    }
-
     /**
      * Parses a gserv Config file
      *
@@ -86,22 +81,6 @@ class GServFactory {
         }
     }//createConfigs
 
-//    /**
-//     * Loads a gserv config file from a Groovy script file
-//     *
-//     * @param cfgScriptFile
-//     * @return GServConfig .
-//     */
-//    GServConfig createConfig(File cfgScriptFile) {
-//        assert cfgScriptFile
-//        try {
-//            new ResourceLoader().loadInstanceConfig(cfgScriptFile, [])
-//        } catch (Throwable ex) {
-//            log.error("Could not create application from gserv config script: ${cfgScriptFile.absolutePath}: ${ex.message}")
-//            throw ex;
-//        }
-//    }//createConfigs
-
     /**
      * Creates a gserv Config
      *
@@ -115,6 +94,7 @@ class GServFactory {
     List<GServConfig> createConfigs(String staticRoot, String bindAddress,
                                     int port, String defaultResource, String instanceScript,
                                     List<String> resourceScripts,
+                                    int maxThreads,
                                     boolean statusPage,
                                     String statusPath,
                                     List<String> classpath,
@@ -142,28 +122,31 @@ class GServFactory {
         }
 
         createConfigs(staticRoot, bindAddress, port, defaultResource,
-                cfg, resources, statusPage, statusPath, classpath, displayName)
+                cfg, resources, maxThreads, statusPage, statusPath, classpath, displayName)
 
     }//createConfigs
 
     GServInstance createInstance(String staticRoot, String bindAddress,
                                  int port, String defaultResource, String instanceScript,
                                  List<String> resourceScripts,
+                                 int maxThreads,
                                  boolean statusPage,
                                  String statusPath,
                                  List<String> classpath,
                                  displayName = "gServ Application") {
         GServConfig cfg
-        def resources = []
         ResourceLoader resourceLoader = new ResourceLoader()
         ScriptLoader scriptLoader = new ScriptLoader()
 
         try {
             /// if there is an instance script then use it to create the config
-            GServInstance instance = resourceLoader.loadInstance(new File(instanceScript), classpath)
+            File f = new File(instanceScript)
+            GServInstance instance = resourceLoader.loadInstance(f, classpath)
+            log.debug("Loaded instance ${instance.config().name()} from script: ${f.absolutePath}")
             instance.config().port(port)
             if (resourceScripts) {
-                resources = scriptLoader.loadResources(resourceScripts, classpath)
+                def resources = scriptLoader.loadResources(resourceScripts, classpath)
+                log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScripts*.toString()}")
                 instance.config().addResources(resources)
             }
 
@@ -173,6 +156,10 @@ class GServFactory {
 
             if (bindAddress) {
                 instance.config().bindAddress(new InetSocketAddress(bindAddress, port))
+            }
+
+            if (maxThreads) {
+                instance.config().maxThreads(maxThreads)
             }
 
             if (defaultResource) {
@@ -211,6 +198,7 @@ class GServFactory {
     def createConfigs(String staticRoot, String bindAddress,
                       int port, String defaultResource,
                       GServConfig cfg, List<GServResource> resources,
+                      int maxThreads,
                       boolean statusPage,
                       String statusPath,
                       List<String> classpath, displayName = "gServ Application") {
@@ -234,6 +222,10 @@ class GServFactory {
 
         if (displayName) {
             cfg.name(displayName)
+        }
+
+        if (maxThreads) {
+            cfg.maxThreads(maxThreads)
         }
 
         cfg.statusPath(statusPath)

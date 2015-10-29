@@ -208,7 +208,6 @@ abstract class AbstractRequestContext implements RequestContext {
     @Override
     String toString() {
         "#${id()} -> $requestMethod:$requestURI"
-//        return super.toString()
     }
 
 }

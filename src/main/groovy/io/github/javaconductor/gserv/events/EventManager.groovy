@@ -93,7 +93,11 @@ class EventManager {
         GParsPool.withPool {
 //            needToKnow.eachParallel {
             needToKnow.eachParallel {
-                it.evtHandler(topic, data)
+                try {
+                    it.evtHandler(topic, data)
+                } catch (Throwable e) {
+                    log.warn("Error firing event handler", e);
+                }
             }
         }
     }

@@ -25,9 +25,7 @@
 package io.github.javaconductor.gserv.requesthandler
 
 import groovy.util.logging.Slf4j
-import groovyx.gpars.actor.DynamicDispatchActor
 import groovyx.gpars.dataflow.DataflowQueue
-import groovyx.gpars.group.DefaultPGroup
 import groovyx.gpars.group.PGroup
 import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.events.EventManager
@@ -38,6 +36,9 @@ import io.github.javaconductor.gserv.events.Events
  * User: lcollins
  * Date: 1/5/14
  * Time: 10:13 PM
+ *
+ * The AsyncHandler receives request and an action from the
+ * AsyncDispatcher and processes the request by executing the action.
  */
 @Slf4j
 class AsyncHandler {// extends DynamicDispatchActor {//implements TypeUtils {

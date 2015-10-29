@@ -25,7 +25,6 @@
 package io.github.javaconductor.gserv.configuration.scriptloader
 
 import groovy.util.logging.Slf4j
-import io.github.javaconductor.gserv.configuration.GServConfig
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.server.GServInstance
@@ -45,9 +44,11 @@ class ScriptLoader {
             return null
         }
         /// script file exists - so run  it
-        GServInstance instance = (resourceLoader.loadInstance(f, classpath) ?: null)
+        GServInstance instance = resourceLoader.loadInstance(f, classpath) ?: null
 
+        log.debug("Loaded instance ${instance.config().name()} from script ${f.absolutePath}")
 
+        instance
     }
 
     List<GServResource> loadResources(resourceScripts, classpath) {
@@ -61,6 +62,7 @@ class ScriptLoader {
                     def resources
                     try {
                         resources = resourceLoader.loadResources(f, classpath)
+                        log.debug("Loaded ${} resources  from: ${f.absolutePath}")
                     } catch (Throwable ex) {
                         throw ex
                     }

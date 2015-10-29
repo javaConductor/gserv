@@ -40,8 +40,8 @@ class ActionSuccessFailure implements ActionStatRecorder {
     ConcurrentMap statsByAction = new ConcurrentHashMap()
     def runningReqs = [] // RegId
 
-    Map createActionStats(ResourceAction action){
-        if (!statsByAction[action]){
+    Map createActionStats(ResourceAction action) {
+        if (!statsByAction[action]) {
             statsByAction[action] = [
                     SuccessfulRequests: new AtomicLong(0),
                     FailedRequests    : new AtomicLong(0)
@@ -86,10 +86,10 @@ class ActionSuccessFailure implements ActionStatRecorder {
     Map reportStat(ResourceAction action) {
         def actionStats = createActionStats(action)
         actionStats ?
-        [
-                ('Successful Requests') : actionStats.SuccessfulRequests.get(),
-                ('Failed Requests')     : actionStats.FailedRequests.get()
-        ] : [:]
+                [
+                        ('Successful Requests'): actionStats.SuccessfulRequests.get(),
+                        ('Failed Requests')    : actionStats.FailedRequests.get()
+                ] : [:]
     }
 
     def reset() {

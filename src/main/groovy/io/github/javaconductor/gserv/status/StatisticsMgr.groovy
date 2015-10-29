@@ -172,7 +172,7 @@ class StatisticsMgr {
 
     def actionStatRecorders = [
             new ActionSuccessFailure()
-         //   new ActionAvgMinMaxReqTime()
+            //   new ActionAvgMinMaxReqTime()
     ]
 
     def handleEvent(topic, data) {
@@ -181,9 +181,9 @@ class StatisticsMgr {
             statRec.recordEvent(topic, data)
         }
 
-        actionStatRecorders.each {ActionStatRecorder actionStatRec ->
+        actionStatRecorders.each { ActionStatRecorder actionStatRec ->
             ResourceAction action = cfg.matchAction(data.requestContext)
-            if(action)
+            if (action)
                 actionStatRec.recordEvent(action, topic, data)
         }
 

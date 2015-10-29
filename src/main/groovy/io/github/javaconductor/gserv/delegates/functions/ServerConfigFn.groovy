@@ -231,7 +231,7 @@ trait ServerConfigFn {
         return authString.split(':')
     }
 
-     boolean _authenticated(String user, String pswd, RequestContext requestContext, Closure challengeFn) {
+    boolean _authenticated(String user, String pswd, RequestContext requestContext, Closure challengeFn) {
         return (challengeFn(user, pswd, requestContext));
     }
 

@@ -59,7 +59,7 @@ class AvgMinMaxReqTime implements StatRecorder {
             case Events.ResourceProcessed://
                 // find the request in the eventDataByRequestId
                 Date startTime = runningReqs[eventData.requestId]
-                Date endTime = eventData.when
+                Date endTime = eventData.when ?: new Date()
                 def totalTime = endTime.time - startTime.time
 
                 /// set the Average

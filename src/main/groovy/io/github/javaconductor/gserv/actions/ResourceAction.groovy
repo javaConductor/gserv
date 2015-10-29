@@ -100,7 +100,7 @@ class ResourceAction {
 
     @Override
     int hashCode() {
-        return ( method() + pathElements().join('/')).hashCode()
+        return (method() + pathElements().join('/')).hashCode()
     }
 
     @Override
