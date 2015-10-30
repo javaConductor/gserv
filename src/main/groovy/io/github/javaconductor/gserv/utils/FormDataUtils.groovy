@@ -136,7 +136,7 @@ class FormDataUtils {
         /////////////
 
         if (isFile) {
-            [new FileElement(name: filename, contentType: contentType.trim(), content: dataArray)]
+            [new FileElement(name: filename, contentType: contentType.trim(), content: dataArray, size: dataArray.length)]
         } else {
             String s = new String(body)
             if (s.endsWith('\r\n')) {
@@ -231,7 +231,7 @@ class FormDataUtils {
         /////////////
 
         if (isFile) {
-            [new FileElement(name: filename, contentType: contentType.trim(), content: dataArray)]
+            [new FileElement(name: filename, contentType: contentType.trim(), content: dataArray, size: dataArray.length)]
         } else {
             String s = new String(dataArray)
             if (s.endsWith('\r\n')) {

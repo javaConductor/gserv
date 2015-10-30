@@ -31,7 +31,7 @@ class FormData {
     }
 
     boolean hasField(key) {
-        !getElement(key)
+        !!getElement(key)
     }
     def fieldValue = new _values(this);
     class _values {
@@ -64,11 +64,23 @@ class FormData {
             }
         }
 
+        /**
+         *
+         *
+         * @param key
+         * @return first value for the key
+         */
         String getValue(key) {
             List l = getElements(key)
             (l.empty) ? null : l[0].value
         }
 
+        /**
+         * Added to use the [] operator
+
+         * @param key
+         * @return String or null
+         */
         String getAt(String key) {
             getValue(key)
         }
@@ -120,6 +132,7 @@ class ValueElement extends FormElement {
 class FileElement extends FormElement {
     String contentType
     byte[] content
+    int size
 
     FileElement() {
         type = ElementType.File
