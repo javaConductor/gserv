@@ -110,7 +110,6 @@ class FormData {
 
 }
 
-
 public enum ElementType {
     Value,
     File

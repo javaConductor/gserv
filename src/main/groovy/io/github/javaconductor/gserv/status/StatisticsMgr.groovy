@@ -37,6 +37,9 @@ import java.text.NumberFormat
 
 /**
  * Created by lcollins on 4/30/2015.
+ *
+ * Compiles the statistics for the statusPage  Creates statistics by using
+ * 'recorders' .
  */
 @Slf4j
 class StatisticsMgr {
@@ -47,6 +50,7 @@ class StatisticsMgr {
         listenUp()
     }
     /**
+     * Using the 'statusPath' from the config, we add a filter to intercept the 'statusPath' and show the status page.
      *
      * @return The Status Filter
      */
@@ -164,17 +168,30 @@ class StatisticsMgr {
         EventManager.instance().subscribe(Events.FilterError, eventHandler)
     }
 
+    /**
+     *  A list of statistics recorders
+     */
     def statRecorders = [
             new SuccessFailure(),
             new MaxCurrentConnections(),
             new AvgMinMaxReqTime()
     ]
 
+    /**
+     *  A list of statistics recorders for specific actions
+     */
     def actionStatRecorders = [
             new ActionSuccessFailure()
             //   new ActionAvgMinMaxReqTime()
     ]
 
+    /**
+     * Record the statistics from these events
+     *
+     * @param topic
+     * @param data
+     * @return
+     */
     def handleEvent(topic, data) {
         //log.trace("Statistics: $topic => $data")
         statRecorders.each { statRec ->
@@ -189,6 +206,11 @@ class StatisticsMgr {
 
     }
 
+    /**
+     * Reset the statistics to reflect the current time and after
+     *
+     * @return
+     */
     def reset() {
         statRecorders.each { statRec ->
             statRec.reset()

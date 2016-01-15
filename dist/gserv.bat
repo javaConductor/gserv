@@ -1,2 +1,3 @@
 @echo off
-java -jar gserv.jar %*
+set "oldDir=%cd%"
+java -jar %~dp0gserv.jar %*

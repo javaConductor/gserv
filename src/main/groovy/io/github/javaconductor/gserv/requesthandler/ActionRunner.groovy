@@ -45,7 +45,6 @@ import java.util.concurrent.atomic.AtomicLong
 @Slf4j
 class ActionRunner {
     GServConfig _cfg
-    FormElement duummy
     private AtomicLong reqId = new AtomicLong(0L)
 
     ActionRunner(GServConfig cfg) {

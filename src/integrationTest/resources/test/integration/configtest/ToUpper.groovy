@@ -30,4 +30,3 @@ package test.integration.configtest
             }
         }
 ]
-

@@ -67,6 +67,7 @@ abstract class AbstractRequestContext implements RequestContext {
         requestHeaders[header] ? requestHeaders[header][0] : null
     }
 
+    @Override
     void setRequestHeaders(Map<String, List> requestHeaders) {
         this.requestHeaders = requestHeaders
     }

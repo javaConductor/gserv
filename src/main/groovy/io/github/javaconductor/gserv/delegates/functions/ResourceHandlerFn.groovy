@@ -32,6 +32,8 @@ import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
 import org.apache.commons.io.IOUtils
 
+import java.lang.reflect.Modifier
+
 /**
  *
  * @author javaConductor
@@ -275,7 +277,7 @@ trait ResourceHandlerFn {
     }
 
     Map asMap(Object thing) {
-        (thing.class.declaredFields as List).findAll { !it.synthetic }.collectEntries {
+        (thing.class.declaredFields as List).findAll { !it.synthetic && (it.modifiers | Modifier.STATIC) }.collectEntries {
             thing."$it.name" ? [(it.name): thing."$it.name"] : [:]
         }
     }

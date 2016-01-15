@@ -166,6 +166,23 @@ trait ResourceFn {
         }
     }
 
+    /**
+     * Declares a handler for an HTTP PATCH request for the specified URL.
+     *
+     * @param url /example/:name/:age
+     * @param clozure clozure(inputStream, name, age )
+     * @return
+     */
+    def patch(url, Object... matchersAndClosure) {
+        log.trace("resourceFn: post url=$url")
+        def clozure = matchersAndClosure.last()
+        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+        def action = _addUrlToPatternList("PATCH", url, clozure)
+        if (customMatchers) {
+            action.customMatchers(customMatchers)
+        }
+    }
+
     private ResourceAction _addUrlToPatternList(method, url, clozure) {
         def absUrl = value("path") ?: "";
         if (url) {
