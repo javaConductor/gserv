@@ -1,25 +1,27 @@
+
+
 /*
- * The MIT License (MIT)
+ *  The MIT License (MIT)
  *
- * Copyright (c) 2014-2015 Lee Collins
+ *  Copyright (c) 2014-2016 Lee Collins
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
  */
 
 package io.github.javaconductor.gserv.cli
@@ -57,6 +59,7 @@ class GServRunner {
         cli.v(longOpt: 'version', 'Prints the current gServ version', args: 0, required: false)
         cli.g(longOpt: 'no-status-page', 'Disables the status page.', args: 0, required: false)
         cli.t(longOpt: 'status-path', 'Path to use for the status page.', args: 0, required: false)
+        cli._(longOpt: 'appProperties', 'Application properties file.', args: 1, required: false)
     }
 
     /**
@@ -91,6 +94,7 @@ class GServRunner {
         def maxThreads
         def statusPage
         def statusPath
+        def appPropertiesFilename
         def configs
         def configFile
         def configFilename = options.c;
@@ -112,6 +116,8 @@ class GServRunner {
                 maxThreads = options.x;
                 statusPath = options.t
                 statusPage = !options.g
+                appPropertiesFilename = options.appProperties
+
                 if (instanceScript) {
                     nuInstance = factory.createInstance(
                             staticRoot ?: "",
@@ -123,6 +129,7 @@ class GServRunner {
                             maxThreads ? maxThreads as int : GServConfig.defaultMaxThreads(),
                             statusPage,
                             statusPath ?: "",
+                            appPropertiesFilename,
                             classpath ?: [],
                             appName ?: null)
                 } else {
@@ -136,10 +143,15 @@ class GServRunner {
                             maxThreads ? maxThreads as int : GServConfig.defaultMaxThreads(),
                             statusPage,
                             statusPath ?: "",
+                            appPropertiesFilename,
                             classpath ?: [],
                             appName ?: null);
                 }
-            } else {   // use ONLY the config file and ignore everything else on the cmdLine
+            } else {   // use ONLY the config file and ignore everything else on the cmdLine Except: appProperties
+
+                //TODO we need to use the appProperties file as the values for config file vars eg: $properties.timeServiceHost
+                //TODO $properties is Map of values from properties file ???? LAC
+
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {
                     throw new IllegalArgumentException("ConfigFile $configFilename not found!");
