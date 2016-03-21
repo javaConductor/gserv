@@ -22,29 +22,28 @@
  *  THE SOFTWARE.
  */
 
-
-
 /* Space out content a bit */
 body {
-  padding-top: 20px;
-  padding-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 /* Custom page footer */
 .footer {
-  padding-top: 19px;
-  color: #777;
-  border-top: 1px solid #e5e5e5;
+    padding-top: 19px;
+    color: #777;
+    border-top: 1px solid #e5e5e5;
 }
 
 /* Customize container */
 @media (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
+    .container {
+        max-width: 730px;
+    }
 }
+
 .container-narrow > hr {
-  margin: 30px 0;
+    margin: 30px 0;
 }
 
 li.menuItem {
@@ -73,11 +72,13 @@ pre {
     border: groove;
     border-color: navy;
     padding: 1em;
-    min-width: 20%;max-width: 100%;
+    min-width: 20%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
-body{
+
+body {
     padding: 2em;
 }
 
@@ -92,7 +93,7 @@ body{
     color: navy;
     font-weight: bold;
     font-size: xx-large;
-    width:100%;
+    width: 100%;
 
 }
 
@@ -101,22 +102,22 @@ body{
     color: navy;
     font-weight: bold;
     font-size: x-large;
-    width:99%;
+    width: 99%;
 }
 
 .sub-section-header {
     color: lightyellow;
     background-color: navy;
-    font-weight:normal;
+    font-weight: normal;
     font-size: medium;
-    width:99%;
+    width: 99%;
 }
 
 .section-content {
     background-color: lightyellow;
     color: navy;
-    font-weight:400;
-    width:99%;
+    font-weight: 400;
+    width: 99%;
     margin: 10px;
     font-size: large;
 
@@ -127,7 +128,9 @@ body{
     background-color: lightyellow;
     color: navy;
     border-color: navy;
-    padding: 1em;min-width: 20%;max-width: 90%;
+    padding: 1em;
+    min-width: 20%;
+    max-width: 90%;
 }
 
 .menu {
@@ -146,21 +149,23 @@ div.menu {
     color: navy;
     font-weight: bold;
     font-size: xx-large;
-    width:99%;
+    width: 99%;
 }
+
 .example-howto-header {
     background-color: lightyellow;
     color: navy;
     font-weight: bold;
     font-size: x-large;
-    width:99%;
+    width: 99%;
 }
+
 .example-complete-header {
     background-color: lightyellow;
     color: navy;
     font-weight: bold;
     font-size: x-large;
-    width:99%;
+    width: 99%;
 }
 
 .example-sub-header {
@@ -168,7 +173,7 @@ div.menu {
     color: navy;
     font-weight: bold;
     font-size: large;
-    width:99%;
+    width: 99%;
 }
 
 .example-content {
@@ -176,23 +181,23 @@ div.menu {
     color: navy;
     font-weight: normal;
     font-size: medium;
-    width:99%;
+    width: 99%;
 }
-
 
 .docs-header {
     background-color: lightyellow;
     color: navy;
     font-weight: bold;
     font-size: xx-large;
-    width:99%;
+    width: 99%;
 }
+
 .docs-sub-header {
     background-color: lightyellow;
     color: navy;
     font-weight: bold;
     font-size: x-large;
-    width:99%;
+    width: 99%;
 }
 
 .docs-heading {
@@ -200,7 +205,7 @@ div.menu {
     color: navy;
     font-weight: normal;
     font-size: x-large;
-    width:99%;
+    width: 99%;
 }
 
 .docs-content {
@@ -208,5 +213,5 @@ div.menu {
     color: navy;
     font-weight: normal;
     font-size: medium;
-    width:99%;
+    width: 99%;
 }

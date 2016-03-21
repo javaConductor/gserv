@@ -62,7 +62,8 @@ body {
 
   .banner .version {
     margin-left: $margin-unit;
-  };
+  }
+;
 
   // This div is available for testing elements that must be added to the DOM.
   // We position it out of view, so it doesn't obstruct the runner.
@@ -119,14 +120,14 @@ body {
         }
       }
 
-        &.disabled {
-          font-size: 14px;
+      &.disabled {
+        font-size: 14px;
 
-          &:before {
-            color: $neutral-color;
-            content: "\02022";
-          }
+        &:before {
+          color: $neutral-color;
+          content: "\02022";
         }
+      }
 
       &.pending {
         line-height: 17px;
@@ -269,7 +270,7 @@ body {
     }
   }
 
-  .description+.suite {
+  .description + .suite {
     margin-top: 0;
   }
 

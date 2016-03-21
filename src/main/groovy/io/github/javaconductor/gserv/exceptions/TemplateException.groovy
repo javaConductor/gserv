@@ -32,12 +32,12 @@ package io.github.javaconductor.gserv.exceptions
  * To change this template use File | Settings | File Templates.
  */
 class TemplateException extends Exception {
-    def _templateFilename
-    def _data
+	def _templateFilename
+	def _data
 
-    def TemplateException(templatename, data, s) {
-        super(s)
-        _templateFilename = templatename
-        _data = data
-    }
+	def TemplateException(templatename, data, s) {
+		super(s)
+		_templateFilename = templatename
+		_data = data
+	}
 }

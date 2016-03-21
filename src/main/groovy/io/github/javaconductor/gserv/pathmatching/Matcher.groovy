@@ -34,113 +34,113 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
 @Slf4j
 class Matcher {
 
-    /**
-     *
-     * @param actionList
-     * @param context
-     * @return
-     */
-    ResourceAction matchAction(List<ResourceAction> actionList, RequestContext context) {
-        def ret = actionList.find { action ->
-            //println "Check route: $p"
-            (action.method() == context.requestMethod && match(action, context))
-        }
-        return ret;
-    }
+	/**
+	 *
+	 * @param actionList
+	 * @param context
+	 * @return
+	 */
+	ResourceAction matchAction(List<ResourceAction> actionList, RequestContext context) {
+		def ret = actionList.find { action ->
+			//println "Check route: $p"
+			(action.method() == context.requestMethod && match(action, context))
+		}
+		return ret;
+	}
 
-    /**
-     *
-     * @param actionList
-     * @param uri
-     * @param method
-     * @param headers
-     * @return
-     */
-    ResourceAction matchAction(List<ResourceAction> actionList, URI uri, String method, Map headers) {
-        def context = new GServFactory().createRequestContext(method, uri, headers)
-        matchAction(actionList, context)
-    }
+	/**
+	 *
+	 * @param actionList
+	 * @param uri
+	 * @param method
+	 * @param headers
+	 * @return
+	 */
+	ResourceAction matchAction(List<ResourceAction> actionList, URI uri, String method, Map headers) {
+		def context = new GServFactory().createRequestContext(method, uri, headers)
+		matchAction(actionList, context)
+	}
 /**
  *
  * @param context
  * @param action
  * @return
  */
-    @CompileStatic
-    boolean matchCustomMatcher(RequestContext context, ResourceAction action) {
-        // it matches if there are no custom matchers
-        if (action.customMatchers().isEmpty()) {
-            return true
-        }
-        def ret = action.customMatchers().every { CustomActionMatcher cm ->
-            //println("Matcher.matchCustomMatcher(): ${context.responseHeaders} -> $action")
-            cm.matches((RequestContext) context, (ResourceAction) action)
-        }
-        ret
-    }
+	@CompileStatic
+	boolean matchCustomMatcher(RequestContext context, ResourceAction action) {
+		// it matches if there are no custom matchers
+		if (action.customMatchers().isEmpty()) {
+			return true
+		}
+		def ret = action.customMatchers().every { CustomActionMatcher cm ->
+			//println("Matcher.matchCustomMatcher(): ${context.responseHeaders} -> $action")
+			cm.matches((RequestContext) context, (ResourceAction) action)
+		}
+		ret
+	}
 
-    /**
-     *
-     * @param action
-     * @param uri
-     * @return
-     */
-    boolean match(ResourceAction action, RequestContext context) {
-        URI uri = context.requestURI
-        def parts = uri.path.split("/")
-        parts = parts.findAll { p -> p }
-        def a = action.pathSize()
-        def b = parts.size()
-        if (a != b)
-            return false;
+	/**
+	 *
+	 * @param action
+	 * @param uri
+	 * @return
+	 */
+	boolean match(ResourceAction action, RequestContext context) {
+		URI uri = context.requestURI
+		def parts = uri.path.split("/")
+		parts = parts.findAll { p -> p }
+		def a = action.pathSize()
+		def b = parts.size()
+		if (a != b)
+			return false;
 
-        // empty == empty
-        if (a == 0) {
-            /// check the customMatchers
-            def ret = matchCustomMatcher(context, action)
-            //println "Matcher matching:  ${context.responseHeaders} = ${ret}"
-            return ret
-        }
-        def ans
-        for (int i = 0; i != action.pathSize(); ++i) {
-            ans = matchActionPathSegment(action.path(i), parts[i])
-            if (!ans)
-                return false;
-        }
+		// empty == empty
+		if (a == 0) {
+			/// check the customMatchers
+			def ret = matchCustomMatcher(context, action)
+			//println "Matcher matching:  ${context.responseHeaders} = ${ret}"
+			return ret
+		}
+		def ans
+		for (int i = 0; i != action.pathSize(); ++i) {
+			ans = matchActionPathSegment(action.path(i), parts[i])
+			if (!ans)
+				return false;
+		}
 
-        return matchCustomMatcher(context, action) && matchActionQuery(
-                action.queryPattern()?.queryMap() ?: [:],
-                (action.queryPattern()?.queryMatchMap()?.keySet()?.toList() ?: []),
-                PathMatchingUtils.queryStringToMap(uri.query));
-    }
+		return matchCustomMatcher(context, action) && matchActionQuery(
+				action.queryPattern()?.queryMap() ?: [:],
+				(action.queryPattern()?.queryMatchMap()?.keySet()?.toList() ?: []),
+				PathMatchingUtils.queryStringToMap(uri.query));
+	}
 
-    /**
-     *
-     * @param actionPathPattern
-     * @param uriValue
-     * @return
-     */
-    def matchActionPathSegment(actionPathPattern, uriValue) {
-        //returns true if the a part of the path matches the equivalent part of the uri
-        //	it matches if pathPattern not var and same as uriValue  NOW
-        //	it matches if pathPattern is regExpr and the uriValue matches
-        //	it matches if pathPattern is var and the uriValue is not empty NOW
-        //	else it returns false NOW
-        def actionPathText = actionPathPattern.text()
-        if ('*' == actionPathText)
-            return true
+	/**
+	 *
+	 * @param actionPathPattern
+	 * @param uriValue
+	 * @return
+	 */
+	def matchActionPathSegment(actionPathPattern, uriValue) {
+		//returns true if the a part of the path matches the equivalent part of the uri
+		//	it matches if pathPattern not var and same as uriValue  NOW
+		//	it matches if pathPattern is regExpr and the uriValue matches
+		//	it matches if pathPattern is var and the uriValue is not empty NOW
+		//	else it returns false NOW
+		def actionPathText = actionPathPattern.text()
+		if ('*' == actionPathText)
+			return true
 
-        if (actionPathPattern.isVariable()) {
-            /// check for type compatibility
-            if (actionPathPattern.type()) {
-                return actionPathPattern.type().validate(uriValue)
-            }
-            /// check for presence only
-            return !(!uriValue)
-        }
-        /// does it match what the route says
-        (uriValue == actionPathText)
-    }
+		if (actionPathPattern.isVariable()) {
+			/// check for type compatibility
+			if (actionPathPattern.type()) {
+				return actionPathPattern.type().validate(uriValue)
+			}
+			/// check for presence only
+			return !(!uriValue)
+		}
+		/// does it match what the route says
+		(uriValue == actionPathText)
+	}
 /**
  *
  * @param qryMap
@@ -148,15 +148,15 @@ class Matcher {
  * @param requestQueryMap
  * @return
  */
-    boolean matchActionQuery(Map qryMap, List<String> queryKeys, Map requestQueryMap) {
-        queryKeys.every { key ->
-            (
-                    (PathMatchingUtils.isValuePattern(qryMap[key]))
-                            /// compare it if its a value
-                            ? requestQueryMap[key] == qryMap[key]
-                            /// just verify the value exists
-                            : requestQueryMap[key]
-            )
-        }
-    }
+	boolean matchActionQuery(Map qryMap, List<String> queryKeys, Map requestQueryMap) {
+		queryKeys.every { key ->
+			(
+					(PathMatchingUtils.isValuePattern(qryMap[key]))
+							/// compare it if its a value
+							? requestQueryMap[key] == qryMap[key]
+							/// just verify the value exists
+							: requestQueryMap[key]
+			)
+		}
+	}
 }

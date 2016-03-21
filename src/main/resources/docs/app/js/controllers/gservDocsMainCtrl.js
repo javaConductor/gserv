@@ -1,4 +1,3 @@
-
 /*
  *  The MIT License (MIT)
  *
@@ -23,15 +22,15 @@
  *  THE SOFTWARE.
  */
 
-function GServDocsMainCtrl($scope, $location){
+function GServDocsMainCtrl($scope, $location) {
 
     $scope.menuItems = []
-    $scope.gotoPage = function(page){
+    $scope.gotoPage = function (page) {
         $location.path(page)
     }
 
 }
 
-GServDocsMainCtrl.$inject = ["$scope", "$location" ]
+GServDocsMainCtrl.$inject = ["$scope", "$location"]
 
 

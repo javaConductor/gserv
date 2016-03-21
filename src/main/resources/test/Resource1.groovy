@@ -23,19 +23,20 @@
  */
 
 package test
+
 import io.github.javaconductor.gserv.GServ
 
 [
-        GServ.Resource("/hello") {
-            get("/") {
-                write("Hello World".bytes)
-            }
+		GServ.Resource("/hello") {
+			get("/") {
+				write("Hello World".bytes)
+			}
 
-            get("/:name") { name ->
-                //println l
-                write("Hello $name".toString().bytes)
-            }
+			get("/:name") { name ->
+				//println l
+				write("Hello $name".toString().bytes)
+			}
 
-        }
+		}
 ]
 

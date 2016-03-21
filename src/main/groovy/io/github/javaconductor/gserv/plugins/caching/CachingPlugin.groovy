@@ -33,93 +33,93 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
  * Created by javaConductor on 4/23/2014.
  */
 class CachingPlugin extends AbstractPlugin {
-    def options
+	def options
 
-    @Override
-    def init(Object options) {
-        this.options = options ?: [:]
-    }
+	@Override
+	def init(Object options) {
+		this.options = options ?: [:]
+	}
 
-    /**
-     * This function adds Plugin-specific methods and variables to the various delegateTypes
-     *
-     * @param delegateType
-     * @param delegateMetaClass
-     * @return
-     */
-    @Override
-    MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
-        if (delegateType == "http" || delegateType == "https") {
-            def weakFn = createWeakDelegateFunction()
-            def strongFn = createStrongDelegateFunction()
-            delegateMetaClass.weakETag << weakFn
-            delegateMetaClass.strongETag << strongFn
-        }
-        delegateMetaClass
-    }
+	/**
+	 * This function adds Plugin-specific methods and variables to the various delegateTypes
+	 *
+	 * @param delegateType
+	 * @param delegateMetaClass
+	 * @return
+	 */
+	@Override
+	MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
+		if (delegateType == "http" || delegateType == "https") {
+			def weakFn = createWeakDelegateFunction()
+			def strongFn = createStrongDelegateFunction()
+			delegateMetaClass.weakETag << weakFn
+			delegateMetaClass.strongETag << strongFn
+		}
+		delegateMetaClass
+	}
 
-    private def createWeakDelegateFunction() {
+	private def createWeakDelegateFunction() {
 
-        return { path, etagFn ->
+		return { path, etagFn ->
 
-            def weakHandler = etagFn
-            /// we must create a beforeFilter to create am ETag value from the request before the output is generated.
+			def weakHandler = etagFn
+			/// we must create a beforeFilter to create am ETag value from the request before the output is generated.
 
-            def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter",
-                    "GET",
-                    path,
-                    [(FilterOptions.MatchedActionsOnly): true],
-                    1) { requestContext, args ->
+			def f = ResourceActionFactory.createBeforeFilter("CachingBeforeFilter",
+					"GET",
+					path,
+					[(FilterOptions.MatchedActionsOnly): true],
+					1) { requestContext, args ->
 
-                def calcETag = weakHandler(requestContext, args)
-                //check the hdr
-                def etagValue = requestContext.requestHeaders["If-None-Match"]
-                if (etagValue)
-                    etagValue = etagValue[0]
-                if (etagValue == calcETag) {
-                    def msg = "Unchanged."
-                    error(304, msg)
-                } else {
-                    // etag it
-                    etagIt(requestContext, calcETag, options)
-                    //exchange.responseHeaders["ETag"] = calcETag
-                    //nextFilter()
-                }
-                return requestContext
-            }
-            // add it to the config
-            addFilter(f)
-            //requestContext
-        }
-    }/// method
+				def calcETag = weakHandler(requestContext, args)
+				//check the hdr
+				def etagValue = requestContext.requestHeaders["If-None-Match"]
+				if (etagValue)
+					etagValue = etagValue[0]
+				if (etagValue == calcETag) {
+					def msg = "Unchanged."
+					error(304, msg)
+				} else {
+					// etag it
+					etagIt(requestContext, calcETag, options)
+					//exchange.responseHeaders["ETag"] = calcETag
+					//nextFilter()
+				}
+				return requestContext
+			}
+			// add it to the config
+			addFilter(f)
+			//requestContext
+		}
+	}/// method
 
-    private def etagIt(RequestContext requestContext, etag, options) {
-        requestContext.setResponseHeader("Cache-Control", "public, max-age=3600;")
-        requestContext.setResponseHeader("ETag", etag)
-    }
+	private def etagIt(RequestContext requestContext, etag, options) {
+		requestContext.setResponseHeader("Cache-Control", "public, max-age=3600;")
+		requestContext.setResponseHeader("ETag", etag)
+	}
 
-    private def createStrongDelegateFunction() {
+	private def createStrongDelegateFunction() {
 
-        return { path, etagFn ->
-            def strongHandler = etagFn
-            /// we must create a afterFilter to create an ETag value from the output once it is generated.
-            def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.MatchedActionsOnly): true], 9
-            ) { context, data ->
-                //check the hdr
-                def calcETag = strongHandler(context, data)
-                def etagValue = context.requestHeaders["If-None-Match"]
-                if (etagValue && etagValue[0] == calcETag) {
-                    def msg = "Unchanged."
-                    error(304, msg)
-                } else {
-                    // etag it
-                    etagIt(context, calcETag, options)
-                }
-                data
-            }
+		return { path, etagFn ->
+			def strongHandler = etagFn
+			/// we must create a afterFilter to create an ETag value from the output once it is generated.
+			def f = ResourceActionFactory.createAfterFilter("CachingAfterFilter", "GET", path, [(FilterOptions.MatchedActionsOnly): true], 9
+			) { context, data ->
+				//check the hdr
+				def calcETag = strongHandler(context, data)
+				def etagValue = context.requestHeaders["If-None-Match"]
+				if (etagValue && etagValue[0] == calcETag) {
+					def msg = "Unchanged."
+					error(304, msg)
+				} else {
+					// etag it
+					etagIt(context, calcETag, options)
+				}
+				data
+			}
 
-            // add it tot the config
-            addFilter(f)
-        }
-    }//method
+			// add it tot the config
+			addFilter(f)
+		}
+	}//method
 }/// class

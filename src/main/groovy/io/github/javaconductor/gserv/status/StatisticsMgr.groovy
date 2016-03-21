@@ -44,66 +44,66 @@ import java.text.NumberFormat
 @Slf4j
 class StatisticsMgr {
 
-    GServConfig cfg
+	GServConfig cfg
 
-    def StatisticsMgr() {
-        listenUp()
-    }
-    /**
-     * Using the 'statusPath' from the config, we add a filter to intercept the 'statusPath' and show the status page.
-     *
-     * @return The Status Filter
-     */
-    Filter createStatusFilter(GServConfig cfg) {
-        this.cfg = cfg
-        def filter = ResourceActionFactory.createBeforeFilter("gServStatus", "GET", cfg.statusPath() ?: '/status', [:], 0) { RequestContext requestContext, args ->
-            def requestId = requestContext.id()
+	def StatisticsMgr() {
+		listenUp()
+	}
+	/**
+	 * Using the 'statusPath' from the config, we add a filter to intercept the 'statusPath' and show the status page.
+	 *
+	 * @return The Status Filter
+	 */
+	Filter createStatusFilter(GServConfig cfg) {
+		this.cfg = cfg
+		def filter = ResourceActionFactory.createBeforeFilter("gServStatus", "GET", cfg.statusPath() ?: '/status', [:], 0) { RequestContext requestContext, args ->
+			def requestId = requestContext.id()
 
-            def doReset = requestContext.requestURI.query?.contains("reset=true")
+			def doReset = requestContext.requestURI.query?.contains("reset=true")
 
-            //log.trace("statusFilter(#${requestId} context: $requestContext")
-            def totalMemory = Runtime.runtime.totalMemory()
-            def freeMemory = Runtime.runtime.freeMemory()
-            def maxMemory = Runtime.runtime.maxMemory()
-            //def reqCount = this.requestCount.get()
+			//log.trace("statusFilter(#${requestId} context: $requestContext")
+			def totalMemory = Runtime.runtime.totalMemory()
+			def freeMemory = Runtime.runtime.freeMemory()
+			def maxMemory = Runtime.runtime.maxMemory()
+			//def reqCount = this.requestCount.get()
 
-            if (doReset) {
-                reset()
-            }
-            def createActionStats = { action ->
-                def actionStats = getActionStats(action)
-                def start = "<tr><td colspan='2'><ul>"
-                def end = "</ul></td></tr>"
-                start + actionStats.keySet().collect { k ->
-                    "<li>$k - ${actionStats[k]}</li>".toString()
-                }.join(' ') + end
-            }
+			if (doReset) {
+				reset()
+			}
+			def createActionStats = { action ->
+				def actionStats = getActionStats(action)
+				def start = "<tr><td colspan='2'><ul>"
+				def end = "</ul></td></tr>"
+				start + actionStats.keySet().collect { k ->
+					"<li>$k - ${actionStats[k]}</li>".toString()
+				}.join(' ') + end
+			}
 
-            def actionRows = """
+			def actionRows = """
             <tr>
                 <th colspan="2" style="text-align: center;" >Actions</th>
             </tr>""" +
-                    cfg.actions().collect { action ->
-                        """<tr><td colspan="2" >$action</td></tr>""" + createActionStats(action)
-                    }.join('\n');
+					cfg.actions().collect { action ->
+						"""<tr><td colspan="2" >$action</td></tr>""" + createActionStats(action)
+					}.join('\n');
 
-            def statsRows = """<tr>
+			def statsRows = """<tr>
             <th colspan='2' style="text-align: center;"  > Statistics </th>
             </tr>
 
                     """ +
-                    getStats().keySet().collect { k ->
-                        """
+					getStats().keySet().collect { k ->
+						"""
             <tr>
             <th>$k</th>
                         <td>${getStats()[k]}</td>
             </tr>
                 """
 
-                    }.join('\n')
+					}.join('\n')
 
 
-            String page = """
+			String page = """
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -139,7 +139,7 @@ class StatisticsMgr {
         <th>Max Memory</th>
         <td>${NumberFormat.getNumberInstance(Locale.US).format(maxMemory)} bytes</td>
     </tr>""" + statsRows + actionRows +
-                    """</tbody>
+					"""</tbody>
 </table>
 
 </body>
@@ -147,102 +147,102 @@ class StatisticsMgr {
 """
 
 
-            write "text/html", page
-            requestContext
-        }
-        filter
-    }
+			write "text/html", page
+			requestContext
+		}
+		filter
+	}
 
-    /**
-     *
-     * @return
-     */
-    def listenUp() {
-        def eventHandler = { topic, data ->
-            handleEvent(topic, data)
-        }
+	/**
+	 *
+	 * @return
+	 */
+	def listenUp() {
+		def eventHandler = { topic, data ->
+			handleEvent(topic, data)
+		}
 
-        EventManager.instance().subscribe(Events.RequestRecieved, eventHandler)
-        EventManager.instance().subscribe(Events.ResourceProcessed, eventHandler)
-        EventManager.instance().subscribe(Events.RequestProcessingError, eventHandler)
-        EventManager.instance().subscribe(Events.FilterError, eventHandler)
-    }
+		EventManager.instance().subscribe(Events.RequestRecieved, eventHandler)
+		EventManager.instance().subscribe(Events.ResourceProcessed, eventHandler)
+		EventManager.instance().subscribe(Events.RequestProcessingError, eventHandler)
+		EventManager.instance().subscribe(Events.FilterError, eventHandler)
+	}
 
-    /**
-     *  A list of statistics recorders
-     */
-    def statRecorders = [
-            new SuccessFailure(),
-            new MaxCurrentConnections(),
-            new AvgMinMaxReqTime()
-    ]
+	/**
+	 *  A list of statistics recorders
+	 */
+	def statRecorders = [
+			new SuccessFailure(),
+			new MaxCurrentConnections(),
+			new AvgMinMaxReqTime()
+	]
 
-    /**
-     *  A list of statistics recorders for specific actions
-     */
-    def actionStatRecorders = [
-            new ActionSuccessFailure()
-            //   new ActionAvgMinMaxReqTime()
-    ]
+	/**
+	 *  A list of statistics recorders for specific actions
+	 */
+	def actionStatRecorders = [
+			new ActionSuccessFailure()
+			//   new ActionAvgMinMaxReqTime()
+	]
 
-    /**
-     * Record the statistics from these events
-     *
-     * @param topic
-     * @param data
-     * @return
-     */
-    def handleEvent(topic, data) {
-        //log.trace("Statistics: $topic => $data")
-        statRecorders.each { statRec ->
-            statRec.recordEvent(topic, data)
-        }
+	/**
+	 * Record the statistics from these events
+	 *
+	 * @param topic
+	 * @param data
+	 * @return
+	 */
+	def handleEvent(topic, data) {
+		//log.trace("Statistics: $topic => $data")
+		statRecorders.each { statRec ->
+			statRec.recordEvent(topic, data)
+		}
 
-        actionStatRecorders.each { ActionStatRecorder actionStatRec ->
-            ResourceAction action = cfg.matchAction(data.requestContext)
-            if (action)
-                actionStatRec.recordEvent(action, topic, data)
-        }
+		actionStatRecorders.each { ActionStatRecorder actionStatRec ->
+			ResourceAction action = cfg.matchAction(data.requestContext)
+			if (action)
+				actionStatRec.recordEvent(action, topic, data)
+		}
 
-    }
+	}
 
-    /**
-     * Reset the statistics to reflect the current time and after
-     *
-     * @return
-     */
-    def reset() {
-        statRecorders.each { statRec ->
-            statRec.reset()
-        }
-        actionStatRecorders.each { actionStatRec ->
-            actionStatRec.reset()
-        }
-    }
+	/**
+	 * Reset the statistics to reflect the current time and after
+	 *
+	 * @return
+	 */
+	def reset() {
+		statRecorders.each { statRec ->
+			statRec.reset()
+		}
+		actionStatRecorders.each { actionStatRec ->
+			actionStatRec.reset()
+		}
+	}
 
-    /**
-     *
-     * @return
-     */
-    def getStats() {
-        def theStats = [:]
-        statRecorders.each { statRec ->
-            theStats += statRec.reportStat()
-        }
-        theStats
-    }
+	/**
+	 *
+	 * @return
+	 */
+	def getStats() {
+		def theStats = [:]
+		statRecorders.each { statRec ->
+			theStats += statRec.reportStat()
+		}
+		theStats
+	}
 
-    /**
-     *
-     * @param action
-     * @return
-     */
-    def getActionStats(ResourceAction action) {
-        def theStats = [:]
-        actionStatRecorders.each { actionStatRec ->
-            theStats += actionStatRec.reportStat(action)
-        }
-        theStats
-    }
+	/**
+	 *
+	 * @param action
+	 * @return
+	 */
+	def getActionStats(ResourceAction action) {
+		def theStats = [:]
+		actionStatRecorders.each { actionStatRec ->
+			theStats += actionStatRec.reportStat(action)
+		}
+		theStats
+	}
 
 }

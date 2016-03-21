@@ -23,6 +23,6 @@
  */
 
 new GServ().http {
-    useResourceDocs(true)
+	useResourceDocs(true)
 
 }

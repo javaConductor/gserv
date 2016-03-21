@@ -37,11 +37,11 @@ import spock.lang.Specification
  */
 class FormDataSpec extends Specification {
 
-    public void "should parse 3 parts"() {
+	public void "should parse 3 parts"() {
 
-        given:
-        def boundary = "-----------------------------287032381131322"
-        def testdata = """-----------------------------287032381131322
+		given:
+		def boundary = "-----------------------------287032381131322"
+		def testdata = """-----------------------------287032381131322
 Content-Disposition: form-data; name="datafile1"; filename="r.txt"
 Content-Type: text/plain
 
@@ -57,19 +57,19 @@ Content-Type: text/plain
 
 B File content
 -----------------------------287032381131322--"""
-        when:
-        def parts = new ByteUtils().splitBytes(testdata.bytes, boundary)
+		when:
+		def parts = new ByteUtils().splitBytes(testdata.bytes, boundary)
 
-        then:
-        parts.size() == 3
-    }
+		then:
+		parts.size() == 3
+	}
 
 
-    public void "should parse file values"() {
+	public void "should parse file values"() {
 
-        given:
-        def boundary = "---------------------------287032381131322"
-        def testdata = """-----------------------------287032381131322
+		given:
+		def boundary = "---------------------------287032381131322"
+		def testdata = """-----------------------------287032381131322
 Content-Disposition: form-data; name="datafile1"; filename="r.txt"
 Content-Type: text/plain
 
@@ -85,19 +85,19 @@ Content-Type: text/plain
 
 B File content
 -----------------------------287032381131322--"""
-        when:
+		when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
+		FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
-        then:
-        fdata.files.size() == 3
-    }
+		then:
+		fdata.files.size() == 3
+	}
 
-    public void "should parse form data value"() {
+	public void "should parse form data value"() {
 
-        given:
-        def boundary = "---------------------------287032381131322"
-        def testdata = """-----------------------------287032381131322
+		given:
+		def boundary = "---------------------------287032381131322"
+		def testdata = """-----------------------------287032381131322
 Content-Disposition: form-data; name="datafile1"; filename="r.txt"
 Content-Type: text/plain
 
@@ -117,20 +117,20 @@ Content-Type: text/plain
 
 B File content
 -----------------------------287032381131322--"""
-        when:
+		when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
+		FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
-        then:
-        fdata?.files?.size() == 3
-        fdata?.values?.size() == 1
-    }
+		then:
+		fdata?.files?.size() == 3
+		fdata?.values?.size() == 1
+	}
 
-    public void "should parse multipart mixed request"() {
+	public void "should parse multipart mixed request"() {
 
-        given:
-        def boundary = "AaB03x"
-        def testdata = """--AaB03x
+		given:
+		def boundary = "AaB03x"
+		def testdata = """--AaB03x
 Content-Disposition: form-data; name="submit-name"
 
 Larry
@@ -151,15 +151,15 @@ Content-Transfer-Encoding: binary
 ...contents of file2.gif...
 --BbC04y--
 --AaB03x--"""
-        when:
+		when:
 
-        FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
+		FormData fdata = new FormDataUtils().getFormData(testdata.bytes, "multipart/form-data; boundary=$boundary")
 
-        then:
-        fdata.files.size() == 2
-        fdata.values.size() == 1
-        fdata.files[0].name == "file1.txt"
-        fdata.files[1].name == "file2.gif"
-    }
+		then:
+		fdata.files.size() == 2
+		fdata.values.size() == 1
+		fdata.files[0].name == "file1.txt"
+		fdata.files[1].name == "file2.gif"
+	}
 
 }

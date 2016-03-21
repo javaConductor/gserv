@@ -30,56 +30,56 @@ import groovyx.gpars.actor.Actor
  * Created by javaConductor on 5/4/2014.
  */
 class ActorPool {
-    def actorList = []
-    def nextIdx = 0;
-    def nuHandlerActorFn
-    def min
+	def actorList = []
+	def nextIdx = 0;
+	def nuHandlerActorFn
+	def min
 //    PGroup pGroup
 
-    def ActorPool(int min, Closure nuHandlerActorFn) {
-        this.nuHandlerActorFn = nuHandlerActorFn
-        this.min = min
-        initList(actorList, min)
-    }
+	def ActorPool(int min, Closure nuHandlerActorFn) {
+		this.nuHandlerActorFn = nuHandlerActorFn
+		this.min = min
+		initList(actorList, min)
+	}
 
-    private def initList(List actorList, int min) {
-        if (actorList.size() < min) {
-            def diff = min - actorList.size();
-            diff.times {
-                add(nuHandlerActorFn())
-            }
-        }
-    }
+	private def initList(List actorList, int min) {
+		if (actorList.size() < min) {
+			def diff = min - actorList.size();
+			diff.times {
+				add(nuHandlerActorFn())
+			}
+		}
+	}
 
-    synchronized Actor next() {
-        if (actorList.empty) {
-            throw new IllegalStateException("No actors in pool.")
-        }
-        Actor ret = actorList[nextIdx]
-        nextIdx = ((nextIdx + 1) >= actorList.size()) ? 0 : ++nextIdx;
-        ret
-    }
+	synchronized Actor next() {
+		if (actorList.empty) {
+			throw new IllegalStateException("No actors in pool.")
+		}
+		Actor ret = actorList[nextIdx]
+		nextIdx = ((nextIdx + 1) >= actorList.size()) ? 0 : ++nextIdx;
+		ret
+	}
 
-    synchronized def replaceActor(actor) {
-        remove(actor)
-        def nuActor = nuHandlerActorFn()
-        add(nuActor)
-    }
+	synchronized def replaceActor(actor) {
+		remove(actor)
+		def nuActor = nuHandlerActorFn()
+		add(nuActor)
+	}
 
-    synchronized def add(Actor actor) {
-        actor.start()
-        actorList.add(actor)
-    }
+	synchronized def add(Actor actor) {
+		actor.start()
+		actorList.add(actor)
+	}
 
-    synchronized def remove(Actor actor) {
-        actor.stop()
-        actorList.remove(actor)
-    }
+	synchronized def remove(Actor actor) {
+		actor.stop()
+		actorList.remove(actor)
+	}
 
-    def start() {
-        actorList.each {
-            it.start()
-        }
-    }
+	def start() {
+		actorList.each {
+			it.start()
+		}
+	}
 
 }

@@ -1,4 +1,4 @@
 {
-  "dataServiceHost":"localhost",
-  "dataServicePort":8080
+  "dataServiceHost": "localhost",
+  "dataServicePort": 8080
 }

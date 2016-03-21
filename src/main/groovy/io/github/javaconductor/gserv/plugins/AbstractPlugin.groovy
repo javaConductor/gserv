@@ -30,48 +30,48 @@ import io.github.javaconductor.gserv.actions.ResourceAction
  * Created by javaConductor on 3/22/14.
  */
 abstract class AbstractPlugin implements io.github.javaconductor.gserv.plugins.IPlugin {
-    @Override
-    abstract def init(Object options)
+	@Override
+	abstract def init(Object options)
 
-    /**
-     * Returns the list of filters deployed by this Plugin
-     *
-     * @return List < Filter >
-     */
-    @Override
-    List<ResourceAction> filters() {
-        return []
-    }
+	/**
+	 * Returns the list of filters deployed by this Plugin
+	 *
+	 * @return List < Filter >
+	 */
+	@Override
+	List<ResourceAction> filters() {
+		return []
+	}
 
-    /**
-     * Returns the list of actions deployed by this Plugin
-     *
-     * @return List < Filter >
-     */
-    @Override
-    List<ResourceAction> actions() {
-        return []
-    }
+	/**
+	 * Returns the list of actions deployed by this Plugin
+	 *
+	 * @return List < Filter >
+	 */
+	@Override
+	List<ResourceAction> actions() {
+		return []
+	}
 
-    /**
-     * Returns the list of static roots used by this Plugin
-     *
-     * @return List < Filter >
-     */
-    @Override
-    List<String> staticRoots() {
-        return []
-    }
+	/**
+	 * Returns the list of static roots used by this Plugin
+	 *
+	 * @return List < Filter >
+	 */
+	@Override
+	List<String> staticRoots() {
+		return []
+	}
 
-    /**
-     * This function adds Plugin-specific methods and variables to the various delegateTypes
-     *
-     * @param delegateType
-     * @param delegateMetaClass
-     * @return
-     */
-    @Override
-    MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
-        return delegateMetaClass
-    }
+	/**
+	 * This function adds Plugin-specific methods and variables to the various delegateTypes
+	 *
+	 * @param delegateType
+	 * @param delegateMetaClass
+	 * @return
+	 */
+	@Override
+	MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
+		return delegateMetaClass
+	}
 }

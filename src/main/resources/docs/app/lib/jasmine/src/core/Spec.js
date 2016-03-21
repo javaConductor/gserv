@@ -1,152 +1,165 @@
-getJasmineRequireObj().Spec = function(j$) {
-  function Spec(attrs) {
-    this.expectationFactory = attrs.expectationFactory;
-    this.resultCallback = attrs.resultCallback || function() {};
-    this.id = attrs.id;
-    this.description = attrs.description || '';
-    this.fn = attrs.fn;
-    this.beforeFns = attrs.beforeFns || function() { return []; };
-    this.afterFns = attrs.afterFns || function() { return []; };
-    this.onStart = attrs.onStart || function() {};
-    this.exceptionFormatter = attrs.exceptionFormatter || function() {};
-    this.getSpecName = attrs.getSpecName || function() { return ''; };
-    this.expectationResultFactory = attrs.expectationResultFactory || function() { };
-    this.queueRunnerFactory = attrs.queueRunnerFactory || function() {};
-    this.catchingExceptions = attrs.catchingExceptions || function() { return true; };
+getJasmineRequireObj().Spec = function (j$) {
+    function Spec(attrs) {
+        this.expectationFactory = attrs.expectationFactory;
+        this.resultCallback = attrs.resultCallback || function () {
+            };
+        this.id = attrs.id;
+        this.description = attrs.description || '';
+        this.fn = attrs.fn;
+        this.beforeFns = attrs.beforeFns || function () {
+                return [];
+            };
+        this.afterFns = attrs.afterFns || function () {
+                return [];
+            };
+        this.onStart = attrs.onStart || function () {
+            };
+        this.exceptionFormatter = attrs.exceptionFormatter || function () {
+            };
+        this.getSpecName = attrs.getSpecName || function () {
+                return '';
+            };
+        this.expectationResultFactory = attrs.expectationResultFactory || function () {
+            };
+        this.queueRunnerFactory = attrs.queueRunnerFactory || function () {
+            };
+        this.catchingExceptions = attrs.catchingExceptions || function () {
+                return true;
+            };
 
-    this.timer = attrs.timer || {setTimeout: setTimeout, clearTimeout: clearTimeout};
+        this.timer = attrs.timer || {setTimeout: setTimeout, clearTimeout: clearTimeout};
 
-    if (!this.fn) {
-      this.pend();
-    }
+        if (!this.fn) {
+            this.pend();
+        }
 
-    this.result = {
-      id: this.id,
-      description: this.description,
-      fullName: this.getFullName(),
-      failedExpectations: []
-    };
-  }
-
-  Spec.prototype.addExpectationResult = function(passed, data) {
-    if (passed) {
-      return;
-    }
-    this.result.failedExpectations.push(this.expectationResultFactory(data));
-  };
-
-  Spec.prototype.expect = function(actual) {
-    return this.expectationFactory(actual, this);
-  };
-
-  Spec.prototype.execute = function(onComplete) {
-    var self = this,
-        timeout;
-
-    this.onStart(this);
-
-    if (this.markedPending || this.disabled) {
-      complete();
-      return;
-    }
-
-    function timeoutable(fn) {
-      return function(done) {
-        timeout = Function.prototype.apply.apply(self.timer.setTimeout, [j$.getGlobal(), [function() {
-          onException(new Error('Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_TIMEOUT_INTERVAL.'));
-          done();
-        }, j$.DEFAULT_TIMEOUT_INTERVAL]]);
-
-        var callDone = function() {
-          clearTimeoutable();
-          done();
+        this.result = {
+            id: this.id,
+            description: this.description,
+            fullName: this.getFullName(),
+            failedExpectations: []
         };
-
-        fn.call(this, callDone); //TODO: do we care about more than 1 arg?
-      };
     }
 
-    function clearTimeoutable() {
-      Function.prototype.apply.apply(self.timer.clearTimeout, [j$.getGlobal(), [timeout]]);
-      timeout = void 0;
-    }
+    Spec.prototype.addExpectationResult = function (passed, data) {
+        if (passed) {
+            return;
+        }
+        this.result.failedExpectations.push(this.expectationResultFactory(data));
+    };
 
-    var allFns = this.beforeFns().concat(this.fn).concat(this.afterFns()),
-      allTimeoutableFns = [];
-    for (var i = 0; i < allFns.length; i++) {
-      var fn = allFns[i];
-      allTimeoutableFns.push(fn.length > 0 ? timeoutable(fn) : fn);
-    }
+    Spec.prototype.expect = function (actual) {
+        return this.expectationFactory(actual, this);
+    };
 
-    this.queueRunnerFactory({
-      fns: allTimeoutableFns,
-      onException: onException,
-      onComplete: complete
-    });
+    Spec.prototype.execute = function (onComplete) {
+        var self = this,
+            timeout;
 
-    function onException(e) {
-      clearTimeoutable();
-      if (Spec.isPendingSpecException(e)) {
-        self.pend();
-        return;
-      }
+        this.onStart(this);
 
-      self.addExpectationResult(false, {
-        matcherName: "",
-        passed: false,
-        expected: "",
-        actual: "",
-        error: e
-      });
-    }
+        if (this.markedPending || this.disabled) {
+            complete();
+            return;
+        }
 
-    function complete() {
-      self.result.status = self.status();
-      self.resultCallback(self.result);
+        function timeoutable(fn) {
+            return function (done) {
+                timeout = Function.prototype.apply.apply(self.timer.setTimeout, [j$.getGlobal(), [function () {
+                    onException(new Error('Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_TIMEOUT_INTERVAL.'));
+                    done();
+                }, j$.DEFAULT_TIMEOUT_INTERVAL]]);
 
-      if (onComplete) {
-        onComplete();
-      }
-    }
-  };
+                var callDone = function () {
+                    clearTimeoutable();
+                    done();
+                };
 
-  Spec.prototype.disable = function() {
-    this.disabled = true;
-  };
+                fn.call(this, callDone); //TODO: do we care about more than 1 arg?
+            };
+        }
 
-  Spec.prototype.pend = function() {
-    this.markedPending = true;
-  };
+        function clearTimeoutable() {
+            Function.prototype.apply.apply(self.timer.clearTimeout, [j$.getGlobal(), [timeout]]);
+            timeout = void 0;
+        }
 
-  Spec.prototype.status = function() {
-    if (this.disabled) {
-      return 'disabled';
-    }
+        var allFns = this.beforeFns().concat(this.fn).concat(this.afterFns()),
+            allTimeoutableFns = [];
+        for (var i = 0; i < allFns.length; i++) {
+            var fn = allFns[i];
+            allTimeoutableFns.push(fn.length > 0 ? timeoutable(fn) : fn);
+        }
 
-    if (this.markedPending) {
-      return 'pending';
-    }
+        this.queueRunnerFactory({
+            fns: allTimeoutableFns,
+            onException: onException,
+            onComplete: complete
+        });
 
-    if (this.result.failedExpectations.length > 0) {
-      return 'failed';
-    } else {
-      return 'passed';
-    }
-  };
+        function onException(e) {
+            clearTimeoutable();
+            if (Spec.isPendingSpecException(e)) {
+                self.pend();
+                return;
+            }
 
-  Spec.prototype.getFullName = function() {
-    return this.getSpecName(this);
-  };
+            self.addExpectationResult(false, {
+                matcherName: "",
+                passed: false,
+                expected: "",
+                actual: "",
+                error: e
+            });
+        }
 
-  Spec.pendingSpecExceptionMessage = "=> marked Pending";
+        function complete() {
+            self.result.status = self.status();
+            self.resultCallback(self.result);
 
-  Spec.isPendingSpecException = function(e) {
-    return e.toString().indexOf(Spec.pendingSpecExceptionMessage) !== -1;
-  };
+            if (onComplete) {
+                onComplete();
+            }
+        }
+    };
 
-  return Spec;
+    Spec.prototype.disable = function () {
+        this.disabled = true;
+    };
+
+    Spec.prototype.pend = function () {
+        this.markedPending = true;
+    };
+
+    Spec.prototype.status = function () {
+        if (this.disabled) {
+            return 'disabled';
+        }
+
+        if (this.markedPending) {
+            return 'pending';
+        }
+
+        if (this.result.failedExpectations.length > 0) {
+            return 'failed';
+        } else {
+            return 'passed';
+        }
+    };
+
+    Spec.prototype.getFullName = function () {
+        return this.getSpecName(this);
+    };
+
+    Spec.pendingSpecExceptionMessage = "=> marked Pending";
+
+    Spec.isPendingSpecException = function (e) {
+        return e.toString().indexOf(Spec.pendingSpecExceptionMessage) !== -1;
+    };
+
+    return Spec;
 };
 
 if (typeof window == void 0 && typeof exports == "object") {
-  exports.Spec = jasmineRequire.Spec;
+    exports.Spec = jasmineRequire.Spec;
 }

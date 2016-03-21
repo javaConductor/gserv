@@ -39,11 +39,11 @@ import io.github.javaconductor.gserv.pathmatching.PathMatchingUtils
  */
 @Slf4j
 class FilterRunner {
-    def _serverConfig
+	def _serverConfig
 
-    def FilterRunner(GServConfig config) {
-        _serverConfig = config
-    }
+	def FilterRunner(GServConfig config) {
+		_serverConfig = config
+	}
 
 /**
  *
@@ -51,32 +51,32 @@ class FilterRunner {
  * @param c
  * @return
  */
-    RequestContext runFilters(List<Filter> filters, RequestContext c) {
-        RequestContext context = c
-        for (Filter f : filters) {
-            log.trace("FilterRunner() running $f on $context")
-            try {
-                context = runFilter(f, context) ?: context
-                if (context.isClosed()) {
-                    log.trace("FilterRunner() filter $f closed context")
-                    return context
-                }
-            } catch (Throwable e) {
-                log.warn("FilterError: ${ex.message}")
-                EventManager.instance().publish(Events.FilterError, [
-                        requestId : rc.id(),
-                        error     : e.message,
-                        statusCode: 500,
-                        filterName: f.name,
-                        method    : rc.requestMethod,
-                        uri       : rc.requestURI,
-                        headers   : rc.requestHeaders])
-            }
+	RequestContext runFilters(List<Filter> filters, RequestContext c) {
+		RequestContext context = c
+		for (Filter f : filters) {
+			log.trace("FilterRunner() running $f on $context")
+			try {
+				context = runFilter(f, context) ?: context
+				if (context.isClosed()) {
+					log.trace("FilterRunner() filter $f closed context")
+					return context
+				}
+			} catch (Throwable e) {
+				log.warn("FilterError: ${ex.message}")
+				EventManager.instance().publish(Events.FilterError, [
+						requestId : rc.id(),
+						error     : e.message,
+						statusCode: 500,
+						filterName: f.name,
+						method    : rc.requestMethod,
+						uri       : rc.requestURI,
+						headers   : rc.requestHeaders])
+			}
 //            log.trace("FilterRunner() running $f on $context")
-        }
+		}
 //        log.trace("FilterRunner() running $f on $context")
-        context
-    }
+		context
+	}
 
 /**
  *
@@ -84,100 +84,100 @@ class FilterRunner {
  * @param bytes
  * @return
  */
-    byte[] runAfterFilters(RequestContext rc, byte[] bytes) {
-        def requestId = rc.id()
-        log.trace "Running ppList for ${rc.getRequestURI().path} - req #${requestId}"
-        /// run the PostProcess List
-        def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
-        ppList.each { fn ->
-            try {
-                log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
-                bytes = fn(rc, bytes) ?: bytes
-            } catch (Throwable ex) {
-                log.warn("FilterError: ${ex.message}")
-                EventManager.instance().publish(Events.FilterError, [
-                        requestId : requestId,
-                        error     : ex.message,
-                        statusCode: 500,
-                        filterName: fn.delegate.$this.name,
-                        method    : rc.requestMethod,
-                        uri       : rc.requestURI,
-                        headers   : rc.requestHeaders])
-            }
-        }
-        bytes
-    }
+	byte[] runAfterFilters(RequestContext rc, byte[] bytes) {
+		def requestId = rc.id()
+		log.trace "Running ppList for ${rc.getRequestURI().path} - req #${requestId}"
+		/// run the PostProcess List
+		def ppList = rc.getAttribute(GServ.contextAttributes.postProcessList).toList()
+		ppList.each { fn ->
+			try {
+				log.trace("Processing Filter Fn: ${fn.delegate.$this.name}  ")
+				bytes = fn(rc, bytes) ?: bytes
+			} catch (Throwable ex) {
+				log.warn("FilterError: ${ex.message}")
+				EventManager.instance().publish(Events.FilterError, [
+						requestId : requestId,
+						error     : ex.message,
+						statusCode: 500,
+						filterName: fn.delegate.$this.name,
+						method    : rc.requestMethod,
+						uri       : rc.requestURI,
+						headers   : rc.requestHeaders])
+			}
+		}
+		bytes
+	}
 
-    /**
-     *
-     * @param theFilter
-     * @param requestContext
-     * @return
-     */
-    RequestContext runFilter(Filter theFilter, RequestContext requestContext) {
+	/**
+	 *
+	 * @param theFilter
+	 * @param requestContext
+	 * @return
+	 */
+	RequestContext runFilter(Filter theFilter, RequestContext requestContext) {
 
-        switch (theFilter.filterType) {
-            case FilterType.After:
-                //////////////////////////////////////////////////////////////////////
-                /// We will set the delegate for the closure before we put in the list
-                //////////////////////////////////////////////////////////////////////
+		switch (theFilter.filterType) {
+			case FilterType.After:
+				//////////////////////////////////////////////////////////////////////
+				/// We will set the delegate for the closure before we put in the list
+				//////////////////////////////////////////////////////////////////////
 
-                def fn = theFilter.requestHandler()
-                fn.delegate = prepareDelegate(theFilter, requestContext)
+				def fn = theFilter.requestHandler()
+				fn.delegate = prepareDelegate(theFilter, requestContext)
 
-                /// add after closure to PostProcessList
-                def ppList = requestContext.getAttribute(GServ.contextAttributes.postProcessList) ?: []
-                log.trace "FilterRunner: Scheduling after filter ${theFilter.name} for req #${requestContext.id()} "
-                ppList << fn
-                requestContext.setAttribute(GServ.contextAttributes.postProcessList, ppList)
-                return requestContext
+				/// add after closure to PostProcessList
+				def ppList = requestContext.getAttribute(GServ.contextAttributes.postProcessList) ?: []
+				log.trace "FilterRunner: Scheduling after filter ${theFilter.name} for req #${requestContext.id()} "
+				ppList << fn
+				requestContext.setAttribute(GServ.contextAttributes.postProcessList, ppList)
+				return requestContext
 
-            case FilterType.Before:
-            case FilterType.Normal:
-                try {
-                    // run the filter
-                    // replace with new context if returned
-                    requestContext = process(theFilter, requestContext) ?: requestContext
-                } catch (Throwable ex) {
-                    //TODO must handle this better -
-                    log.trace("FilterRunner: $theFilter threw exception: ${ex.message}.", ex)
-                    log.error("FilterRunner: $theFilter threw exception: ${ex.message}.")
-                }
-                return requestContext
-        }//switch
-    }
+			case FilterType.Before:
+			case FilterType.Normal:
+				try {
+					// run the filter
+					// replace with new context if returned
+					requestContext = process(theFilter, requestContext) ?: requestContext
+				} catch (Throwable ex) {
+					//TODO must handle this better -
+					log.trace("FilterRunner: $theFilter threw exception: ${ex.message}.", ex)
+					log.error("FilterRunner: $theFilter threw exception: ${ex.message}.")
+				}
+				return requestContext
+		}//switch
+	}
 
-    /**
-     *
-     * @param theFilter
-     * @param context
-     * @return
-     */
-    RequestContext process(Filter theFilter, RequestContext context) {
-        Closure cl = theFilter.requestHandler()//_handler
-        FilterDelegate dgt = prepareDelegate(theFilter, context)
-        def errorHandlingWrapper = { clozure, List argList ->
-            try {
-                return clozure(context, argList)
-            } catch (Throwable e) {
-                log.error("FilterRunner filter: [$theFilter] error: ${e.message}", e)
-                e.printStackTrace(System.err)
-                dgt.error(500, e.message)
-                context
-            }
-        }
+	/**
+	 *
+	 * @param theFilter
+	 * @param context
+	 * @return
+	 */
+	RequestContext process(Filter theFilter, RequestContext context) {
+		Closure cl = theFilter.requestHandler()//_handler
+		FilterDelegate dgt = prepareDelegate(theFilter, context)
+		def errorHandlingWrapper = { clozure, List argList ->
+			try {
+				return clozure(context, argList)
+			} catch (Throwable e) {
+				log.error("FilterRunner filter: [$theFilter] error: ${e.message}", e)
+				e.printStackTrace(System.err)
+				dgt.error(500, e.message)
+				context
+			}
+		}
 
-        //TODO Should be a cleaner way to do this
-        cl.delegate = dgt
-        cl.resolveStrategy = Closure.DELEGATE_FIRST
-        /// Pass the route variables to the behavior if option is set
-        /// Else there will be no args
-        List args = prepareArguments(context, theFilter)
+		//TODO Should be a cleaner way to do this
+		cl.delegate = dgt
+		cl.resolveStrategy = Closure.DELEGATE_FIRST
+		/// Pass the route variables to the behavior if option is set
+		/// Else there will be no args
+		List args = prepareArguments(context, theFilter)
 
-        /// Execute the behavior for this filter
-        def ret = errorHandlingWrapper(cl, args)
-        ret
-    }
+		/// Execute the behavior for this filter
+		def ret = errorHandlingWrapper(cl, args)
+		ret
+	}
 
 /**
  *
@@ -186,42 +186,42 @@ class FilterRunner {
  * @param templateEngineName
  * @return
  */
-    private def prepareDelegate(filter, requestContext, templateEngineName = "") {
-        new FilterDelegate(filter, requestContext, _serverConfig, templateEngineName)
-    }
+	private def prepareDelegate(filter, requestContext, templateEngineName = "") {
+		new FilterDelegate(filter, requestContext, _serverConfig, templateEngineName)
+	}
 
-    /**
-     * Set up the args to be sent to a FilterBehaviorClosure
-     *
-     * @param context
-     * @param theFilter
-     * @return
-     */
-    private def prepareArguments(context, theFilter) {
-        def uri = context.requestURI
-        def args = []
-        def method = theFilter.method()
-        if (method == "PUT" || method == "POST") {
-            // add the data before the other args
-            // data is a byte[]
-            args.add(context.getRequestBody())
-        }
+	/**
+	 * Set up the args to be sent to a FilterBehaviorClosure
+	 *
+	 * @param context
+	 * @param theFilter
+	 * @return
+	 */
+	private def prepareArguments(context, theFilter) {
+		def uri = context.requestURI
+		def args = []
+		def method = theFilter.method()
+		if (method == "PUT" || method == "POST") {
+			// add the data before the other args
+			// data is a byte[]
+			args.add(context.getRequestBody())
+		}
 
-        def pathElements = uri.path.split("/").findAll { !(!it) }
-        //// loop thru the Patterns getting the corresponding uri path elements
-        for (int i = 0; i != theFilter.pathSize(); ++i) {
-            def p = theFilter.path(i)
-            def pathElement = pathElements[i];
-            if (p.isVariable()) {
-                args.add(pathElement)
-            }
-        }
+		def pathElements = uri.path.split("/").findAll { !(!it) }
+		//// loop thru the Patterns getting the corresponding uri path elements
+		for (int i = 0; i != theFilter.pathSize(); ++i) {
+			def p = theFilter.path(i)
+			def pathElement = pathElements[i];
+			if (p.isVariable()) {
+				args.add(pathElement)
+			}
+		}
 
-        def qmap = PathMatchingUtils.queryStringToMap(uri.query)
-        theFilter.queryPattern().queryKeys().each { k ->
-            args.add(qmap[k])
-        }
-        args
-    }
+		def qmap = PathMatchingUtils.queryStringToMap(uri.query)
+		theFilter.queryPattern().queryKeys().each { k ->
+			args.add(qmap[k])
+		}
+		args
+	}
 
 }

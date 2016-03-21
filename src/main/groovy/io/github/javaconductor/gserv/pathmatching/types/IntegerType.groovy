@@ -31,15 +31,15 @@ import static io.github.javaconductor.gserv.utils.TextUtils.isInteger
  */
 class IntegerType extends PathElementType {
 
-    IntegerType() {
-        name = "Integer"
-    }
+	IntegerType() {
+		name = "Integer"
+	}
 
-    boolean validate(String s) {
-        isInteger(s)
-    }
+	boolean validate(String s) {
+		isInteger(s)
+	}
 
-    Object toType(String s) {
-        Integer.parseInt(s)
-    }
+	Object toType(String s) {
+		Integer.parseInt(s)
+	}
 }

@@ -1,14 +1,14 @@
-getJasmineRequireObj().toBeLessThan = function() {
-  function toBeLessThan() {
-    return {
-
-      compare: function(actual, expected) {
+getJasmineRequireObj().toBeLessThan = function () {
+    function toBeLessThan() {
         return {
-          pass: actual < expected
-        };
-      }
-    };
-  }
 
-  return toBeLessThan;
+            compare: function (actual, expected) {
+                return {
+                    pass: actual < expected
+                };
+            }
+        };
+    }
+
+    return toBeLessThan;
 };

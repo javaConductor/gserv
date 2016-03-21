@@ -16,51 +16,51 @@
  */
 angular.module('ui.directives').directive('uiValidate', function () {
 
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    link: function (scope, elm, attrs, ctrl) {
-      var validateFn, watch, validators = {},
-        validateExpr = scope.$eval(attrs.uiValidate);
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, elm, attrs, ctrl) {
+            var validateFn, watch, validators = {},
+                validateExpr = scope.$eval(attrs.uiValidate);
 
-      if (!validateExpr) return;
+            if (!validateExpr) return;
 
-      if (angular.isString(validateExpr)) {
-        validateExpr = { validator: validateExpr };
-      }
+            if (angular.isString(validateExpr)) {
+                validateExpr = {validator: validateExpr};
+            }
 
-      angular.forEach(validateExpr, function (expression, key) {
-        validateFn = function (valueToValidate) {
-          if (scope.$eval(expression, { '$value' : valueToValidate })) {
-            ctrl.$setValidity(key, true);
-            return valueToValidate;
-          } else {
-            ctrl.$setValidity(key, false);
-            return undefined;
-          }
-        };
-        validators[key] = validateFn;
-        ctrl.$formatters.push(validateFn);
-        ctrl.$parsers.push(validateFn);
-      });
-
-      // Support for ui-validate-watch
-      if (attrs.uiValidateWatch) {
-        watch = scope.$eval(attrs.uiValidateWatch);
-        if (angular.isString(watch)) {
-          scope.$watch(watch, function(){
-            angular.forEach(validators, function(validatorFn, key){
-              validatorFn(ctrl.$modelValue);
+            angular.forEach(validateExpr, function (expression, key) {
+                validateFn = function (valueToValidate) {
+                    if (scope.$eval(expression, {'$value': valueToValidate})) {
+                        ctrl.$setValidity(key, true);
+                        return valueToValidate;
+                    } else {
+                        ctrl.$setValidity(key, false);
+                        return undefined;
+                    }
+                };
+                validators[key] = validateFn;
+                ctrl.$formatters.push(validateFn);
+                ctrl.$parsers.push(validateFn);
             });
-          });
-        } else {
-          angular.forEach(watch, function(expression, key){
-            scope.$watch(expression, function(){
-              validators[key](ctrl.$modelValue);
-            });
-          });
+
+            // Support for ui-validate-watch
+            if (attrs.uiValidateWatch) {
+                watch = scope.$eval(attrs.uiValidateWatch);
+                if (angular.isString(watch)) {
+                    scope.$watch(watch, function () {
+                        angular.forEach(validators, function (validatorFn, key) {
+                            validatorFn(ctrl.$modelValue);
+                        });
+                    });
+                } else {
+                    angular.forEach(watch, function (expression, key) {
+                        scope.$watch(expression, function () {
+                            validators[key](ctrl.$modelValue);
+                        });
+                    });
+                }
+            }
         }
-      }
-    }
-  };
+    };
 });

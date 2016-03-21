@@ -36,70 +36,70 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
  */
 @Slf4j
 class ResourceLoader {
-    static def resourceCache = [:]
+	static def resourceCache = [:]
 
-    /**
-     * Creates a list of Resources from a resourceScriptFile.
-     *
-     * @param resourceScriptFile
-     * @param classPath
-     *
-     * @return List < gServResource >
-     */
-    def loadResources(File resourceScriptFile, classPath) {
-        assert true, "resourceScriptFile required"
-        if (!resourceScriptFile.exists()) {
-            throw new ResourceScriptException("Bad resource script file: $resourceScriptFile not found.")
-        }
+	/**
+	 * Creates a list of Resources from a resourceScriptFile.
+	 *
+	 * @param resourceScriptFile
+	 * @param classPath
+	 *
+	 * @return List < gServResource >
+	 */
+	def loadResources(File resourceScriptFile, classPath) {
+		assert true, "resourceScriptFile required"
+		if (!resourceScriptFile.exists()) {
+			throw new ResourceScriptException("Bad resource script file: $resourceScriptFile not found.")
+		}
 
-        classPath = classPath ?: []
-        GroovyShell groovyShell = createGroovyShell(classPath)
-        def resources
-        try {
-            resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
-            log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScriptFile.absolutePath}")
-            resourceCache[resourceScriptFile.absolutePath] = resources
-        } catch (MultipleCompilationErrorsException ex) {
-            //TODO report the line number of the syntax error
-            //log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            //log.warn("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
-            throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
-        } catch (Throwable ex) {
-            log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-            log.warn("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
-            throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
-        }
-        resources
-    }
+		classPath = classPath ?: []
+		GroovyShell groovyShell = createGroovyShell(classPath)
+		def resources
+		try {
+			resources = resourceCache[resourceScriptFile.absolutePath] ?: groovyShell.evaluate(resourceScriptFile)
+			log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScriptFile.absolutePath}")
+			resourceCache[resourceScriptFile.absolutePath] = resources
+		} catch (MultipleCompilationErrorsException ex) {
+			//TODO report the line number of the syntax error
+			//log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+			//log.warn("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+			throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
+		} catch (Throwable ex) {
+			log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
+			log.warn("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+			throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
+		}
+		resources
+	}
 
-    /**
-     * Creates a GServConfig from an instanceScriptFile.
-     * @param instanceScriptFile
-     * @return GServConfig
-     */
-    GServInstance loadInstance(File instanceScriptFile, classpath) {
-        if (!(instanceScriptFile?.exists()))
-            return null;
-        GroovyShell groovyShell = createGroovyShell(classpath ?: [])
-        GServInstance instance = groovyShell.evaluate(instanceScriptFile)
-        instance
-    }
+	/**
+	 * Creates a GServConfig from an instanceScriptFile.
+	 * @param instanceScriptFile
+	 * @return GServConfig
+	 */
+	GServInstance loadInstance(File instanceScriptFile, classpath) {
+		if (!(instanceScriptFile?.exists()))
+			return null;
+		GroovyShell groovyShell = createGroovyShell(classpath ?: [])
+		GServInstance instance = groovyShell.evaluate(instanceScriptFile)
+		instance
+	}
 
-    GServConfig loadInstanceConfig(File instanceScriptFile, classpath) {
-        loadInstance(instanceScriptFile, classpath)?.config()
-    }
+	GServConfig loadInstanceConfig(File instanceScriptFile, classpath) {
+		loadInstance(instanceScriptFile, classpath)?.config()
+	}
 
-    def createGroovyShell(classpath) {
-        // Add imports for script.
-        def importCustomizer = new ImportCustomizer()
-        importCustomizer.addStaticStars 'io.github.javaconductor.gserv.GServ'
-        importCustomizer.addImports 'io.github.javaconductor.gserv.GServ'
+	def createGroovyShell(classpath) {
+		// Add imports for script.
+		def importCustomizer = new ImportCustomizer()
+		importCustomizer.addStaticStars 'io.github.javaconductor.gserv.GServ'
+		importCustomizer.addImports 'io.github.javaconductor.gserv.GServ'
 
-        def configuration = new CompilerConfiguration()
-        configuration.classpathList = classpath
-        configuration.addCompilationCustomizers(importCustomizer)
+		def configuration = new CompilerConfiguration()
+		configuration.classpathList = classpath
+		configuration.addCompilationCustomizers(importCustomizer)
 
-        // Create shell.
-        new GroovyShell(configuration)
-    }
+		// Create shell.
+		new GroovyShell(configuration)
+	}
 }

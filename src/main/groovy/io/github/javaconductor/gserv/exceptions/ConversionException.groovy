@@ -28,11 +28,11 @@ package io.github.javaconductor.gserv.exceptions
  * Created by javaConductor on 8/18/2014.
  */
 class ConversionException extends Exception {
-    def ConversionException(String s) {
-        super(s)
-    }
+	def ConversionException(String s) {
+		super(s)
+	}
 
-    def ConversionException(String s, Throwable e) {
-        super(s, e)
-    }
+	def ConversionException(String s, Throwable e) {
+		super(s, e)
+	}
 }

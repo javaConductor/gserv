@@ -37,50 +37,50 @@ import static groovyx.net.http.Method.GET
  * Created by javaConductor on 10/5/2014.
  */
 class AppPropertiesSpec {
-    def baseDir = "src/integrationTest/resources/test/integration/"
+	def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @Test
-    public final void testAppProps() {
-        def port = "11007"
-        def dir = baseDir + "appPropsTest"
-        def f = new File(dir, "test.properties.json")
-        def args = ["-p", port,
-                    "-s", dir,
-                    "--appProperties", f.absolutePath,
-                    "-d", "index.html"
-        ]
-        // start server
-        def stopFn = new GServRunner().start(args);
-        Thread.sleep(1300)
+	@Test
+	public final void testAppProps() {
+		def port = "11007"
+		def dir = baseDir + "appPropsTest"
+		def f = new File(dir, "test.properties.json")
+		def args = ["-p", port,
+					"-s", dir,
+					"--appProperties", f.absolutePath,
+					"-d", "index.html"
+		]
+		// start server
+		def stopFn = new GServRunner().start(args);
+		Thread.sleep(1300)
 
-        // request
-        def http = new HTTPBuilder("http://localhost:$port/appProperties")
-        http.request(GET, TEXT) { req ->
+		// request
+		def http = new HTTPBuilder("http://localhost:$port/appProperties")
+		http.request(GET, TEXT) { req ->
 
-            headers.'User-Agent' = 'Mozilla/5.0'
-            response.success = { resp, Reader reader ->
-                assert resp.status == 200
-                char[] ac = new char [100]
-                reader.read(ac)
-                def data = new String(ac);
-                assert  (data.contains("dataServiceHost"))
-                assert  (data.contains("dataServicePort"))
-                //stop the server
-                stopFn()
-            }
-            // called only for a 404 (not found) status code:
-            response.'404' = { resp ->
-                assert false, "Not found."
-                println 'Not found'
-                //stop the server
-                stopFn()
-            }
-            response.'500' = { resp ->
-                assert false, "Internal Error."
-                println '500 Error'
-                //stop the server
-                stopFn()
-            }
-        }
-    }
+			headers.'User-Agent' = 'Mozilla/5.0'
+			response.success = { resp, Reader reader ->
+				assert resp.status == 200
+				char[] ac = new char[100]
+				reader.read(ac)
+				def data = new String(ac);
+				assert (data.contains("dataServiceHost"))
+				assert (data.contains("dataServicePort"))
+				//stop the server
+				stopFn()
+			}
+			// called only for a 404 (not found) status code:
+			response.'404' = { resp ->
+				assert false, "Not found."
+				println 'Not found'
+				//stop the server
+				stopFn()
+			}
+			response.'500' = { resp ->
+				assert false, "Internal Error."
+				println '500 Error'
+				//stop the server
+				stopFn()
+			}
+		}
+	}
 }

@@ -9,14 +9,14 @@ describe('global methods', function () {
         });
 
         it('defaults the radix to 10 when the number does not start with 0x or 0X', function () {
-           [
-               '01',
-               '08',
-               '10',
-               '42'
-           ].forEach(function (str) {
-               expect(parseInt(str)).toBe(parseInt(str, 10));
-           });
+            [
+                '01',
+                '08',
+                '10',
+                '42'
+            ].forEach(function (str) {
+                expect(parseInt(str)).toBe(parseInt(str, 10));
+            });
         });
 
         it('defaults the radix to 16 when the number starts with 0x or 0X', function () {
@@ -30,11 +30,15 @@ describe('global methods', function () {
             expect(parseInt('  08')).toBe(parseInt('08', 10));
         });
 
-       it('defaults the radix properly when not a true number', function () {
-           var fakeZero = { valueOf: function () { return 0; } };
-           expect(parseInt('08', fakeZero)).toBe(parseInt('08', 10));
-           expect(parseInt('0x16', fakeZero)).toBe(parseInt('0x16', 16));
-       });
+        it('defaults the radix properly when not a true number', function () {
+            var fakeZero = {
+                valueOf: function () {
+                    return 0;
+                }
+            };
+            expect(parseInt('08', fakeZero)).toBe(parseInt('08', 10));
+            expect(parseInt('0x16', fakeZero)).toBe(parseInt('0x16', 16));
+        });
     });
 });
 

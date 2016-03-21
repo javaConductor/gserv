@@ -36,68 +36,68 @@ import static groovyx.net.http.Method.GET
  */
 
 class BasicAuthSpec {
-    def baseDir = "src/integrationTest/resources/test/integration/"
+	def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @Test
-    public final void testBasicAuthentication() {
+	@Test
+	public final void testBasicAuthentication() {
 
-        def http = new HTTPBuilder('http://localhost:51200/')
-        def dir = baseDir + "basicauth"
-        def args = ["-p", "51200",
-                    "-i", dir + "/BasicAuth.groovy"]
-        def stopFn = new GServRunner().start(args);
-        def testCnt = 2
-        def uAndP = "secret:thing".bytes.encodeBase64()
+		def http = new HTTPBuilder('http://localhost:51200/')
+		def dir = baseDir + "basicauth"
+		def args = ["-p", "51200",
+					"-i", dir + "/BasicAuth.groovy"]
+		def stopFn = new GServRunner().start(args);
+		def testCnt = 2
+		def uAndP = "secret:thing".bytes.encodeBase64()
 
-        try {
-            http.request(GET, TEXT) { req ->
+		try {
+			http.request(GET, TEXT) { req ->
 
-                headers.'User-Agent' = 'Mozilla/5.0'
-                headers.'Authorization' = 'Basic ' + uAndP
-                response.success = { resp, Reader reader ->
-                    --testCnt
-                    assert resp.status == 200
-                    //stop the server
-                    if (testCnt == 0)
-                        stopFn()
-                }
-                response.failure = { resp ->
-                    --testCnt
+				headers.'User-Agent' = 'Mozilla/5.0'
+				headers.'Authorization' = 'Basic ' + uAndP
+				response.success = { resp, Reader reader ->
+					--testCnt
+					assert resp.status == 200
+					//stop the server
+					if (testCnt == 0)
+						stopFn()
+				}
+				response.failure = { resp ->
+					--testCnt
 
-                    //stop the server
-                    if (testCnt == 0)
-                        stopFn()
-                    assert "Failed!", false
-                }
-            }
-        } finally {
-            --testCnt
-            if (testCnt == 0)
-                stopFn()
-            //assert e.message == "Unauthorized"
-        }
+					//stop the server
+					if (testCnt == 0)
+						stopFn()
+					assert "Failed!", false
+				}
+			}
+		} finally {
+			--testCnt
+			if (testCnt == 0)
+				stopFn()
+			//assert e.message == "Unauthorized"
+		}
 
-        try {
-            http.request(GET, TEXT) { req ->
-                headers.'User-Agent' = 'Mozilla/5.0'
-                //headers.'Authorization' = 'Basic '+uAndP
-                response.success = { resp, Reader reader ->
-                    --testCnt
-                    assert resp.status == 403
-                    //stop the server
-                    if (testCnt == 0)
-                        stopFn()
-                }
-                response.failure = { resp ->
-                    --testCnt
-                    //stop the server
-                    if (testCnt == 0)
-                        stopFn()
-                }
-            }
-        }
-        catch (Throwable e) {
-            assert "${e.message}", false
-        }
-    }
+		try {
+			http.request(GET, TEXT) { req ->
+				headers.'User-Agent' = 'Mozilla/5.0'
+				//headers.'Authorization' = 'Basic '+uAndP
+				response.success = { resp, Reader reader ->
+					--testCnt
+					assert resp.status == 403
+					//stop the server
+					if (testCnt == 0)
+						stopFn()
+				}
+				response.failure = { resp ->
+					--testCnt
+					//stop the server
+					if (testCnt == 0)
+						stopFn()
+				}
+			}
+		}
+		catch (Throwable e) {
+			assert "${e.message}", false
+		}
+	}
 }

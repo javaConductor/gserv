@@ -31,104 +31,104 @@ import io.github.javaconductor.gserv.pathmatching.custom.CustomActionMatcher
  */
 class ResourceAction {
 
-    private def _urlPatterns
-    private def _queryPattern
-    private def _handler, _method
-    private def _options
-    private List<CustomActionMatcher> _customMatchers = []
-    String name
+	private def _urlPatterns
+	private def _queryPattern
+	private def _handler, _method
+	private def _options
+	private List<CustomActionMatcher> _customMatchers = []
+	String name
 
-    String toString() {
-        return "$_method(/" + _urlPatterns.join("/") + ")"
-    }
+	String toString() {
+		return "$_method(/" + _urlPatterns.join("/") + ")"
+	}
 
-    def ResourceAction(method, urlPatterns, queryPattern, clHandler) {
-        this(method, urlPatterns, queryPattern, [:], clHandler)
-    }
+	def ResourceAction(method, urlPatterns, queryPattern, clHandler) {
+		this(method, urlPatterns, queryPattern, [:], clHandler)
+	}
 
-    def ResourceAction(name, method, urlPatterns, ActionPathQuery queryPattern, Map options, clHandler) {
-        this(method, urlPatterns, queryPattern, options, clHandler)
-        this.name = name
-    }
+	def ResourceAction(name, method, urlPatterns, ActionPathQuery queryPattern, Map options, clHandler) {
+		this(method, urlPatterns, queryPattern, options, clHandler)
+		this.name = name
+	}
 
-    def ResourceAction(method, urlPatterns, ActionPathQuery queryPattern, Map options, clHandler) {
-        _queryPattern = queryPattern
-        _urlPatterns = urlPatterns
-        _handler = clHandler
-        _method = method
-        _options = options
-    }
+	def ResourceAction(method, urlPatterns, ActionPathQuery queryPattern, Map options, clHandler) {
+		_queryPattern = queryPattern
+		_urlPatterns = urlPatterns
+		_handler = clHandler
+		_method = method
+		_options = options
+	}
 
-    //returns clone of handler Closure
-    def requestHandler() {
-        _handler.clone()
-    }
+	//returns clone of handler Closure
+	def requestHandler() {
+		_handler.clone()
+	}
 
-    def method() { _method }
+	def method() { _method }
 
-    Map options() { _options }
-    //returns PathElement representing const or var
-    def path(idx) {
-        (idx >= 0 && idx < _urlPatterns.size()) ? _urlPatterns[idx] : null
-    }
+	Map options() { _options }
+	//returns PathElement representing const or var
+	def path(idx) {
+		(idx >= 0 && idx < _urlPatterns.size()) ? _urlPatterns[idx] : null
+	}
 
-    //returns number of elements in path
-    def pathSize() {
-        _urlPatterns.size()
-    }
+	//returns number of elements in path
+	def pathSize() {
+		_urlPatterns.size()
+	}
 
-    //returns list of elements in path
-    def pathElements() {
-        (_urlPatterns as List).asImmutable()
-    }
+	//returns list of elements in path
+	def pathElements() {
+		(_urlPatterns as List).asImmutable()
+	}
 
-    //returns number of query values
-    def queryPatternSize() {
-        _queryPattern.size()
-    }
+	//returns number of query values
+	def queryPatternSize() {
+		_queryPattern.size()
+	}
 
-    ActionPathQuery queryPattern() {
-        _queryPattern
-    }
+	ActionPathQuery queryPattern() {
+		_queryPattern
+	}
 
-    List<CustomActionMatcher> customMatchers() {
-        _customMatchers
-    }
+	List<CustomActionMatcher> customMatchers() {
+		_customMatchers
+	}
 
-    def customMatchers(List<CustomActionMatcher> matchers) {
-        _customMatchers = matchers
-    }
+	def customMatchers(List<CustomActionMatcher> matchers) {
+		_customMatchers = matchers
+	}
 
-    def customMatcher(CustomActionMatcher matcher) {
-        _customMatchers << matcher
-    }
+	def customMatcher(CustomActionMatcher matcher) {
+		_customMatchers << matcher
+	}
 
-    Map<String, Closure> _linksFunctions = [:]
+	Map<String, Closure> _linksFunctions = [:]
 
-    @Deprecated
-    def linksFunctions(String name = "default") {
-        _linksFunctions[name]
-    }
+	@Deprecated
+	def linksFunctions(String name = "default") {
+		_linksFunctions[name]
+	}
 
-    Closure linksFunction(String name = "default") {
-        _linksFunctions[name]
-    }
+	Closure linksFunction(String name = "default") {
+		_linksFunctions[name]
+	}
 
-    def addLinksFunction(String name, Closure c) {
-        _linksFunctions[name] = c
-    }
+	def addLinksFunction(String name, Closure c) {
+		_linksFunctions[name] = c
+	}
 
-    def addLinksFunction(Closure c) {
-        addLinksFunction("default", c)
-    }
+	def addLinksFunction(Closure c) {
+		addLinksFunction("default", c)
+	}
 
-    @Override
-    int hashCode() {
-        return (method() + pathElements().join('/')).hashCode()
-    }
+	@Override
+	int hashCode() {
+		return (method() + pathElements().join('/')).hashCode()
+	}
 
-    @Override
-    boolean equals(Object obj) {
-        hashCode() == obj.hashCode()
-    }
+	@Override
+	boolean equals(Object obj) {
+		hashCode() == obj.hashCode()
+	}
 }

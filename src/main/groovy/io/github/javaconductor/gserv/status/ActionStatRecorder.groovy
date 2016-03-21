@@ -31,9 +31,9 @@ import io.github.javaconductor.gserv.actions.ResourceAction
  */
 interface ActionStatRecorder {
 
-    def recordEvent(ResourceAction action, String topic, Map eventData)
+	def recordEvent(ResourceAction action, String topic, Map eventData)
 
-    Map reportStat(ResourceAction action) // Map [statDisplayName] : value
+	Map reportStat(ResourceAction action) // Map [statDisplayName] : value
 
-    def reset()
+	def reset()
 }

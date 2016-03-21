@@ -4,7 +4,7 @@ describe('Object', function () {
     describe("Object.keys", function () {
         var obj = {
             "str": "boz",
-            "obj": { },
+            "obj": {},
             "arr": [],
             "bool": true,
             "num": 42,
@@ -50,8 +50,8 @@ describe('Object', function () {
         });
     });
 
-	describe("Object.isExtensible", function () {
-        var obj = { };
+    describe("Object.isExtensible", function () {
+        var obj = {};
 
         it('should return true if object is extensible', function () {
             expect(Object.isExtensible(obj)).toBe(true);
@@ -81,18 +81,18 @@ describe('Object', function () {
         });
     });
 
-	describe("Object.defineProperty", function () {
+    describe("Object.defineProperty", function () {
         var obj;
 
-        beforeEach(function() {
-           obj = {};
+        beforeEach(function () {
+            obj = {};
 
-           Object.defineProperty(obj, 'name', {
-               value : 'Testing',
-               configurable: true,
-               enumerable: true,
-               writable: true
-           });
+            Object.defineProperty(obj, 'name', {
+                value: 'Testing',
+                configurable: true,
+                enumerable: true,
+                writable: true
+            });
         });
 
         it('should return the initial value', function () {
@@ -116,7 +116,7 @@ describe('Object', function () {
             var child = Object.create(obj, {});
 
             Object.defineProperty(child, 'name', {
-                value : 'Other'
+                value: 'Other'
             });
 
             expect(obj.name).toBe('Testing');
@@ -130,7 +130,7 @@ describe('Object', function () {
         });
     });
 
-	describe("Object.getOwnPropertyDescriptor", function () {
+    describe("Object.getOwnPropertyDescriptor", function () {
         it('should return undefined because the object does not own the property', function () {
             var descr = Object.getOwnPropertyDescriptor({}, 'name');
 
@@ -156,7 +156,7 @@ describe('Object', function () {
         it('should return a data descriptor', function () {
             var obj = Object.create({}, {
                 name: {
-                    value : 'Testing',
+                    value: 'Testing',
                     configurable: true,
                     enumerable: true,
                     writable: true
@@ -172,7 +172,7 @@ describe('Object', function () {
             expect(descr.configurable).toBe(true);
         });
 
-    	it('should throw error for non object', function () {
+        it('should throw error for non object', function () {
             expect(function () {
                 Object.getOwnPropertyDescriptor(42, 'name');
             }).toThrow();

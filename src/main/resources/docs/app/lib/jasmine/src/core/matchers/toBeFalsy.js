@@ -1,13 +1,13 @@
-getJasmineRequireObj().toBeFalsy = function() {
-  function toBeFalsy() {
-    return {
-      compare: function(actual) {
+getJasmineRequireObj().toBeFalsy = function () {
+    function toBeFalsy() {
         return {
-          pass: !!!actual
+            compare: function (actual) {
+                return {
+                    pass: !!!actual
+                };
+            }
         };
-      }
-    };
-  }
+    }
 
-  return toBeFalsy;
+    return toBeFalsy;
 };

@@ -37,37 +37,37 @@ import io.github.javaconductor.gserv.pathmatching.custom.HeaderMatcher
  */
 trait ResourceFn {
 
-    /**
-     *
-     * @param name
-     * @param url
-     * @param clozure
-     * @return
-     */
-    def handle(String name, url, clozure) {
-        if (name.equalsIgnoreCase("get")) {
-            get(url, clozure)
-        } else if (name.equalsIgnoreCase("put")) {
-            put(url, clozure)
-        } else if (name.equalsIgnoreCase("post")) {
-            post(url, clozure)
-        } else if (name.equalsIgnoreCase("delete")) {
-            delete(url, clozure)
-        } else throw new IllegalArgumentException("HTTP method $name either not supported or no such method.")
+	/**
+	 *
+	 * @param name
+	 * @param url
+	 * @param clozure
+	 * @return
+	 */
+	def handle(String name, url, clozure) {
+		if (name.equalsIgnoreCase("get")) {
+			get(url, clozure)
+		} else if (name.equalsIgnoreCase("put")) {
+			put(url, clozure)
+		} else if (name.equalsIgnoreCase("post")) {
+			post(url, clozure)
+		} else if (name.equalsIgnoreCase("delete")) {
+			delete(url, clozure)
+		} else throw new IllegalArgumentException("HTTP method $name either not supported or no such method.")
 
-    }
-    /**
-     *
-     * @param methods
-     * @param url
-     * @param clozure
-     * @return
-     */
-    def handle(List<String> methods, url, clozure) {
-        methods.each { methodName ->
-            handle(methodName, url, clozure)
-        }
-    }
+	}
+	/**
+	 *
+	 * @param methods
+	 * @param url
+	 * @param clozure
+	 * @return
+	 */
+	def handle(List<String> methods, url, clozure) {
+		methods.each { methodName ->
+			handle(methodName, url, clozure)
+		}
+	}
 //    /**
 //     * Declares a handler for an HTTP GET request for the specified URL.
 //     *
@@ -79,151 +79,151 @@ trait ResourceFn {
 //        get(null, url, clozure)
 //    }
 
-    /**
-     * Declares a handler for an HTTP GET request for the specified URL.
-     *
-     * @param url /example/:name/:age
-     * @param clozure clozure(name, age )
-     * @return
-     */
-    def get(String url, Object... matchersAndClozure) {
-        get(null, url, matchersAndClozure)
-    }
+	/**
+	 * Declares a handler for an HTTP GET request for the specified URL.
+	 *
+	 * @param url /example/:name/:age
+	 * @param clozure clozure(name, age )
+	 * @return
+	 */
+	def get(String url, Object... matchersAndClozure) {
+		get(null, url, matchersAndClozure)
+	}
 
-    /**
-     * Declares a handler for an HTTP GET request for the specified URL.
-     *
-     * @param actionName optional name of the Action
-     * @param url /example/:name/:age
-     * @param clozure clozure(name, age )
-     * @return
-     */
-    def get(String actionName, String url, Object... matchersAndClosure) {
-        def clozure = matchersAndClosure.last()
-        def customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
-        log.trace("resourceFn: get ${actionName ?: ''} base=${(value("path")) ?: 'none'} url=$url")
-        def rte = _addUrlToPatternList("GET", url, clozure)
-        if (actionName)
-            value("linkBuilder").addLink(actionName, rte)
-        if (customMatchers) {
-            rte.customMatchers(customMatchers as List)
-        }
-        rte
-    }
+	/**
+	 * Declares a handler for an HTTP GET request for the specified URL.
+	 *
+	 * @param actionName optional name of the Action
+	 * @param url /example/:name/:age
+	 * @param clozure clozure(name, age )
+	 * @return
+	 */
+	def get(String actionName, String url, Object... matchersAndClosure) {
+		def clozure = matchersAndClosure.last()
+		def customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+		log.trace("resourceFn: get ${actionName ?: ''} base=${(value("path")) ?: 'none'} url=$url")
+		def rte = _addUrlToPatternList("GET", url, clozure)
+		if (actionName)
+			value("linkBuilder").addLink(actionName, rte)
+		if (customMatchers) {
+			rte.customMatchers(customMatchers as List)
+		}
+		rte
+	}
 
-    /**
-     * Declares a handler for an HTTP PUT request for the specified URL.
-     *
-     * @param url /example/:name/:age
-     * @param customerMatchers 0 or more custom matchers
-     * @param clozure clozure(input, name, age )
-     * @return
-     */
-    def put(url, Object... matchersAndClosure) {
-        log.trace("resourceFn: put url=$url")
-        def clozure = matchersAndClosure.last()
-        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
-        def rte = _addUrlToPatternList("PUT", url, clozure)
-        if (rte && customMatchers) {
-            rte.customMatchers(customMatchers)
+	/**
+	 * Declares a handler for an HTTP PUT request for the specified URL.
+	 *
+	 * @param url /example/:name/:age
+	 * @param customerMatchers 0 or more custom matchers
+	 * @param clozure clozure(input, name, age )
+	 * @return
+	 */
+	def put(url, Object... matchersAndClosure) {
+		log.trace("resourceFn: put url=$url")
+		def clozure = matchersAndClosure.last()
+		List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+		def rte = _addUrlToPatternList("PUT", url, clozure)
+		if (rte && customMatchers) {
+			rte.customMatchers(customMatchers)
 
-        }
-        //if(routeName) linkBuilder.add(routeName, rte)
-        rte
-    }
+		}
+		//if(routeName) linkBuilder.add(routeName, rte)
+		rte
+	}
 
-    /**
-     * Declares a handler for an HTTP POST request for the specified URL.
-     *
-     * @param url /example/:name/:age
-     * @param clozure clozure(inputStream, name, age )
-     * @return
-     */
-    def post(url, Object... matchersAndClosure) {
-        log.trace("resourceFn: post url=$url")
-        def clozure = matchersAndClosure.last()
-        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
-        def action = _addUrlToPatternList("POST", url, clozure)
-        if (customMatchers) {
-            action.customMatchers(customMatchers)
-        }
-    }
+	/**
+	 * Declares a handler for an HTTP POST request for the specified URL.
+	 *
+	 * @param url /example/:name/:age
+	 * @param clozure clozure(inputStream, name, age )
+	 * @return
+	 */
+	def post(url, Object... matchersAndClosure) {
+		log.trace("resourceFn: post url=$url")
+		def clozure = matchersAndClosure.last()
+		List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+		def action = _addUrlToPatternList("POST", url, clozure)
+		if (customMatchers) {
+			action.customMatchers(customMatchers)
+		}
+	}
 
-    /**
-     * Declares a handler for an HTTP DELETE request for the specified URL.
-     *
-     * @param url /example/:name/:age
-     * @param clozure clozure(name, age )
-     * @return
-     */
-    def delete(url, Object... matchersAndClosure) {
-        log.trace("resourceFn: delete url=$url")
-        def clozure = matchersAndClosure.last()
-        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
-        def action = _addUrlToPatternList("DELETE", url, clozure)
-        if (customMatchers) {
-            action.customMatchers(customMatchers)
-        }
-    }
+	/**
+	 * Declares a handler for an HTTP DELETE request for the specified URL.
+	 *
+	 * @param url /example/:name/:age
+	 * @param clozure clozure(name, age )
+	 * @return
+	 */
+	def delete(url, Object... matchersAndClosure) {
+		log.trace("resourceFn: delete url=$url")
+		def clozure = matchersAndClosure.last()
+		List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+		def action = _addUrlToPatternList("DELETE", url, clozure)
+		if (customMatchers) {
+			action.customMatchers(customMatchers)
+		}
+	}
 
-    /**
-     * Declares a handler for an HTTP PATCH request for the specified URL.
-     *
-     * @param url /example/:name/:age
-     * @param clozure clozure(inputStream, name, age )
-     * @return
-     */
-    def patch(url, Object... matchersAndClosure) {
-        log.trace("resourceFn: post url=$url")
-        def clozure = matchersAndClosure.last()
-        List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
-        def action = _addUrlToPatternList("PATCH", url, clozure)
-        if (customMatchers) {
-            action.customMatchers(customMatchers)
-        }
-    }
+	/**
+	 * Declares a handler for an HTTP PATCH request for the specified URL.
+	 *
+	 * @param url /example/:name/:age
+	 * @param clozure clozure(inputStream, name, age )
+	 * @return
+	 */
+	def patch(url, Object... matchersAndClosure) {
+		log.trace("resourceFn: post url=$url")
+		def clozure = matchersAndClosure.last()
+		List<CustomActionMatcher> customMatchers = matchersAndClosure.take(matchersAndClosure.length - 1)
+		def action = _addUrlToPatternList("PATCH", url, clozure)
+		if (customMatchers) {
+			action.customMatchers(customMatchers)
+		}
+	}
 
-    private ResourceAction _addUrlToPatternList(method, url, clozure) {
-        def absUrl = value("path") ?: "";
-        if (url) {
-            if (!url.startsWith("/")) {
-                url = ("/" + url)
-            }
-            absUrl += url
-        }
-        log.trace "resourceFn: _addUrlToPatternList url=$absUrl".toString();
+	private ResourceAction _addUrlToPatternList(method, url, clozure) {
+		def absUrl = value("path") ?: "";
+		if (url) {
+			if (!url.startsWith("/")) {
+				url = ("/" + url)
+			}
+			absUrl += url
+		}
+		log.trace "resourceFn: _addUrlToPatternList url=$absUrl".toString();
 
-        def action = ResourceActionFactory.createAction(method, absUrl, clozure)
-        value("actionList").add(action)
-        action
-    }
+		def action = ResourceActionFactory.createAction(method, absUrl, clozure)
+		value("actionList").add(action)
+		action
+	}
 
-    def onlyIfAccepts(String... types) {
-        new AcceptsMatcher(types)
-    }
+	def onlyIfAccepts(String... types) {
+		new AcceptsMatcher(types)
+	}
 
-    def onlyIfContentType(String... types) {
-        new ContentTypeMatcher(types)
-    }
+	def onlyIfContentType(String... types) {
+		new ContentTypeMatcher(types)
+	}
 
-    def onlyIfHeader(String hdr, String... values) {
-        new HeaderMatcher(hdr, values)
-    }
+	def onlyIfHeader(String hdr, String... values) {
+		new HeaderMatcher(hdr, values)
+	}
 
-    def links(String name, Closure c) {
-        value("linkBuilder").addLinksFunction(name ?: 'default', c)
-    }
+	def links(String name, Closure c) {
+		value("linkBuilder").addLinksFunction(name ?: 'default', c)
+	}
 
-    def links(Closure c) {
-        links('', c)
-    }
+	def links(Closure c) {
+		links('', c)
+	}
 
-    /*
-    *
-                onlyHeader("X-MODE", "chill"),
-                onlyHeaderIn("X-MODE", "work" , "chill"),
-                onlyIfAccepts("application/json", "application/xml"),
-                onlyIfContentType("application/json", "application/xml")*/
+	/*
+	*
+				onlyHeader("X-MODE", "chill"),
+				onlyHeaderIn("X-MODE", "work" , "chill"),
+				onlyIfAccepts("application/json", "application/xml"),
+				onlyIfContentType("application/json", "application/xml")*/
 
 }
 

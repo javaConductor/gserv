@@ -30,168 +30,168 @@ import spock.lang.Specification
 
 public class CorsSpec extends Specification {
 
-    CORSConfig cfg;
+	CORSConfig cfg;
 
-    public void "test allowAllWithLocalHost"() {
-        def cfg
-        when:
-        cfg = new CORSConfig(3600, CORSMode.AllowAll)
+	public void "test allowAllWithLocalHost"() {
+		def cfg
+		when:
+		cfg = new CORSConfig(3600, CORSMode.AllowAll)
 
-        then:
-        cfg.hasAccess("localhost", "GET")
-    }
+		then:
+		cfg.hasAccess("localhost", "GET")
+	}
 
-    public void "should allow localhost using whitelist"() {
-        cfg = new CORSConfig(3600, CORSMode.WhiteList, ["localhost": [maxAge: 3600, methods: ["*"]]
-        ])
-        assert cfg.hasAccess("localhost", "GET")
-    }
+	public void "should allow localhost using whitelist"() {
+		cfg = new CORSConfig(3600, CORSMode.WhiteList, ["localhost": [maxAge: 3600, methods: ["*"]]
+		])
+		assert cfg.hasAccess("localhost", "GET")
+	}
 
-    public void "should allow GET when * is in WhiteList"() {
-        def cfg
+	public void "should allow GET when * is in WhiteList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "127.0.0.1": [
-                        maxAge : 3600,
-                        methods: ["*"]
-                ]
-        ]
-        );
-        then:
-        cfg.hasAccess("127.0.0.1", "GET")
-    }
-
-
-    public void "should allow GET when not in BlackList"() {
-        def cfg
-
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.BlackList, [
-                "127.0.0.1": [
-                        maxAge : 3600,
-                        methods: ["*"]
-                ]])
-
-        then:
-        cfg.hasAccess("127.0.0.2", "GET")
-    }
-
-    public void "should NOT allow GET when in BlackList"() {
-        def cfg
-
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.BlackList, [
-                "127.0.0.1": [
-                        maxAge : 3600,
-                        methods: ["*"]
-                ]])
-
-        then:
-        !cfg.hasAccess("127.0.0.1", "GET")
-    }
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"127.0.0.1": [
+						maxAge : 3600,
+						methods: ["*"]
+				]
+		]
+		);
+		then:
+		cfg.hasAccess("127.0.0.1", "GET")
+	}
 
 
-    public void "should fail using WhiteList"() {
-        def cfg
+	public void "should allow GET when not in BlackList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "localhost.org": [
-                        maxAge : 3600,
-                        methods: ["*"]
-                ]
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.BlackList, [
+				"127.0.0.1": [
+						maxAge : 3600,
+						methods: ["*"]
+				]])
 
-        ])
-        then:
-        !cfg.hasAccess("localhost", "GET")
-    }
+		then:
+		cfg.hasAccess("127.0.0.2", "GET")
+	}
 
-    public void "should fail PUT using WhiteList"() {
-        def cfg
+	public void "should NOT allow GET when in BlackList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "localhost.org": [
-                        maxAge : 3600,
-                        methods: ["GET", "POST"]
-                ]
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.BlackList, [
+				"127.0.0.1": [
+						maxAge : 3600,
+						methods: ["*"]
+				]])
 
-        ])
-        then:
-        !cfg.hasAccess("localhost", "PUT")
-    }
-
-    public void "should allow PUT using WhiteList"() {
-        def cfg
-
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "127.0.0.1": [
-                        maxAge : 3600,
-                        methods: ["GET", "PUT", "POST"]
-                ]
-
-        ])
-        then:
-        cfg.hasAccess("127.0.0.1", "PUT")
-    }
+		then:
+		!cfg.hasAccess("127.0.0.1", "GET")
+	}
 
 
-    public void "should allow X-Other Header"() {
-        def cfg
+	public void "should fail using WhiteList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "127.0.0.1": [
-                        maxAge              : 3600,
-                        methods             : ["GET", "PUT", "POST"],
-                        customRequestHeaders: ['X-Other']
-                ]
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"localhost.org": [
+						maxAge : 3600,
+						methods: ["*"]
+				]
 
-        ])
-        then:
-        cfg.hasAccess("127.0.0.1", "PUT", ['X-Other'])
-    }
+		])
+		then:
+		!cfg.hasAccess("localhost", "GET")
+	}
 
-    public void "should not allow X-Same Header"() {
-        def cfg
+	public void "should fail PUT using WhiteList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "127.0.0.1": [
-                        maxAge              : 3600,
-                        methods             : ["GET", "PUT", "POST"],
-                        customRequestHeaders: ['X-Other']
-                ]
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"localhost.org": [
+						maxAge : 3600,
+						methods: ["GET", "POST"]
+				]
 
-        ])
-        then:
-        !cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
-    }
+		])
+		then:
+		!cfg.hasAccess("localhost", "PUT")
+	}
 
-    public void "should allow X-Same Header when none specified"() {
-        def cfg
+	public void "should allow PUT using WhiteList"() {
+		def cfg
 
-        when:
-        cfg = new CORSConfig(3600,
-                CORSMode.WhiteList, [
-                "127.0.0.1": [
-                        maxAge : 3600,
-                        methods: ["GET", "PUT", "POST"]
-                ]
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"127.0.0.1": [
+						maxAge : 3600,
+						methods: ["GET", "PUT", "POST"]
+				]
 
-        ])
-        then:
-        cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
-    }
+		])
+		then:
+		cfg.hasAccess("127.0.0.1", "PUT")
+	}
+
+
+	public void "should allow X-Other Header"() {
+		def cfg
+
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"127.0.0.1": [
+						maxAge              : 3600,
+						methods             : ["GET", "PUT", "POST"],
+						customRequestHeaders: ['X-Other']
+				]
+
+		])
+		then:
+		cfg.hasAccess("127.0.0.1", "PUT", ['X-Other'])
+	}
+
+	public void "should not allow X-Same Header"() {
+		def cfg
+
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"127.0.0.1": [
+						maxAge              : 3600,
+						methods             : ["GET", "PUT", "POST"],
+						customRequestHeaders: ['X-Other']
+				]
+
+		])
+		then:
+		!cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
+	}
+
+	public void "should allow X-Same Header when none specified"() {
+		def cfg
+
+		when:
+		cfg = new CORSConfig(3600,
+				CORSMode.WhiteList, [
+				"127.0.0.1": [
+						maxAge : 3600,
+						methods: ["GET", "PUT", "POST"]
+				]
+
+		])
+		then:
+		cfg.hasAccess("127.0.0.1", "PUT", ['X-Same'])
+	}
 
 }

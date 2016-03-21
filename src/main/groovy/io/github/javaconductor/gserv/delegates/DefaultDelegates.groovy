@@ -1,4 +1,3 @@
-
 /*
  *  The MIT License (MIT)
  *
@@ -31,16 +30,16 @@ package io.github.javaconductor.gserv.delegates
  *
  */
 class DefaultDelegates {
-    /**
-     *
-     * @return Map ( delegateType: delegateMetaClass )
-     */
-    static def getDelegates() {
-        [(DelegateTypes.HttpMethod): HttpMethodDelegate.metaClass,
-         (DelegateTypes.Filter)    : FilterDelegate.metaClass,
-         (DelegateTypes.Http)      : ServerInstanceDelegate.metaClass,
-         (DelegateTypes.Https)     : ServerInstanceDelegate.metaClass,
-         (DelegateTypes.Resource)  : ResourceDelegate.metaClass
-        ]
-    }
+	/**
+	 *
+	 * @return Map ( delegateType: delegateMetaClass )
+	 */
+	static def getDelegates() {
+		[(DelegateTypes.HttpMethod): HttpMethodDelegate.metaClass,
+		 (DelegateTypes.Filter)    : FilterDelegate.metaClass,
+		 (DelegateTypes.Http)      : ServerInstanceDelegate.metaClass,
+		 (DelegateTypes.Https)     : ServerInstanceDelegate.metaClass,
+		 (DelegateTypes.Resource)  : ResourceDelegate.metaClass
+		]
+	}
 }

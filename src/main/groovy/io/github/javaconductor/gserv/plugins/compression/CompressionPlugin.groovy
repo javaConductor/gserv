@@ -43,151 +43,151 @@ import java.util.zip.GZIPOutputStream
  */
 @Slf4j
 class CompressionPlugin extends AbstractPlugin {
-    @Override
-    def init(Object options) {
-        return null
-    }
+	@Override
+	def init(Object options) {
+		return null
+	}
 
-    @Override
-    List<ResourceAction> filters() {
-        createFilter("GET") //+ createFilter("PUT") + createFilter("POST")
-    }
+	@Override
+	List<ResourceAction> filters() {
+		createFilter("GET") //+ createFilter("PUT") + createFilter("POST")
+	}
 
-    /**
-     * Filter Handler
-     *
-     * @param exchange
-     * @return
-     */
-    def CompressionTypes = ["GZIP": "gzip", "DEFLATE": "deflate"]
+	/**
+	 * Filter Handler
+	 *
+	 * @param exchange
+	 * @return
+	 */
+	def CompressionTypes = ["GZIP": "gzip", "DEFLATE": "deflate"]
 
-    private def handleAfter(RequestContext context, data) {
-        def reqId = context.id()
-        def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
-        def outEncoding
-        if (outEncodings)
-            if (outEncodings[0]?.contains("gzip"))
-                outEncoding = CompressionTypes.GZIP
-            else if (outEncodings[0]?.contains("deflate"))
-                outEncoding = CompressionTypes.DEFLATE
-        byte[] bytes = data ?: new byte[0]
-        /// if Should GZIP this
-        if (outEncoding)
-            if (shouldCompress(context.responseCode)) {
-                def oldSz = bytes.length
-                bytes = compressBytes(bytes, outEncoding)
-                def newSz = bytes.length
-                log.trace("Request #$reqId compressed [$outEncoding] $oldSz -> $newSz")
-                /// add headers to real Exchange
-                context.responseHeaders.put("Content-Encoding", [outEncoding])
-            }
-        bytes
-    }
+	private def handleAfter(RequestContext context, data) {
+		def reqId = context.id()
+		def outEncodings = context.getRequestHeaders().get("Accept-Encoding")
+		def outEncoding
+		if (outEncodings)
+			if (outEncodings[0]?.contains("gzip"))
+				outEncoding = CompressionTypes.GZIP
+			else if (outEncodings[0]?.contains("deflate"))
+				outEncoding = CompressionTypes.DEFLATE
+		byte[] bytes = data ?: new byte[0]
+		/// if Should GZIP this
+		if (outEncoding)
+			if (shouldCompress(context.responseCode)) {
+				def oldSz = bytes.length
+				bytes = compressBytes(bytes, outEncoding)
+				def newSz = bytes.length
+				log.trace("Request #$reqId compressed [$outEncoding] $oldSz -> $newSz")
+				/// add headers to real Exchange
+				context.responseHeaders.put("Content-Encoding", [outEncoding])
+			}
+		bytes
+	}
 
-    private def handleBefore(context) {
-        def inputStream = context.requestBody
+	private def handleBefore(context) {
+		def inputStream = context.requestBody
 
-        /// wrap the input if needed
-        def inEncoding = context.requestHeaders["Content-Encoding"]
-        def instream
-        if (inEncoding) {
-            inEncoding = inEncoding[0]
-            switch (inEncoding) {
-                case "gzip":
-                    instream = new GZIPInputStream(inputStream)
-                    break;
+		/// wrap the input if needed
+		def inEncoding = context.requestHeaders["Content-Encoding"]
+		def instream
+		if (inEncoding) {
+			inEncoding = inEncoding[0]
+			switch (inEncoding) {
+				case "gzip":
+					instream = new GZIPInputStream(inputStream)
+					break;
 
-                case "deflate":
-                    instream = new DeflaterInputStream(inputStream)
-                    break;
+				case "deflate":
+					instream = new DeflaterInputStream(inputStream)
+					break;
 
-                default:
-                    break;
-            }
-        }
+				default:
+					break;
+			}
+		}
 
-        if (instream) {
-            EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: context.id(),
-                    name     : "Compression-Before-Filter",
-                    message  : "Processing Compression Filter - Replacing input stream."])
-            context.setStreams(instream, context.responseBody)
-        } else {
-            EventManager.instance().publish(Events.FilterProcessing, [
-                    requestId: context.id(),
-                    name     : "Compression-Before-Filter",
-                    message  : "Processing Compression Filter - NOT Replacing input stream."])
-            //println("compressionPlugin: no compression here.")
-        }
-        context
-    }
+		if (instream) {
+			EventManager.instance().publish(Events.FilterProcessing, [
+					requestId: context.id(),
+					name     : "Compression-Before-Filter",
+					message  : "Processing Compression Filter - Replacing input stream."])
+			context.setStreams(instream, context.responseBody)
+		} else {
+			EventManager.instance().publish(Events.FilterProcessing, [
+					requestId: context.id(),
+					name     : "Compression-Before-Filter",
+					message  : "Processing Compression Filter - NOT Replacing input stream."])
+			//println("compressionPlugin: no compression here.")
+		}
+		context
+	}
 
-    private def createFilter(method) {
-        EventManager.instance().publish(Events.FilterProcessing, [
-                name   : "Compression-$method-Filter",
-                message: "Creating Processing Compression Filter"])
+	private def createFilter(method) {
+		EventManager.instance().publish(Events.FilterProcessing, [
+				name   : "Compression-$method-Filter",
+				message: "Creating Processing Compression Filter"])
 
-        switch (method) {
+		switch (method) {
 
-            case "get":
-            case "GET":
-                [ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter",
-                        method, '/**', [(FilterOptions.MatchedActionsOnly): true], 10) { context, data ->
-                    data = handleAfter(context, data) ?: data
+			case "get":
+			case "GET":
+				[ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter",
+						method, '/**', [(FilterOptions.MatchedActionsOnly): true], 10) { context, data ->
+					data = handleAfter(context, data) ?: data
 //                    println "CompressionPlugin: before GET doFilter()"
-                    EventManager.instance().publish(Events.FilterProcessing, [
-                            requestId: context.id(),
-                            name     : "Compressioncontext-$method-After-Filter",
-                            message  : "Filter is done! Compression Filter passing control down the chain. "])
-                    data
-                }]
-                break;
+					EventManager.instance().publish(Events.FilterProcessing, [
+							requestId: context.id(),
+							name     : "Compressioncontext-$method-After-Filter",
+							message  : "Filter is done! Compression Filter passing control down the chain. "])
+					data
+				}]
+				break;
 
-            case "PUT":
-            case "POST":
-                [ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter",
-                        method, '/**',
-                        [(FilterOptions.MatchedActionsOnly): true], 1) { requestContext, args ->
-                    RequestContext ctxt = handleBefore(requestContext) ?: requestContext
-                    //nextFilter(ctxt)
-                    log.trace "CompressionPlugin: before $method doFilter()"
-                    ctxt
-                },
-                 ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { requestContext, data ->
-                     handleAfter(requestContext, data) ?: data
-                 }]
-                break;
-        }
-    }
+			case "PUT":
+			case "POST":
+				[ResourceActionFactory.createBeforeFilter("Compression-$method-Before-Filter",
+						method, '/**',
+						[(FilterOptions.MatchedActionsOnly): true], 1) { requestContext, args ->
+					RequestContext ctxt = handleBefore(requestContext) ?: requestContext
+					//nextFilter(ctxt)
+					log.trace "CompressionPlugin: before $method doFilter()"
+					ctxt
+				},
+				 ResourceActionFactory.createAfterFilter("Compression-$method-After-Filter", method, '/**', [(FilterOptions.PassRouteParams): false, (FilterOptions.MatchedActionsOnly): true], 10) { requestContext, data ->
+					 handleAfter(requestContext, data) ?: data
+				 }]
+				break;
+		}
+	}
 
-    private byte[] compressBytes(bytes, contentEncoding) {
-        def bostream = new ByteArrayOutputStream()
-        def cmpStream = wrapOutputStreamWithCompression(bostream, contentEncoding)
-        cmpStream.write(bytes)
-        cmpStream.close()
-        // return the compressed bytes
-        def ret = bostream.toByteArray()
-        EventManager.instance().publish(Events.FilterProcessing, [
-                oldSize: bytes.size(),
-                newSize: ret.size(),
-                name   : "Compression-Filter"])
-        ret
-    }
+	private byte[] compressBytes(bytes, contentEncoding) {
+		def bostream = new ByteArrayOutputStream()
+		def cmpStream = wrapOutputStreamWithCompression(bostream, contentEncoding)
+		cmpStream.write(bytes)
+		cmpStream.close()
+		// return the compressed bytes
+		def ret = bostream.toByteArray()
+		EventManager.instance().publish(Events.FilterProcessing, [
+				oldSize: bytes.size(),
+				newSize: ret.size(),
+				name   : "Compression-Filter"])
+		ret
+	}
 
-    OutputStream wrapOutputStreamWithCompression(ostream, contentEncoding) {
-        def os = ostream
-        switch (contentEncoding) {
-            case 'gzip':
-                os = new GZIPOutputStream(ostream)
-                break;
-            case 'deflate':
-                os = new DeflaterOutputStream(ostream)
-                break;
-        }
-        os
-    }
+	OutputStream wrapOutputStreamWithCompression(ostream, contentEncoding) {
+		def os = ostream
+		switch (contentEncoding) {
+			case 'gzip':
+				os = new GZIPOutputStream(ostream)
+				break;
+			case 'deflate':
+				os = new DeflaterOutputStream(ostream)
+				break;
+		}
+		os
+	}
 
-    private boolean shouldCompress(statusCode) {
-        !([301, 305, 304, 500, 400..505, 302].contains(statusCode))
-    }
+	private boolean shouldCompress(statusCode) {
+		!([301, 305, 304, 500, 400..505, 302].contains(statusCode))
+	}
 }

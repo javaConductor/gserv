@@ -31,94 +31,94 @@ import groovy.util.logging.Slf4j
  */
 @Slf4j
 class CORSConfig {
-    def maxAge
-    String mode
-    def list = [:]
+	def maxAge
+	String mode
+	def list = [:]
 
-    def static exampleConfig = [
-            maxAge: 3600,
-            mode  : 'CORSMode.WhiteList',
-            list  : [
-                    "127.0.0.1"    : [
-                            methods             : ["*"],
-                            maxAge              : 14400,
-                            customRequestHeaders: []
-                    ],
-                    "129.25.192.33": [
-                            methods             : ["GET"],
-                            maxAge              : 7200,
-                            customRequestHeaders: ['X-Custom-Header']
-                    ]
-            ]
-    ];
+	def static exampleConfig = [
+			maxAge: 3600,
+			mode  : 'CORSMode.WhiteList',
+			list  : [
+					"127.0.0.1"    : [
+							methods             : ["*"],
+							maxAge              : 14400,
+							customRequestHeaders: []
+					],
+					"129.25.192.33": [
+							methods             : ["GET"],
+							maxAge              : 7200,
+							customRequestHeaders: ['X-Custom-Header']
+					]
+			]
+	];
 
-    def CORSConfig(corsConfig) {
-        maxAge = corsConfig.maxAge
-        mode = corsConfig.mode
-        this.list = corsConfig?.list?.inject([:]) { hostCfgs, hcfg ->
-            def host = hcfg.key
-            def hostCfg = hcfg.value
-            hostCfgs + [("$host".toString()): new HostConfig(host, hostCfg.methods, hostCfg.maxAge, hostCfg.customRequestHeaders ?: [])]
-        }
-    };
+	def CORSConfig(corsConfig) {
+		maxAge = corsConfig.maxAge
+		mode = corsConfig.mode
+		this.list = corsConfig?.list?.inject([:]) { hostCfgs, hcfg ->
+			def host = hcfg.key
+			def hostCfg = hcfg.value
+			hostCfgs + [("$host".toString()): new HostConfig(host, hostCfg.methods, hostCfg.maxAge, hostCfg.customRequestHeaders ?: [])]
+		}
+	};
 
-    def CORSConfig(int maxAge) {
-        this.maxAge = maxAge
-        mode = CORSMode.AllowAll
-        list = [:]
-    };
+	def CORSConfig(int maxAge) {
+		this.maxAge = maxAge
+		mode = CORSMode.AllowAll
+		list = [:]
+	};
 
-    def CORSConfig(int maxAge, String mode) {
-        this(maxAge, mode, [:])
-    }
+	def CORSConfig(int maxAge, String mode) {
+		this(maxAge, mode, [:])
+	}
 
-    def CORSConfig(int maxAge, String mode, Map list) {
-        this.maxAge = maxAge
-        this.mode = mode
-        this.list = list.inject([:]) { hostCfgs, hcfg ->
-            def host = hcfg.key
-            def hostCfg = hcfg.value
-            hostCfgs + [("$host".toString()): new HostConfig(host,
-                    hostCfg.methods,
-                    hostCfg.maxAge ?: (maxAge ?: 3600),
-                    hostCfg.customRequestHeaders ?: [])]
-        }
+	def CORSConfig(int maxAge, String mode, Map list) {
+		this.maxAge = maxAge
+		this.mode = mode
+		this.list = list.inject([:]) { hostCfgs, hcfg ->
+			def host = hcfg.key
+			def hostCfg = hcfg.value
+			hostCfgs + [("$host".toString()): new HostConfig(host,
+					hostCfg.methods,
+					hostCfg.maxAge ?: (maxAge ?: 3600),
+					hostCfg.customRequestHeaders ?: [])]
+		}
 
-    }
+	}
 
-    def findHostConfig(String remoteHost) {
-        remoteHost ? list[remoteHost] : null
-    }
+	def findHostConfig(String remoteHost) {
+		remoteHost ? list[remoteHost] : null
+	}
 
-    def hasAccess(host, method, customReqHdrs) {
-        def hcfg = findHostConfig(host);
-        hcfg && hcfg.allowsCustomHeaders(customReqHdrs) && hasAccess(host, method)
-    };
+	def hasAccess(host, method, customReqHdrs) {
+		def hcfg = findHostConfig(host);
+		hcfg && hcfg.allowsCustomHeaders(customReqHdrs) && hasAccess(host, method)
+	};
 
-    def hasAccess(host, method) {
-        switch (mode) {
-            case (CORSMode.AllowAll):
-                log.trace("CORSConfig(AllowAll): allows access to: $host")
-                return true
+	def hasAccess(host, method) {
+		switch (mode) {
+			case (CORSMode.AllowAll):
+				log.trace("CORSConfig(AllowAll): allows access to: $host")
+				return true
 
-            case (CORSMode.BlackList):
-                log.trace("CORSConfig(BlackList): Looking for $host in $list")
-                def hcfg = findHostConfig(host)
-                def allow = (!hcfg)
-                if (!allow) {
-                    allow = (!hcfg.hasMethod(method))
-                }
-                log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} access to $host")
-                return allow
+			case (CORSMode.BlackList):
+				log.trace("CORSConfig(BlackList): Looking for $host in $list")
+				def hcfg = findHostConfig(host)
+				def allow = (!hcfg)
+				if (!allow) {
+					allow = (!hcfg.hasMethod(method))
+				}
+				log.trace("CORSConfig(BlackList): ${allow ? "allows" : "does NOT allow"} access to $host")
+				return allow
 
-            case (CORSMode.WhiteList):
-                log.trace("CORSConfig(WhiteList): Looking for $host in $list")
-                def hcfg = findHostConfig(host)
-                def allow = hcfg?.hasMethod(method)
-                log.trace("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} access to $host")
-                return allow;
-        }// switch
-    }// hasAccess
+			case (CORSMode.WhiteList):
+				log.trace("CORSConfig(WhiteList): Looking for $host in $list")
+				def hcfg = findHostConfig(host)
+				def allow = hcfg?.hasMethod(method)
+				log.trace("CORSConfig(WhiteList): ${allow ? "allows" : "does NOT allow"} access to $host")
+				return allow;
+		}// switch
+	}// hasAccess
 }
 
 /**
@@ -126,28 +126,28 @@ class CORSConfig {
  */
 @Slf4j
 class HostConfig {
-    String host
-    List methods
-    int maxAge
-    List<String> customRequestHeaders
+	String host
+	List methods
+	int maxAge
+	List<String> customRequestHeaders
 
-    def HostConfig(h, methodList, maxAge, customReqHdrs) {
-        this.host = h
-        methods = methodList ?: ["*"]
-        this.maxAge = maxAge
-        customRequestHeaders = customReqHdrs
-        log.trace("HostConfig($h, ${methodList.join(',')}, $maxAge, ${customReqHdrs} )")
-    }
+	def HostConfig(h, methodList, maxAge, customReqHdrs) {
+		this.host = h
+		methods = methodList ?: ["*"]
+		this.maxAge = maxAge
+		customRequestHeaders = customReqHdrs
+		log.trace("HostConfig($h, ${methodList.join(',')}, $maxAge, ${customReqHdrs} )")
+	}
 
-    def allowsCustomHeaders(reqHeaders) {
-        (!customRequestHeaders) || customRequestHeaders.intersect(reqHeaders).size() == reqHeaders.size()
-    }
+	def allowsCustomHeaders(reqHeaders) {
+		(!customRequestHeaders) || customRequestHeaders.intersect(reqHeaders).size() == reqHeaders.size()
+	}
 
-    def hasMethod(httpMethod) {
-        return methods.contains("*") || methods.contains(httpMethod)
-    }
+	def hasMethod(httpMethod) {
+		return methods.contains("*") || methods.contains(httpMethod)
+	}
 
-    String toString() {
-        "$host($maxAge, $methods, $customRequestHeaders)"
-    }
+	String toString() {
+		"$host($maxAge, $methods, $customRequestHeaders)"
+	}
 }

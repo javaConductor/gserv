@@ -8,37 +8,37 @@
     <script type="text/javascript" src="http://code.angularjs.org/1.2.16/angular.min.js"></script>
     <script type="text/javascript" src="dist/angular-ui-tree.js"></script>
     <script type="text/javascript">
-//<![CDATA[ 
+        //<![CDATA[
 
-  angular.module('treeApp', ['ui.tree'])
-  .controller('treeCtrl', function($scope, $timeout) {
-    $timeout(function(){
-      $scope.data = [
-        {title: 'A'},
-        {title: 'Abc'},
-        {title: 'Ab'},
-        {title: 'Ac'},
-        {title: 'bc'},
-        {title: 'B'},
-        {title: 'C'}
-      ];
-    },100);
+        angular.module('treeApp', ['ui.tree'])
+                .controller('treeCtrl', function ($scope, $timeout) {
+                    $timeout(function () {
+                        $scope.data = [
+                            {title: 'A'},
+                            {title: 'Abc'},
+                            {title: 'Ab'},
+                            {title: 'Ac'},
+                            {title: 'bc'},
+                            {title: 'B'},
+                            {title: 'C'}
+                        ];
+                    }, 100);
 
-    $scope.treeOptions = {
-      dragStart: function(event) {
-        console.log('Start dragging', event);
-      },
-      dragStop: function(event) {
-              // This will be never called :(
-        console.log('Stop dragging', event);
-      },
-      dropped: function(event) {
-        console.log('dropped', event);
-      },
-    };
-  });
+                    $scope.treeOptions = {
+                        dragStart: function (event) {
+                            console.log('Start dragging', event);
+                        },
+                        dragStop: function (event) {
+                            // This will be never called :(
+                            console.log('Stop dragging', event);
+                        },
+                        dropped: function (event) {
+                            console.log('dropped', event);
+                        },
+                    };
+                });
 
-//]]>  
+        //]]>
 
 
     </script>

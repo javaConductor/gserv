@@ -1,5 +1,3 @@
-
-
 /*
  *  The MIT License (MIT)
  *
@@ -30,11 +28,11 @@ package io.github.javaconductor.gserv.exceptions
  * Created by javaConductor on 8/18/2014.
  */
 class ConfigException extends Exception {
-    def ConfigException(String s) {
-        super(s)
-    }
+	def ConfigException(String s) {
+		super(s)
+	}
 
-    def ConfigException(String s, Throwable e) {
-        super(s, e)
-    }
+	def ConfigException(String s, Throwable e) {
+		super(s, e)
+	}
 }

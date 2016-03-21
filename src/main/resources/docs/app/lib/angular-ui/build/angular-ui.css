@@ -5,46 +5,46 @@
 /* ui-reset */
 
 .ui-resetwrap {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .ui-reset {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
-  display: none;
-  height: 100%;
-  cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    display: none;
+    height: 100%;
+    cursor: pointer;
 }
 
 .ui-resetwrap:hover .ui-reset {
-  display: block;
+    display: block;
 }
 
 /* ui-currency */
 
 .ui-currency-pos {
-  color: green;
+    color: green;
 }
 
 .ui-currency-neg {
-  color: red;
+    color: red;
 }
 
 .ui-currency-zero {
-  color: blue;
+    color: blue;
 }
 
 .ui-currency-pos.ui-bignum,
 .ui-currency-neg.ui-smallnum {
-  font-size: 110%;
+    font-size: 110%;
 }
 
 /* highlight */
 
 .ui-match {
-  background: yellow;
+    background: yellow;
 }
 

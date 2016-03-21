@@ -31,26 +31,26 @@ import java.security.MessageDigest
  */
 class Encoder {
 
-    /**
-     *
-     * Returns MD5 of stuff
-     * @param stuff
-     * @return byte[] MD5 of the data
-     */
-    static byte[] md5(byte[] stuff) {
-        MessageDigest digest = MessageDigest.getInstance("MD5")
-        digest.update(stuff)
-        digest.digest()
-    }
+	/**
+	 *
+	 * Returns MD5 of stuff
+	 * @param stuff
+	 * @return byte[] MD5 of the data
+	 */
+	static byte[] md5(byte[] stuff) {
+		MessageDigest digest = MessageDigest.getInstance("MD5")
+		digest.update(stuff)
+		digest.digest()
+	}
 
-    /**
-     * Does MD5 hash and returns base64 representation of hash.
-     *
-     * @param stuff
-     * @return Base64 of MD5 of the data
-     */
-    static String md5WithBase64(byte[] stuff) {
-        (md5(stuff).encodeBase64())
-    }
+	/**
+	 * Does MD5 hash and returns base64 representation of hash.
+	 *
+	 * @param stuff
+	 * @return Base64 of MD5 of the data
+	 */
+	static String md5WithBase64(byte[] stuff) {
+		(md5(stuff).encodeBase64())
+	}
 
 }

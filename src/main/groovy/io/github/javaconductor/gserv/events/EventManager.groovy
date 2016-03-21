@@ -33,14 +33,14 @@ import groovyx.gpars.actor.Actors
  */
 
 class _subscription {
-    def topic
-    def evtHandler // evtHandler(topic, data)
+	def topic
+	def evtHandler // evtHandler(topic, data)
 }
 
 class _broadcast {
-    def topic
-    def data
-    def when = new Date()
+	def topic
+	def data
+	def when = new Date()
 }
 
 /**
@@ -48,75 +48,75 @@ class _broadcast {
  */
 @Slf4j
 class EventManager {
-    private def EventManager() {
-    }
-    private static theInstance = new EventManager()
+	private def EventManager() {
+	}
+	private static theInstance = new EventManager()
 
-    static instance() {
-        theInstance
-    }
-    private def _listeners = []
+	static instance() {
+		theInstance
+	}
+	private def _listeners = []
 
-    /**
-     * Subscribe to a topic
-     *
-     * @param topic The Topic
-     * @param evtHandler Code to call once the event occurs. signature: evtHandler(topic, data)
-     *
-     */
-    def subscribe(topic, evtHandler) {
-        _act << new _subscription([topic: topic, evtHandler: evtHandler])
-    }
+	/**
+	 * Subscribe to a topic
+	 *
+	 * @param topic The Topic
+	 * @param evtHandler Code to call once the event occurs. signature: evtHandler(topic, data)
+	 *
+	 */
+	def subscribe(topic, evtHandler) {
+		_act << new _subscription([topic: topic, evtHandler: evtHandler])
+	}
 
-    /**
-     * Publish a message to a topic
-     *
-     * @param topic
-     * @param data
-     *
-     */
-    def publish(topic, data) {
-        data.'when' = new Date()
-        try {
-            _act << new _broadcast([topic: topic, data: data])
-        }
-        catch (Throwable ex) {
-            log.error("EventManager.publish. Exception: ${ex.message}")
-            ex.printStackTrace(System.err)
-        }
-    }
+	/**
+	 * Publish a message to a topic
+	 *
+	 * @param topic
+	 * @param data
+	 *
+	 */
+	def publish(topic, data) {
+		data.'when' = new Date()
+		try {
+			_act << new _broadcast([topic: topic, data: data])
+		}
+		catch (Throwable ex) {
+			log.error("EventManager.publish. Exception: ${ex.message}")
+			ex.printStackTrace(System.err)
+		}
+	}
 
-    private def _tellIt(topic, data, List listeners) {
-        def needToKnow = listeners.findAll {
-            it.topic == topic || it.topic == '*'
-        }
-        GParsPool.withPool {
+	private def _tellIt(topic, data, List listeners) {
+		def needToKnow = listeners.findAll {
+			it.topic == topic || it.topic == '*'
+		}
+		GParsPool.withPool {
 //            needToKnow.eachParallel {
-            needToKnow.eachParallel {
-                try {
-                    it.evtHandler(topic, data)
-                } catch (Throwable e) {
-                    log.warn("Error firing event handler", e);
-                }
-            }
-        }
-    }
+			needToKnow.eachParallel {
+				try {
+					it.evtHandler(topic, data)
+				} catch (Throwable e) {
+					log.warn("Error firing event handler", e);
+				}
+			}
+		}
+	}
 
-    private def _act = Actors.actor {
-        loop {
-            react {
-                switch (it) {
-                    case _subscription:
-                        _listeners.add(it)
-                        break;
+	private def _act = Actors.actor {
+		loop {
+			react {
+				switch (it) {
+					case _subscription:
+						_listeners.add(it)
+						break;
 
-                    case _broadcast:
-                        def topic = it.topic
-                        def data = it.data
-                        _tellIt(topic, data, _listeners)
-                        break;
-                }
-            }
-        }
-    }
+					case _broadcast:
+						def topic = it.topic
+						def data = it.data
+						_tellIt(topic, data, _listeners)
+						break;
+				}
+			}
+		}
+	}
 }

@@ -32,36 +32,36 @@ import org.junit.Test
  *
  */
 class EventMgrTest {
-    EventManager em
+	EventManager em
 
-    @Before
-    public final void init() {
-        em = EventManager.instance();
-    }
+	@Before
+	public final void init() {
+		em = EventManager.instance();
+	}
 
-    @Test
-    public final void testEventMgr() {
-        def _topic, _data
-        em.subscribe("test_test") { topic, data ->
-            _data = data
-            _topic = topic
-        }
-        em.publish("test_test", [msg: 'test'])
-        Thread.sleep(500)
-        assert "test_test" == _topic
-        assert "test" == _data.msg
-    }
+	@Test
+	public final void testEventMgr() {
+		def _topic, _data
+		em.subscribe("test_test") { topic, data ->
+			_data = data
+			_topic = topic
+		}
+		em.publish("test_test", [msg: 'test'])
+		Thread.sleep(500)
+		assert "test_test" == _topic
+		assert "test" == _data.msg
+	}
 
-    @Test
-    public final void testEventMgr2() {
-        def _topic, _data
-        em.subscribe("test_test") { topic, data ->
-            _data = data
-            _topic = topic
-        }
-        em.publish("test_test", [msg: 'test'])
-        Thread.sleep(1000)
-        assert "test_test" == _topic
-        assert "test2" != _data.msg
-    }
+	@Test
+	public final void testEventMgr2() {
+		def _topic, _data
+		em.subscribe("test_test") { topic, data ->
+			_data = data
+			_topic = topic
+		}
+		em.publish("test_test", [msg: 'test'])
+		Thread.sleep(1000)
+		assert "test_test" == _topic
+		assert "test2" != _data.msg
+	}
 }

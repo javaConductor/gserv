@@ -33,74 +33,74 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class AvgMinMaxReqTime implements StatRecorder {
 
-    def stats = [
-            MaxRequestTime: new AtomicLong(0),
-            MinRequestTime: new AtomicLong(0),
-            AvgRequestTime: new AtomicLong(0)
-    ]
+	def stats = [
+			MaxRequestTime: new AtomicLong(0),
+			MinRequestTime: new AtomicLong(0),
+			AvgRequestTime: new AtomicLong(0)
+	]
 
-    AtomicLong totalMilliseconds = new AtomicLong(0)
-    AtomicLong totalRequests = new AtomicLong(0)
+	AtomicLong totalMilliseconds = new AtomicLong(0)
+	AtomicLong totalRequests = new AtomicLong(0)
 
-    def runningReqs = [:] // RegId: StartTime
+	def runningReqs = [:] // RegId: StartTime
 
-    @Override
-    def recordEvent(String topic, Map eventData) {
+	@Override
+	def recordEvent(String topic, Map eventData) {
 
-        switch (topic) {
+		switch (topic) {
 
-            case Events.RequestRecieved:
-                /// add to number of requests
+			case Events.RequestRecieved:
+				/// add to number of requests
 
-                /// add to waiting list
-                runningReqs[eventData.requestId] = eventData.when as Date
-                break;
-            case Events.RequestProcessingError: break;
-            case Events.ResourceProcessed://
-                // find the request in the eventDataByRequestId
-                Date startTime = runningReqs[eventData.requestId]
-                Date endTime = eventData.when ?: new Date()
-                def totalTime = endTime.time - startTime.time
+				/// add to waiting list
+				runningReqs[eventData.requestId] = eventData.when as Date
+				break;
+			case Events.RequestProcessingError: break;
+			case Events.ResourceProcessed://
+				// find the request in the eventDataByRequestId
+				Date startTime = runningReqs[eventData.requestId]
+				Date endTime = eventData.when ?: new Date()
+				def totalTime = endTime.time - startTime.time
 
-                /// set the Average
-                def totalMillis = totalMilliseconds.addAndGet(totalTime)
-                def totalReqs = totalRequests.addAndGet(1)
-                stats['AvgRequestTime'].set(totalMillis / totalReqs as long)
+				/// set the Average
+				def totalMillis = totalMilliseconds.addAndGet(totalTime)
+				def totalReqs = totalRequests.addAndGet(1)
+				stats['AvgRequestTime'].set(totalMillis / totalReqs as long)
 
-                /// set Min
-                synchronized (stats['MinRequestTime']) {
-                    if (0 == stats['MinRequestTime'].get() || totalTime < stats['MinRequestTime'].get()) {
-                        stats['MinRequestTime'].set(totalTime as long)
-                    }
-                }
+				/// set Min
+				synchronized (stats['MinRequestTime']) {
+					if (0 == stats['MinRequestTime'].get() || totalTime < stats['MinRequestTime'].get()) {
+						stats['MinRequestTime'].set(totalTime as long)
+					}
+				}
 
-                /// set Max
-                synchronized (stats['MaxRequestTime']) {
-                    if (totalTime > stats['MaxRequestTime'].get()) {
-                        stats['MaxRequestTime'].set(totalTime as long)
-                    }
-                }
+				/// set Max
+				synchronized (stats['MaxRequestTime']) {
+					if (totalTime > stats['MaxRequestTime'].get()) {
+						stats['MaxRequestTime'].set(totalTime as long)
+					}
+				}
 
-                break;
+				break;
 
-        }
+		}
 
-    }
+	}
 
-    @Override
-    Map reportStat() {
-        [
-                'Max Request Time': stats.MaxRequestTime.get(),
-                'Min Request Time': stats.MinRequestTime.get(),
-                'Avg Request Time': stats.AvgRequestTime.get()
-        ]
-    }
+	@Override
+	Map reportStat() {
+		[
+				'Max Request Time': stats.MaxRequestTime.get(),
+				'Min Request Time': stats.MinRequestTime.get(),
+				'Avg Request Time': stats.AvgRequestTime.get()
+		]
+	}
 
-    synchronized def reset() {
-        stats.MaxRequestTime.set(0)
-        stats.MinRequestTime.set(0)
-        stats.AvgRequestTime.set(0)
+	synchronized def reset() {
+		stats.MaxRequestTime.set(0)
+		stats.MinRequestTime.set(0)
+		stats.AvgRequestTime.set(0)
 
-    }
+	}
 
 }

@@ -2,7 +2,6 @@
 // Forms
 // --------------------------------------------------
 
-
 // GENERAL STYLES
 // --------------
 
@@ -44,6 +43,7 @@ select,
 textarea {
   @include font-shorthand($baseFontSize, normal, $baseLineHeight); // Set size, weight, line-height here
 }
+
 input,
 button,
 select,
@@ -96,10 +96,12 @@ textarea,
 .uneditable-input {
   width: 206px; // plus 12px padding and 2px border
 }
+
 // Reset height since textareas have rows
 textarea {
   height: auto;
 }
+
 // Everything else
 textarea,
 input[type="text"],
@@ -119,15 +121,16 @@ input[type="color"],
 .uneditable-input {
   background-color: $inputBackground;
   border: 1px solid $inputBorder;
-  @include box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+  @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075));
   @include transition(border linear .2s, box-shadow linear .2s);
 
   // Focus state
   &:focus {
-    border-color: rgba(82,168,236,.8);
+    border-color: rgba(82, 168, 236, .8);
     outline: 0;
-    outline: thin dotted \9; /* IE6-9 */
-    @include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6));
+    outline: thin dotted \9
+  ; /* IE6-9 */
+    @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6));
   }
 }
 
@@ -136,7 +139,8 @@ input[type="radio"],
 input[type="checkbox"] {
   margin: 4px 0 0;
   *margin-top: 0; /* IE7 */
-  margin-top: 1px \9; /* IE8-9 */
+  margin-top: 1px \9
+; /* IE8-9 */
   line-height: normal;
 }
 
@@ -180,7 +184,6 @@ input[type="checkbox"]:focus {
   @include tab-focus();
 }
 
-
 // Uneditable inputs
 // -------------------------
 
@@ -190,7 +193,7 @@ input[type="checkbox"]:focus {
   color: $grayLight;
   background-color: darken($inputBackground, 1%);
   border-color: $inputBorder;
-  @include box-shadow(inset 0 1px 2px rgba(0,0,0,.025));
+  @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, .025));
   cursor: not-allowed;
 }
 
@@ -206,7 +209,6 @@ input[type="checkbox"]:focus {
   height: auto;
 }
 
-
 // Placeholder
 // -------------------------
 
@@ -215,7 +217,6 @@ input,
 textarea {
   @include placeholder();
 }
-
 
 // CHECKBOXES & RADIOS
 // -------------------
@@ -226,6 +227,7 @@ textarea {
   min-height: $baseLineHeight; // clear the floating input if there is no label text
   padding-left: 20px;
 }
+
 .radio input[type="radio"],
 .checkbox input[type="checkbox"] {
   float: left;
@@ -247,30 +249,46 @@ textarea {
   margin-bottom: 0;
   vertical-align: middle;
 }
+
 .radio.inline + .radio.inline,
 .checkbox.inline + .checkbox.inline {
   margin-left: 10px; // space out consecutive inline controls
 }
 
-
-
 // INPUT SIZES
 // -----------
 
 // General classes for quick sizes
-.input-mini       { width: 60px; }
-.input-small      { width: 90px; }
-.input-medium     { width: 150px; }
-.input-large      { width: 210px; }
-.input-xlarge     { width: 270px; }
-.input-xxlarge    { width: 530px; }
+.input-mini {
+  width: 60px;
+}
+
+.input-small {
+  width: 90px;
+}
+
+.input-medium {
+  width: 150px;
+}
+
+.input-large {
+  width: 210px;
+}
+
+.input-xlarge {
+  width: 270px;
+}
+
+.input-xxlarge {
+  width: 530px;
+}
 
 // Grid style input sizes
 input[class*="span"],
 select[class*="span"],
 textarea[class*="span"],
 .uneditable-input[class*="span"],
-// Redeclare since the fluid row class is more specific
+  // Redeclare since the fluid row class is more specific
 .row-fluid input[class*="span"],
 .row-fluid select[class*="span"],
 .row-fluid textarea[class*="span"],
@@ -278,6 +296,7 @@ textarea[class*="span"],
   float: none;
   margin-left: 0;
 }
+
 // Ensure input-prepend/append never wraps
 .input-append input[class*="span"],
 .input-append .uneditable-input[class*="span"],
@@ -292,8 +311,6 @@ textarea[class*="span"],
   display: inline-block;
 }
 
-
-
 // GRID SIZING FOR INPUTS
 // ----------------------
 
@@ -307,18 +324,16 @@ textarea[class*="span"],
 
 // Float to collapse white-space for proper grid alignment
 .controls-row [class*="span"],
-// Redeclare the fluid grid collapse since we undo the float for inputs
+  // Redeclare the fluid grid collapse since we undo the float for inputs
 .row-fluid .controls-row [class*="span"] {
   float: left;
 }
+
 // Explicity set top padding on all checkboxes/radios, not just first-child
 .controls-row .checkbox[class*="span"],
 .controls-row .radio[class*="span"] {
   padding-top: 5px;
 }
-
-
-
 
 // DISABLED STATE
 // --------------
@@ -333,6 +348,7 @@ textarea[readonly] {
   cursor: not-allowed;
   background-color: $inputDisabledBackground;
 }
+
 // Explicitly reset the colors here
 input[type="radio"][disabled],
 input[type="checkbox"][disabled],
@@ -341,9 +357,6 @@ input[type="checkbox"][readonly] {
   background-color: transparent;
 }
 
-
-
-
 // FORM FIELD FEEDBACK STATES
 // --------------------------
 
@@ -351,14 +364,17 @@ input[type="checkbox"][readonly] {
 .control-group.warning {
   @include formFieldState($warningText, $warningText, $warningBackground);
 }
+
 // Error
 .control-group.error {
   @include formFieldState($errorText, $errorText, $errorBackground);
 }
+
 // Success
 .control-group.success {
   @include formFieldState($successText, $successText, $successBackground);
 }
+
 // Info
 .control-group.info {
   @include formFieldState($infoText, $infoText, $infoBackground);
@@ -377,8 +393,6 @@ select:focus:invalid {
   }
 }
 
-
-
 // FORM ACTIONS
 // ------------
 
@@ -390,8 +404,6 @@ select:focus:invalid {
   border-top: 1px solid #e5e5e5;
   @include clearfix(); // Adding clearfix to allow for .pull-right button containers
 }
-
-
 
 // HELP TEXT
 // ---------
@@ -412,8 +424,6 @@ select:focus:invalid {
   vertical-align: middle;
   padding-left: 5px;
 }
-
-
 
 // INPUT GROUPS
 // ------------
@@ -533,17 +543,16 @@ select:focus:invalid {
   }
 }
 
-
-
-
 // SEARCH FORM
 // -----------
 
 input.search-query {
   padding-right: 14px;
-  padding-right: 4px \9;
+  padding-right: 4px \9
+;
   padding-left: 14px;
-  padding-left: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
+  padding-left: 4px \9
+; /* IE7-8 doesn't have border-radius, so don't indent the padding */
   margin-bottom: 0; // Remove the default margin on all inputs
   @include border-radius(15px);
 }
@@ -553,21 +562,22 @@ input.search-query {
 .form-search .input-prepend .search-query {
   @include border-radius(0); // Override due to specificity
 }
+
 .form-search .input-append .search-query {
   @include border-radius(14px 0 0 14px);
 }
+
 .form-search .input-append .btn {
   @include border-radius(0 14px 14px 0);
 }
+
 .form-search .input-prepend .search-query {
   @include border-radius(0 14px 14px 0);
 }
+
 .form-search .input-prepend .btn {
   @include border-radius(14px 0 0 14px);
 }
-
-
-
 
 // HORIZONTAL & VERTICAL FORMS
 // ---------------------------
@@ -595,12 +605,14 @@ input.search-query {
     display: none;
   }
 }
+
 .form-search label,
 .form-inline label,
 .form-search .btn-group,
 .form-inline .btn-group {
   display: inline-block;
 }
+
 // Remove margin for input-prepend/-append
 .form-search .input-append,
 .form-inline .input-append,
@@ -608,6 +620,7 @@ input.search-query {
 .form-inline .input-prepend {
   margin-bottom: 0;
 }
+
 // Inline checkbox/radio labels (remove padding on left)
 .form-search .radio,
 .form-search .checkbox,
@@ -617,6 +630,7 @@ input.search-query {
   margin-bottom: 0;
   vertical-align: middle;
 }
+
 // Remove float and margin, set to inline-block
 .form-search .radio input[type="radio"],
 .form-search .checkbox input[type="checkbox"],
@@ -626,7 +640,6 @@ input.search-query {
   margin-right: 3px;
   margin-left: 0;
 }
-
 
 // Margin to space out fieldsets
 .control-group {

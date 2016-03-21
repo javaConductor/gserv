@@ -13,134 +13,134 @@ jasmineRequire.console(jasmineRequire, jasmine);
 var env = jasmine.getEnv();
 
 var jasmineInterface = {
-  describe: function(description, specDefinitions) {
-    return env.describe(description, specDefinitions);
-  },
+    describe: function (description, specDefinitions) {
+        return env.describe(description, specDefinitions);
+    },
 
-  xdescribe: function(description, specDefinitions) {
-    return env.xdescribe(description, specDefinitions);
-  },
+    xdescribe: function (description, specDefinitions) {
+        return env.xdescribe(description, specDefinitions);
+    },
 
-  it: function(desc, func) {
-    return env.it(desc, func);
-  },
+    it: function (desc, func) {
+        return env.it(desc, func);
+    },
 
-  xit: function(desc, func) {
-    return env.xit(desc, func);
-  },
+    xit: function (desc, func) {
+        return env.xit(desc, func);
+    },
 
-  beforeEach: function(beforeEachFunction) {
-    return env.beforeEach(beforeEachFunction);
-  },
+    beforeEach: function (beforeEachFunction) {
+        return env.beforeEach(beforeEachFunction);
+    },
 
-  afterEach: function(afterEachFunction) {
-    return env.afterEach(afterEachFunction);
-  },
+    afterEach: function (afterEachFunction) {
+        return env.afterEach(afterEachFunction);
+    },
 
-  expect: function(actual) {
-    return env.expect(actual);
-  },
+    expect: function (actual) {
+        return env.expect(actual);
+    },
 
-  spyOn: function(obj, methodName) {
-    return env.spyOn(obj, methodName);
-  },
+    spyOn: function (obj, methodName) {
+        return env.spyOn(obj, methodName);
+    },
 
-  jsApiReporter: new jasmine.JsApiReporter({
-    timer: new jasmine.Timer()
-  })
+    jsApiReporter: new jasmine.JsApiReporter({
+        timer: new jasmine.Timer()
+    })
 };
 
 extend(global, jasmineInterface);
 
 function extend(destination, source) {
-  for (var property in source) destination[property] = source[property];
-  return destination;
+    for (var property in source) destination[property] = source[property];
+    return destination;
 }
 
-jasmine.addCustomEqualityTester = function(tester) {
-  env.addCustomEqualityTester(tester);
+jasmine.addCustomEqualityTester = function (tester) {
+    env.addCustomEqualityTester(tester);
 };
 
-jasmine.addMatchers = function(matchers) {
-  return env.addMatchers(matchers);
+jasmine.addMatchers = function (matchers) {
+    return env.addMatchers(matchers);
 };
 
-jasmine.clock = function() {
-  return env.clock;
+jasmine.clock = function () {
+    return env.clock;
 };
 
 // Jasmine "runner"
 function executeSpecs(specs, done, isVerbose, showColors) {
-  global.jasmine = jasmine;
+    global.jasmine = jasmine;
 
-  for (var i = 0; i < specs.length; i++) {
-    var filename = specs[i];
-    require(filename.replace(/\.\w+$/, ""));
-  }
+    for (var i = 0; i < specs.length; i++) {
+        var filename = specs[i];
+        require(filename.replace(/\.\w+$/, ""));
+    }
 
-  var env = jasmine.getEnv();
-  var consoleReporter = new jasmine.ConsoleReporter({
-    print: util.print,
-    onComplete: done,
-    showColors: showColors,
-    timer: new jasmine.Timer()
-  });
+    var env = jasmine.getEnv();
+    var consoleReporter = new jasmine.ConsoleReporter({
+        print: util.print,
+        onComplete: done,
+        showColors: showColors,
+        timer: new jasmine.Timer()
+    });
 
-  env.addReporter(consoleReporter);
-  env.execute();
+    env.addReporter(consoleReporter);
+    env.execute();
 }
 
 function getFiles(dir, matcher) {
-  var allFiles = [];
+    var allFiles = [];
 
-  if (fs.statSync(dir).isFile() && dir.match(matcher)) {
-    allFiles.push(dir);
-  } else {
-    var files = fs.readdirSync(dir);
-    for (var i = 0, len = files.length; i < len; ++i) {
-      var filename = dir + '/' + files[i];
-      if (fs.statSync(filename).isFile() && filename.match(matcher)) {
-        allFiles.push(filename);
-      } else if (fs.statSync(filename).isDirectory()) {
-        var subfiles = getFiles(filename);
-        subfiles.forEach(function(result) {
-          allFiles.push(result);
-        });
-      }
+    if (fs.statSync(dir).isFile() && dir.match(matcher)) {
+        allFiles.push(dir);
+    } else {
+        var files = fs.readdirSync(dir);
+        for (var i = 0, len = files.length; i < len; ++i) {
+            var filename = dir + '/' + files[i];
+            if (fs.statSync(filename).isFile() && filename.match(matcher)) {
+                allFiles.push(filename);
+            } else if (fs.statSync(filename).isDirectory()) {
+                var subfiles = getFiles(filename);
+                subfiles.forEach(function (result) {
+                    allFiles.push(result);
+                });
+            }
+        }
     }
-  }
-  return allFiles;
+    return allFiles;
 }
 
 function getSpecFiles(dir) {
-  return getFiles(dir, new RegExp("Spec.js$"));
+    return getFiles(dir, new RegExp("Spec.js$"));
 }
 
-var j$require = (function() {
-  var exported = {},
-      j$req;
+var j$require = (function () {
+    var exported = {},
+        j$req;
 
-  global.getJasmineRequireObj = getJasmineRequireObj;
+    global.getJasmineRequireObj = getJasmineRequireObj;
 
-  j$req = require(__dirname + "/../src/core/requireCore.js");
-  extend(j$req, require(__dirname + "/../src/console/requireConsole.js"));
+    j$req = require(__dirname + "/../src/core/requireCore.js");
+    extend(j$req, require(__dirname + "/../src/console/requireConsole.js"));
 
-  var srcFiles = getFiles(__dirname + "/../src/core");
-  srcFiles.push(__dirname + "/../src/version.js");
-  srcFiles.push(__dirname + "/../src/console/ConsoleReporter.js");
+    var srcFiles = getFiles(__dirname + "/../src/core");
+    srcFiles.push(__dirname + "/../src/version.js");
+    srcFiles.push(__dirname + "/../src/console/ConsoleReporter.js");
 
-  for (var i = 0; i < srcFiles.length; i++) {
-    require(srcFiles[i]);
-  }
-  extend(j$req, exported);
+    for (var i = 0; i < srcFiles.length; i++) {
+        require(srcFiles[i]);
+    }
+    extend(j$req, exported);
 
-  delete global.getJasmineRequireObj;
+    delete global.getJasmineRequireObj;
 
-  return j$req;
+    return j$req;
 
-  function getJasmineRequireObj() {
-    return exported;
-  }
+    function getJasmineRequireObj() {
+        return exported;
+    }
 }());
 
 j$ = j$require.core(j$require);
@@ -151,37 +151,37 @@ var isVerbose = false;
 var showColors = true;
 var perfSuite = false;
 
-process.argv.forEach(function(arg) {
-  switch (arg) {
-    case '--color':
-      showColors = true;
-      break;
-    case '--noColor':
-      showColors = false;
-      break;
-    case '--verbose':
-      isVerbose = true;
-      break;
-    case '--perf':
-      perfSuite = true;
-      break;
-  }
+process.argv.forEach(function (arg) {
+    switch (arg) {
+        case '--color':
+            showColors = true;
+            break;
+        case '--noColor':
+            showColors = false;
+            break;
+        case '--verbose':
+            isVerbose = true;
+            break;
+        case '--perf':
+            perfSuite = true;
+            break;
+    }
 });
 
 specs = [];
 
 if (perfSuite) {
-  specs = getFiles(__dirname + '/performance', new RegExp("test.js$"));
+    specs = getFiles(__dirname + '/performance', new RegExp("test.js$"));
 } else {
-  var consoleSpecs = getSpecFiles(__dirname + "/console"),
-      coreSpecs = getSpecFiles(__dirname + "/core"),
-      specs = consoleSpecs.concat(coreSpecs);
+    var consoleSpecs = getSpecFiles(__dirname + "/console"),
+        coreSpecs = getSpecFiles(__dirname + "/core"),
+        specs = consoleSpecs.concat(coreSpecs);
 }
 
-executeSpecs(specs, function(passed) {
-  if (passed) {
-    process.exit(0);
-  } else {
-    process.exit(1);
-  }
+executeSpecs(specs, function (passed) {
+    if (passed) {
+        process.exit(0);
+    } else {
+        process.exit(1);
+    }
 }, isVerbose, showColors);

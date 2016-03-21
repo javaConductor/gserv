@@ -33,18 +33,18 @@ import io.github.javaconductor.gserv.server.GServPlugins
  * Delegate for the plugin definitions of a ServerInstance
  */
 class PluginsDelegate {
-    def pluginMgr = PluginMgr.instance()
-    def plugins = new GServPlugins()
+	def pluginMgr = PluginMgr.instance()
+	def plugins = new GServPlugins()
 
-    /**
-     * This function is used to declare the use of a plugin in a ServerInstances
-     *
-     * @param name
-     * @param options
-     *
-     */
-    def plugin(name, options) {
-        EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
-        plugins.add(pluginMgr.plugin(name, options))
-    }
+	/**
+	 * This function is used to declare the use of a plugin in a ServerInstances
+	 *
+	 * @param name
+	 * @param options
+	 *
+	 */
+	def plugin(name, options) {
+		EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
+		plugins.add(pluginMgr.plugin(name, options))
+	}
 }

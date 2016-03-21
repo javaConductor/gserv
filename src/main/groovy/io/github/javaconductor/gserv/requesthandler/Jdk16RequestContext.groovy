@@ -37,75 +37,75 @@ import io.github.javaconductor.gserv.events.Events
 @Slf4j
 class Jdk16RequestContext extends AbstractRequestContext {
 
-    HttpExchange _exchange
-    boolean _closed = false
+	HttpExchange _exchange
+	boolean _closed = false
 
-    Jdk16RequestContext(GServConfig config, HttpExchange exchange) {
-        super(config)
-        assert exchange
-        this.requestBody = exchange.requestBody
-        this.responseBody = exchange.responseBody
-        this.requestHeaders = exchange.requestHeaders as Map
-        this.responseHeaders = exchange.responseHeaders as Map
-        this.requestURI = exchange.requestURI
-        this.requestMethod = exchange.requestMethod
-        this.localAddress = exchange.localAddress
-        this.remoteAddress = exchange.remoteAddress
-        this.principal = exchange.principal
-        this.protocol = exchange.protocol
-        _exchange = exchange
-    }
+	Jdk16RequestContext(GServConfig config, HttpExchange exchange) {
+		super(config)
+		assert exchange
+		this.requestBody = exchange.requestBody
+		this.responseBody = exchange.responseBody
+		this.requestHeaders = exchange.requestHeaders as Map
+		this.responseHeaders = exchange.responseHeaders as Map
+		this.requestURI = exchange.requestURI
+		this.requestMethod = exchange.requestMethod
+		this.localAddress = exchange.localAddress
+		this.remoteAddress = exchange.remoteAddress
+		this.principal = exchange.principal
+		this.protocol = exchange.protocol
+		_exchange = exchange
+	}
 
-    def isClosed() {
-        _closed
-    }
+	def isClosed() {
+		_closed
+	}
 
-    /**
-     *
-     * @param responseCode
-     * @param size
-     */
-    void sendResponseHeaders(int responseCode, long size) {
-        if (!_closed) {
-            _exchange.responseHeaders.putAll(responseHeaders)
-            log.trace("Sending headers ($this) : ${_exchange.responseHeaders} ")
-            _exchange.sendResponseHeaders(responseCode, size)
-        } else {
-            log.warn("sendResponseHeaders() called twice.")
-        }
-    }
+	/**
+	 *
+	 * @param responseCode
+	 * @param size
+	 */
+	void sendResponseHeaders(int responseCode, long size) {
+		if (!_closed) {
+			_exchange.responseHeaders.putAll(responseHeaders)
+			log.trace("Sending headers ($this) : ${_exchange.responseHeaders} ")
+			_exchange.sendResponseHeaders(responseCode, size)
+		} else {
+			log.warn("sendResponseHeaders() called twice.")
+		}
+	}
 
-    def setStreams(InputStream is, OutputStream os) {
-        requestBody = is
-        responseBody = os
-    }
+	def setStreams(InputStream is, OutputStream os) {
+		requestBody = is
+		responseBody = os
+	}
 
-    @Override
-    def close() {
-        if (!_closed) {
-            _exchange.close()
-            _exchange.setAttribute(GServ.contextAttributes.requestContext, null)
+	@Override
+	def close() {
+		if (!_closed) {
+			_exchange.close()
+			_exchange.setAttribute(GServ.contextAttributes.requestContext, null)
 
-            EventManager.instance().publish(Events.ResourceProcessed, [
-                    requestId: id(),
-                    requestContext: this,
-                    when     : new Date()])
-        }
-        _closed = true
-    }
+			EventManager.instance().publish(Events.ResourceProcessed, [
+					requestId     : id(),
+					requestContext: this,
+					when          : new Date()])
+		}
+		_closed = true
+	}
 
-    String dump() {
-        ""
-    }
+	String dump() {
+		""
+	}
 
-    Object nativeObject() {
-        _exchange
-    }
+	Object nativeObject() {
+		_exchange
+	}
 
-    @Override
-    String toString() {
-        "#${id()} -> $requestMethod:$requestURI"
-        return super.toString()
-    }
+	@Override
+	String toString() {
+		"#${id()} -> $requestMethod:$requestURI"
+		return super.toString()
+	}
 
 }

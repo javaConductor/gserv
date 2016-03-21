@@ -41,149 +41,149 @@ import org.apache.commons.io.IOUtils
  */
 trait ServerConfigFn {
 
-    def name(nm) {
-        this.value "name", nm
-        this
-    }
+	def name(nm) {
+		this.value "name", nm
+		this
+	}
 
-    def name() {
-        this.value("name")
-    }
+	def name() {
+		this.value("name")
+	}
 
-    def defaultResource(nm) {
-        this.value "defaultResource", nm
-        this
-    }
+	def defaultResource(nm) {
+		this.value "defaultResource", nm
+		this
+	}
 
-    def defaultResource() {
-        this.value("defaultResource")
-    }
+	def defaultResource() {
+		this.value("defaultResource")
+	}
 
-    def addAction(action) {
-        this.value("actionList").add(action)
-        this
-    }
+	def addAction(action) {
+		this.value("actionList").add(action)
+		this
+	}
 
-    def addResource(GServResource resource) {
-        resource.actions.each(this.&addAction)
-        this
-    }
+	def addResource(GServResource resource) {
+		resource.actions.each(this.&addAction)
+		this
+	}
 
-    def addFilter(f) {
-        value("filterList").add(f)
-        this
-    }
+	def addFilter(f) {
+		value("filterList").add(f)
+		this
+	}
 
-    def addStaticRoot(r) {
-        value("staticRoots").add(r)
-        this
-    }
+	def addStaticRoot(r) {
+		value("staticRoots").add(r)
+		this
+	}
 
-    def addLink(name, action) {
-        value("linkBuilder").add(name, action)
-        this
-    }
+	def addLink(name, action) {
+		value("linkBuilder").add(name, action)
+		this
+	}
 
-    /**
-     * Imports a Resource into a ServerInstance
-     *
-     * @param r The Resource to import
-     *
-     */
-    def resource(GServResource r) {
-        if (r instanceof ResourceObject) {
-            r = GServResource.Resource(r.basePath, r)
-        }
-        addResource(r)
-        addLinkBuilder r.linkBuilder
-        this
-    }
+	/**
+	 * Imports a Resource into a ServerInstance
+	 *
+	 * @param r The Resource to import
+	 *
+	 */
+	def resource(GServResource r) {
+		if (r instanceof ResourceObject) {
+			r = GServResource.Resource(r.basePath, r)
+		}
+		addResource(r)
+		addLinkBuilder r.linkBuilder
+		this
+	}
 
-    private addLinkBuilder(LinkBuilder lb) {
-        value("linkBuilder", value("linkBuilder") + lb)
-        this
-    }
+	private addLinkBuilder(LinkBuilder lb) {
+		value("linkBuilder", value("linkBuilder") + lb)
+		this
+	}
 
-    /**
-     *
-     * @return true if using resource Docs else false
-     */
-    def useResourceDocs() {
-        value("useResourceDocs")
-    }
-    /**
-     * Allows/disallows the use of classPath resources inside the jar file.
-     *
-     * @param b boolean
-     * @return
-     */
-    def useResourceDocs(boolean b) {
-        value("useResourceDocs", b)
-    }
+	/**
+	 *
+	 * @return true if using resource Docs else false
+	 */
+	def useResourceDocs() {
+		value("useResourceDocs")
+	}
+	/**
+	 * Allows/disallows the use of classPath resources inside the jar file.
+	 *
+	 * @param b boolean
+	 * @return
+	 */
+	def useResourceDocs(boolean b) {
+		value("useResourceDocs", b)
+	}
 
-    /**
-     * Creates a named filter for this url/method combination.
-     *
-     * @param name The name of this filter - for logging and debugging
-     * @param url URL on which this filter will be applied
-     * @param method HttpMethod -> GET, POST, PUT, DELETE
-     * @param clozure Filter behavior
-     * @return
-     */
-    def filter(name, url, method, clozure) {
-        filter(name, url, method, [:], clozure)
-    }
+	/**
+	 * Creates a named filter for this url/method combination.
+	 *
+	 * @param name The name of this filter - for logging and debugging
+	 * @param url URL on which this filter will be applied
+	 * @param method HttpMethod -> GET, POST, PUT, DELETE
+	 * @param clozure Filter behavior
+	 * @return
+	 */
+	def filter(name, url, method, clozure) {
+		filter(name, url, method, [:], clozure)
+	}
 
-    /**
-     * Creates a named filter for this url/method combination.
-     *
-     * @param name The name of this filter - for logging and debugging
-     * @param url URL on which this filter will be applied
-     * @param method HttpMethod -> GET, POST, PUT, DELETE
-     * @param options Filter Options:
-     *                   passRouteParams :boolean -> if true the path variables will be passed to 'clozure'
-     * @param clozure Filter behavior
-     *
-     */
-    def filter(name, url, method, options, clozure, order) {
-        method = method ?: '*'
-        //println("serverInitClosure: filter($name) $method, url=$url")
-        addFilter(ResourceActionFactory.createFilter(name, method, url, options, clozure))
-    }
+	/**
+	 * Creates a named filter for this url/method combination.
+	 *
+	 * @param name The name of this filter - for logging and debugging
+	 * @param url URL on which this filter will be applied
+	 * @param method HttpMethod -> GET, POST, PUT, DELETE
+	 * @param options Filter Options:
+	 *                   passRouteParams :boolean -> if true the path variables will be passed to 'clozure'
+	 * @param clozure Filter behavior
+	 *
+	 */
+	def filter(name, url, method, options, clozure, order) {
+		method = method ?: '*'
+		//println("serverInitClosure: filter($name) $method, url=$url")
+		addFilter(ResourceActionFactory.createFilter(name, method, url, options, clozure))
+	}
 
-    /**
-     *
-     * @param name
-     * @param url
-     * @param method
-     * @param options
-     * @param clozure fn(requestContext, byte[] data)
-     * @return
-     *
-     */
-    def after(name, url, method, options, order, clozure) {
-        method = method ?: '*'
-        //println("serverInitClosure: after($name) $method, url=$url, list=${this._filterList}")
-        def theFilter = ResourceActionFactory.createAfterFilter(name, method, url, options, order, clozure)
-        addFilter(theFilter)
-        this
-    }
+	/**
+	 *
+	 * @param name
+	 * @param url
+	 * @param method
+	 * @param options
+	 * @param clozure fn(requestContext, byte[] data)
+	 * @return
+	 *
+	 */
+	def after(name, url, method, options, order, clozure) {
+		method = method ?: '*'
+		//println("serverInitClosure: after($name) $method, url=$url, list=${this._filterList}")
+		def theFilter = ResourceActionFactory.createAfterFilter(name, method, url, options, order, clozure)
+		addFilter(theFilter)
+		this
+	}
 
-    /**
-     *
-     * @param name
-     * @param url
-     * @param method
-     * @param options
-     * @param clozure fn(requestContext, byte[] data)
-     * @return this
-     */
-    def before(name, url, method, options, order, clozure) {
-        method = method ?: '*'
-        def theFilter = ResourceActionFactory.createBeforeFilter(name, method, url, options, order, clozure)
-        addFilter(theFilter)
-        this
-    }
+	/**
+	 *
+	 * @param name
+	 * @param url
+	 * @param method
+	 * @param options
+	 * @param clozure fn(requestContext, byte[] data)
+	 * @return this
+	 */
+	def before(name, url, method, options, order, clozure) {
+		method = method ?: '*'
+		def theFilter = ResourceActionFactory.createBeforeFilter(name, method, url, options, order, clozure)
+		addFilter(theFilter)
+		this
+	}
 
 /**
  *
@@ -193,165 +193,165 @@ trait ServerConfigFn {
  * @param challengeFn
  * @return
  */
-    def basicAuthentication(methods, path, realm, challengeFn) {
+	def basicAuthentication(methods, path, realm, challengeFn) {
 
-        assert challengeFn;
+		assert challengeFn;
 
-        def options = [(FilterOptions.MatchedActionsOnly): true];
-        methods.each { method ->
-            before("basicAuth($method->$path)", path, method, options, 2) { requestContext, args ->
-                log.trace("basicAuth before()");
+		def options = [(FilterOptions.MatchedActionsOnly): true];
+		methods.each { method ->
+			before("basicAuth($method->$path)", path, method, options, 2) { requestContext, args ->
+				log.trace("basicAuth before()");
 
-                def userPswd = getBasicAuthUserPswd(requestContext);
-                log.trace("basicAuth before(): userPswd:$userPswd");
-                if (!userPswd || userPswd.length < 2) {
-                    log.trace("basicAuth before(): userPswd:$userPswd")
-                    (requestContext).responseHeaders.put("WWW-Authenticate", ["Basic realm=$realm".toString()])
-                    error(401, "Authentication Required")
-                } else {
-                    def bAuthenticated = this._authenticated(userPswd[0], userPswd[1], requestContext, challengeFn)
-                    log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!")
-                    if (!bAuthenticated) {
-                        error(403, "Bad credentials for path ${requestContext.requestURI.path}.")
-                    }
-                }
-                return (requestContext)
-            }
-        }//each
-    }//basicAuthentication
+				def userPswd = getBasicAuthUserPswd(requestContext);
+				log.trace("basicAuth before(): userPswd:$userPswd");
+				if (!userPswd || userPswd.length < 2) {
+					log.trace("basicAuth before(): userPswd:$userPswd")
+					(requestContext).responseHeaders.put("WWW-Authenticate", ["Basic realm=$realm".toString()])
+					error(401, "Authentication Required")
+				} else {
+					def bAuthenticated = this._authenticated(userPswd[0], userPswd[1], requestContext, challengeFn)
+					log.trace("basicAuth after(): Auth: ${bAuthenticated ? 'Successful' : 'Failed'}!")
+					if (!bAuthenticated) {
+						error(403, "Bad credentials for path ${requestContext.requestURI.path}.")
+					}
+				}
+				return (requestContext)
+			}
+		}//each
+	}//basicAuthentication
 
-    def getBasicAuthUserPswd(requestContext) {
-        def basic = requestContext.requestHeaders.get("Authorization");
-        if (!basic)
-            return null;
-        basic = basic[0];// we get a list as response but we only need the first one
-        //" Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
-        def base64 = basic.trim().substring(6);
-        def authString = new String(base64.toString().decodeBase64());
-        return authString.split(':')
-    }
+	def getBasicAuthUserPswd(requestContext) {
+		def basic = requestContext.requestHeaders.get("Authorization");
+		if (!basic)
+			return null;
+		basic = basic[0];// we get a list as response but we only need the first one
+		//" Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
+		def base64 = basic.trim().substring(6);
+		def authString = new String(base64.toString().decodeBase64());
+		return authString.split(':')
+	}
 
-    boolean _authenticated(String user, String pswd, RequestContext requestContext, Closure challengeFn) {
-        return (challengeFn(user, pswd, requestContext));
-    }
+	boolean _authenticated(String user, String pswd, RequestContext requestContext, Closure challengeFn) {
+		return (challengeFn(user, pswd, requestContext));
+	}
 
-    /**
-     * Creates a closure that returns file 'filename'
-     *
-     * @param filename
-     * @return
-     */
-    def file(filename) {
-        file(null, filename)
-    }
+	/**
+	 * Creates a closure that returns file 'filename'
+	 *
+	 * @param filename
+	 * @return
+	 */
+	def file(filename) {
+		file(null, filename)
+	}
 
-    /**
-     * Creates a closure that writes file 'filename' to the outputStream
-     * The filename is applied to the static roots
-     *
-     * @param mimeType Optional contentType
-     * @param filename
-     * @return Closure that will return the file
-     *
-     */
-    def file(mimeType, filename) {
-        def staticHandler = new StaticFileHandler()
-        if (!mimeType) {
-            mimeType = URLConnection.guessContentTypeFromName(filename)
-        }
+	/**
+	 * Creates a closure that writes file 'filename' to the outputStream
+	 * The filename is applied to the static roots
+	 *
+	 * @param mimeType Optional contentType
+	 * @param filename
+	 * @return Closure that will return the file
+	 *
+	 */
+	def file(mimeType, filename) {
+		def staticHandler = new StaticFileHandler()
+		if (!mimeType) {
+			mimeType = URLConnection.guessContentTypeFromName(filename)
+		}
 
-        { ->
-            EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: requestContext.id(),
-                    mimeType : mimeType,
-                    msg      : "Sending static file.",
-                    path     : "$filename"])
-            /// search the staticRoots
-            InputStream is = getFile(value('staticRoots'), filename)
-            if (is) {
-                def sz = is.available();
-                requestContext.responseHeaders.put("Content-Type", [mimeType])
-                requestContext.sendResponseHeaders(200, sz)
-                IOUtils.copy(is, requestContext.responseBody)
-            } else {
-                def msg = "No such file: $filename"
-                def ab = msg.getBytes()
-                requestContext.sendResponseHeaders(404, ab.size())
-                requestContext.responseBody.write(ab);
-            }
-            requestContext.responseBody.close();
-            requestContext.close()
-            requestContext
-        }
-    }
+		{ ->
+			EventManager.instance().publish(Events.ResourceProcessing, [
+					requestId: requestContext.id(),
+					mimeType : mimeType,
+					msg      : "Sending static file.",
+					path     : "$filename"])
+			/// search the staticRoots
+			InputStream is = getFile(value('staticRoots'), filename)
+			if (is) {
+				def sz = is.available();
+				requestContext.responseHeaders.put("Content-Type", [mimeType])
+				requestContext.sendResponseHeaders(200, sz)
+				IOUtils.copy(is, requestContext.responseBody)
+			} else {
+				def msg = "No such file: $filename"
+				def ab = msg.getBytes()
+				requestContext.sendResponseHeaders(404, ab.size())
+				requestContext.responseBody.write(ab);
+			}
+			requestContext.responseBody.close();
+			requestContext.close()
+			requestContext
+		}
+	}
 
-    /**
-     * Creates a closure that writes file 'filename' to the outputStream
-     *
-     * @param mimeType Optional contentType
-     * @param filename  fully qualified file name
-     *
-     * @return Closure that will return the file
-     *
-     */
-    def systemFile(mimeType, File file) {
-        if (!mimeType) {
-            mimeType = URLConnection.guessContentTypeFromName(file.name)
-        }
+	/**
+	 * Creates a closure that writes file 'filename' to the outputStream
+	 *
+	 * @param mimeType Optional contentType
+	 * @param filename fully qualified file name
+	 *
+	 * @return Closure that will return the file
+	 *
+	 */
+	def systemFile(mimeType, File file) {
+		if (!mimeType) {
+			mimeType = URLConnection.guessContentTypeFromName(file.name)
+		}
 
-        { ->
-            EventManager.instance().publish(Events.ResourceProcessing, [
-                    requestId: requestContext.id(),
-                    mimeType : mimeType,
-                    msg      : "Sending static file.",
-                    path     : "${file.absolutePath}"])
-            /// search the staticRoots
-            if (!file.exists()){
-                def msg = "No such file: ${file.absolutePath}"
-                def ab = msg.getBytes()
-                requestContext.sendResponseHeaders(404, ab.size())
-                requestContext.responseBody.write(ab);
-            }
-            InputStream is = new FileInputStream(file);
-            def sz = is.available();
-            requestContext.responseHeaders.put("Content-Type", [mimeType])
-            requestContext.sendResponseHeaders(200, sz)
-            IOUtils.copy(is, requestContext.responseBody)
+		{ ->
+			EventManager.instance().publish(Events.ResourceProcessing, [
+					requestId: requestContext.id(),
+					mimeType : mimeType,
+					msg      : "Sending static file.",
+					path     : "${file.absolutePath}"])
+			/// search the staticRoots
+			if (!file.exists()) {
+				def msg = "No such file: ${file.absolutePath}"
+				def ab = msg.getBytes()
+				requestContext.sendResponseHeaders(404, ab.size())
+				requestContext.responseBody.write(ab);
+			}
+			InputStream is = new FileInputStream(file);
+			def sz = is.available();
+			requestContext.responseHeaders.put("Content-Type", [mimeType])
+			requestContext.sendResponseHeaders(200, sz)
+			IOUtils.copy(is, requestContext.responseBody)
 
-            requestContext.responseBody.close();
-            requestContext.close()
-            requestContext
-        }
-    }
+			requestContext.responseBody.close();
+			requestContext.close()
+			requestContext
+		}
+	}
 
-    /**
-     * Declares a directory from which to serve static content.
-     *
-     * @param directory
-     * @return
-     */
-    def static_root(directory) {
-        addStaticRoot(directory)
-    }
+	/**
+	 * Declares a directory from which to serve static content.
+	 *
+	 * @param directory
+	 * @return
+	 */
+	def static_root(directory) {
+		addStaticRoot(directory)
+	}
 
-    def conversion(Class c, Closure fn) {
-        value('inputStreamTypeConverter').add(c, fn)
-    }
+	def conversion(Class c, Closure fn) {
+		value('inputStreamTypeConverter').add(c, fn)
+	}
 
-    void statusPage(boolean b) {
-        value("statusPage", b)
-    }
+	void statusPage(boolean b) {
+		value("statusPage", b)
+	}
 
-    boolean statusPage() {
-        value("statusPage")
-    }
+	boolean statusPage() {
+		value("statusPage")
+	}
 
-    void statusPath(String s) {
-        value("statusPath", s)
-    }
+	void statusPath(String s) {
+		value("statusPath", s)
+	}
 
-    String statusPath() {
-        value("statusPath")
-    }
+	String statusPath() {
+		value("statusPath")
+	}
 
 }

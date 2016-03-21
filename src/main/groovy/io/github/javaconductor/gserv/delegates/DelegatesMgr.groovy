@@ -32,80 +32,80 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
  * Manages Delegates for an application
  */
 class DelegatesMgr {
-    def delegates
+	def delegates
 
-    /**
-     * Creates the creation and manipulation of delegates for an App.
-     *
-     * @param delegates Map (delegateType: delegateMetaClass)
-     *                      Optional. Custom default delegates Map
-     *
-     */
-    def DelegatesMgr(delegates = null) {
-        this.delegates = delegates ?: DefaultDelegates.delegates.clone()
-    }
+	/**
+	 * Creates the creation and manipulation of delegates for an App.
+	 *
+	 * @param delegates Map (delegateType: delegateMetaClass)
+	 *                      Optional. Custom default delegates Map
+	 *
+	 */
+	def DelegatesMgr(delegates = null) {
+		this.delegates = delegates ?: DefaultDelegates.delegates.clone()
+	}
 
-    private def prepareDelegate(delegateType, delegates, args) {
-        /// delegates is a map of delegates by type -> ExpandoMetaClass
-        /// we invoke the constructor and return the newly created object
-        if (!delegates[delegateType])
-            throw new IllegalArgumentException("$delegateType is not a valid delegate type.")
-        if (args)
-            delegates[delegateType].invokeConstructor(*args)
-        else
-            delegates[delegateType].invokeConstructor()
-    }
+	private def prepareDelegate(delegateType, delegates, args) {
+		/// delegates is a map of delegates by type -> ExpandoMetaClass
+		/// we invoke the constructor and return the newly created object
+		if (!delegates[delegateType])
+			throw new IllegalArgumentException("$delegateType is not a valid delegate type.")
+		if (args)
+			delegates[delegateType].invokeConstructor(*args)
+		else
+			delegates[delegateType].invokeConstructor()
+	}
 
-    /**
-     * Creates a delegate instance of the specified type.
-     *
-     * @param delegateType httpMethod|filter|http|resource
-     * @param args Options to pass to the init() function of the delegate
-     * @return Delegate
-     */
-    def createDelegate(delegateType, args) {
-        prepareDelegate(delegateType, this.delegates, args)
-    }
+	/**
+	 * Creates a delegate instance of the specified type.
+	 *
+	 * @param delegateType httpMethod|filter|http|resource
+	 * @param args Options to pass to the init() function of the delegate
+	 * @return Delegate
+	 */
+	def createDelegate(delegateType, args) {
+		prepareDelegate(delegateType, this.delegates, args)
+	}
 
-    /**
-     * Create an HttpMethodDelegate
-     *
-     * @param httpExchange
-     * @param serverConfig
-     * @return
-     */
-    def createHttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
-        createDelegate(DelegateTypes.HttpMethod, [requestContext, action, serverConfig])
-    }
+	/**
+	 * Create an HttpMethodDelegate
+	 *
+	 * @param httpExchange
+	 * @param serverConfig
+	 * @return
+	 */
+	def createHttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
+		createDelegate(DelegateTypes.HttpMethod, [requestContext, action, serverConfig])
+	}
 
-    /**
-     *  Creates delegate for Server Configuration Closure
-     *
-     * @return HttpDelegate
-     */
-    def createHttpDelegate() {
-        createDelegate(DelegateTypes.Http, null)
-    }
+	/**
+	 *  Creates delegate for Server Configuration Closure
+	 *
+	 * @return HttpDelegate
+	 */
+	def createHttpDelegate() {
+		createDelegate(DelegateTypes.Http, null)
+	}
 
-    /**
-     *  Creates delegate for Server Configuration Closure
-     *  This delegate is used for HTTPS configurations
-     *
-     * @return HttpDelegate
-     */
-    def createHttpsDelegate() {
-        createDelegate(DelegateTypes.Https, null)
-    }
+	/**
+	 *  Creates delegate for Server Configuration Closure
+	 *  This delegate is used for HTTPS configurations
+	 *
+	 * @return HttpDelegate
+	 */
+	def createHttpsDelegate() {
+		createDelegate(DelegateTypes.Https, null)
+	}
 }
 
 /**
  * Constants for ALL Delegate Types
  */
 class DelegateTypes {
-    final static public String Http = "http"
-    final static public String Https = "https"
-    final static public String HttpMethod = "httpMethod"
-    final static public String Resource = "resource"
-    final static public String Filter = "filter"
+	final static public String Http = "http"
+	final static public String Https = "https"
+	final static public String HttpMethod = "httpMethod"
+	final static public String Resource = "resource"
+	final static public String Filter = "filter"
 
 }

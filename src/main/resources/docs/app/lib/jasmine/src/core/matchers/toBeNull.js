@@ -1,14 +1,14 @@
-getJasmineRequireObj().toBeNull = function() {
+getJasmineRequireObj().toBeNull = function () {
 
-  function toBeNull() {
-    return {
-      compare: function(actual) {
+    function toBeNull() {
         return {
-          pass: actual === null
+            compare: function (actual) {
+                return {
+                    pass: actual === null
+                };
+            }
         };
-      }
-    };
-  }
+    }
 
-  return toBeNull;
+    return toBeNull;
 };

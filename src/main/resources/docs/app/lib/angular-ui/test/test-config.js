@@ -3,31 +3,30 @@
 // Most of the options can be overriden by cli arguments (see testacular --help)
 
 
-
 // base path, that will be used to resolve files and exclude
 basePath = '..';
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
-  'test/lib/jquery/jquery-1.7.2.js',
-  'test/lib/jquery/jquery-ui-1.8.18.js',
-  'test/lib/angular-1.0.1/angular.js',
-  'test/lib/angular-1.0.1/angular-mocks.js',
-  'test/lib/codemirror/codemirror.js',
-  'test/lib/tinymce/tiny_mce.js',
-  'test/lib/tinymce/jquery.tinymce.js',
-  'test/lib/googlemaps/googlemaps.js',
-  'test/lib/bootstrap/bootstrap-modal.js',
-  'test/lib/select2/select2.js',
-  'test/lib/maskedinput/jquery.maskedinput-1.3.js',
-  'test/lib/calendar/calendar.js.min',
-  'common/module.js',
-  'modules/*/*/*.js',
-  'modules/*/*/test/*.js',
-  'templates/*.js',
-  'templates/test/*.js'
+    JASMINE,
+    JASMINE_ADAPTER,
+    'test/lib/jquery/jquery-1.7.2.js',
+    'test/lib/jquery/jquery-ui-1.8.18.js',
+    'test/lib/angular-1.0.1/angular.js',
+    'test/lib/angular-1.0.1/angular-mocks.js',
+    'test/lib/codemirror/codemirror.js',
+    'test/lib/tinymce/tiny_mce.js',
+    'test/lib/tinymce/jquery.tinymce.js',
+    'test/lib/googlemaps/googlemaps.js',
+    'test/lib/bootstrap/bootstrap-modal.js',
+    'test/lib/select2/select2.js',
+    'test/lib/maskedinput/jquery.maskedinput-1.3.js',
+    'test/lib/calendar/calendar.js.min',
+    'common/module.js',
+    'modules/*/*/*.js',
+    'modules/*/*/test/*.js',
+    'templates/*.js',
+    'templates/test/*.js'
 ];
 
 // list of files to exclude

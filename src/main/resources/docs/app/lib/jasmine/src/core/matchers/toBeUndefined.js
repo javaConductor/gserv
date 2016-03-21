@@ -1,14 +1,14 @@
-getJasmineRequireObj().toBeUndefined = function() {
+getJasmineRequireObj().toBeUndefined = function () {
 
-  function toBeUndefined() {
-    return {
-      compare: function(actual) {
+    function toBeUndefined() {
         return {
-          pass: void 0 === actual
+            compare: function (actual) {
+                return {
+                    pass: void 0 === actual
+                };
+            }
         };
-      }
-    };
-  }
+    }
 
-  return toBeUndefined;
+    return toBeUndefined;
 };

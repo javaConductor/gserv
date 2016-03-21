@@ -26,7 +26,7 @@
  * Created by lcollins on 10/26/14.
  */
 
-function ExampleCtrl($scope){
+function ExampleCtrl($scope) {
 
 
 }

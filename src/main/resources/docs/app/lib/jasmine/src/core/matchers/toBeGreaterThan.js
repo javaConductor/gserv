@@ -1,15 +1,15 @@
-getJasmineRequireObj().toBeGreaterThan = function() {
+getJasmineRequireObj().toBeGreaterThan = function () {
 
-  function toBeGreaterThan() {
-    return {
-      compare: function(actual, expected) {
+    function toBeGreaterThan() {
         return {
-          pass: actual > expected
+            compare: function (actual, expected) {
+                return {
+                    pass: actual > expected
+                };
+            }
         };
-      }
-    };
-  }
+    }
 
-  return toBeGreaterThan;
+    return toBeGreaterThan;
 };
 

@@ -35,38 +35,38 @@ import io.github.javaconductor.gserv.server.GServInstance
 @Slf4j
 class ScriptLoader {
 
-    ResourceLoader resourceLoader = new ResourceLoader();
+	ResourceLoader resourceLoader = new ResourceLoader();
 
-    GServInstance loadInstance(instanceScript, classpath) {
-        def f = new File(instanceScript)
-        if (!f.exists()) {
-            System.err.println("No gserv instanceScript: ${f.absolutePath}")
-            return null
-        }
-        /// script file exists - so run  it
-        GServInstance instance = resourceLoader.loadInstance(f, classpath) ?: null
+	GServInstance loadInstance(instanceScript, classpath) {
+		def f = new File(instanceScript)
+		if (!f.exists()) {
+			System.err.println("No gserv instanceScript: ${f.absolutePath}")
+			return null
+		}
+		/// script file exists - so run  it
+		GServInstance instance = resourceLoader.loadInstance(f, classpath) ?: null
 
-        log.debug("Loaded instance ${instance.config().name()} from script ${f.absolutePath}")
+		log.debug("Loaded instance ${instance.config().name()} from script ${f.absolutePath}")
 
-        instance
-    }
+		instance
+	}
 
-    List<GServResource> loadResources(resourceScripts, classpath) {
-        (!resourceScripts) ? [] :
-                resourceScripts.collect { scriptFileName ->
-                    def f = new File(scriptFileName)
-                    if (!f.exists()) {
-                        System.err.println("No resourceScript: ${f.absolutePath}")
-                        return []
-                    }
-                    def resources
-                    try {
-                        resources = resourceLoader.loadResources(f, classpath)
-                        log.debug("Loaded ${} resources  from: ${f.absolutePath}")
-                    } catch (Throwable ex) {
-                        throw ex
-                    }
-                    return resources ?: []
-                }.flatten()
-    }
+	List<GServResource> loadResources(resourceScripts, classpath) {
+		(!resourceScripts) ? [] :
+				resourceScripts.collect { scriptFileName ->
+					def f = new File(scriptFileName)
+					if (!f.exists()) {
+						System.err.println("No resourceScript: ${f.absolutePath}")
+						return []
+					}
+					def resources
+					try {
+						resources = resourceLoader.loadResources(f, classpath)
+						log.debug("Loaded ${} resources  from: ${f.absolutePath}")
+					} catch (Throwable ex) {
+						throw ex
+					}
+					return resources ?: []
+				}.flatten()
+	}
 }

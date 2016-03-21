@@ -38,33 +38,34 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
  */
 @Slf4j
 @Mixin([StaticFileHandler])
-class ServerInstanceDelegate extends DelegateFunctions implements ServerConfigFn, ResourceFn {
+class ServerInstanceDelegate extends DelegateFunctions
+		implements ServerConfigFn, ResourceFn {
 
-    def templateEngine = "default"
-    def eventManager = EventManager.instance()
-    def actions = { ->
-        value("actionList")
-    }
-    def filters = { -> value("filterList") }
-    def staticRoots = { value("staticRoots") }
-    def statusPage = { value("statusPage") }
-    def statusPath = { value("statusPath") }
+	def templateEngine = "default"
+	def eventManager = EventManager.instance()
+	def actions = { ->
+		value("actionList")
+	}
+	def filters = { -> value("filterList") }
+	def staticRoots = { value("staticRoots") }
+	def statusPage = { value("statusPage") }
+	def statusPath = { value("statusPath") }
 
-    def linkBuilder = { value("linkBuilder") }
-    def converter = { value("inputStreamTypeConverter") }
+	def linkBuilder = { value("linkBuilder") }
+	def converter = { value("inputStreamTypeConverter") }
 
-    def ServerInstanceDelegate() {
-        value("name", "gServ Application")
+	def ServerInstanceDelegate() {
+		value("name", "gServ Application")
 
-        value('inputStreamTypeConverter', new InputStreamTypeConverter());
-        value("actionList", [])
-        value("filterList", [])
-        value("staticRoots", [])
-        value("statusPage", true)
-        value("statusPath", '/status')
-        value("defaultResource", "")
+		value('inputStreamTypeConverter', new InputStreamTypeConverter());
+		value("actionList", [])
+		value("filterList", [])
+		value("staticRoots", [])
+		value("statusPage", true)
+		value("statusPath", '/status')
+		value("defaultResource", "")
 
-        value("useResourceDocs", [])
-        value("linkBuilder", new LinkBuilder())
-    }
+		value("useResourceDocs", [])
+		value("linkBuilder", new LinkBuilder())
+	}
 }

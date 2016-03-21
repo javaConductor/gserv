@@ -45,77 +45,77 @@ import static org.hamcrest.MatcherAssert.assertThat
  */
 @Slf4j
 class LongRunningProcessSpec {
-    def baseDir = "src/integrationTest/resources/test/integration/"
+	def baseDir = "src/integrationTest/resources/test/integration/"
 
-    @Test
-    @Ignore
-    public final void test_10_secondRequests() {
-        def port = 51038
-        def dir = baseDir + "longrun"
-        def args = ["-p", "$port",
-                    "-i", dir + "/LongRun.groovy"]
-        def stopFn = new GServRunner().start(args)
-        try {
-            def now = new Date().time
-            log.debug "LongRunningProcess @$now"
-            withPool(3) {
-                [1, 2, 3].collectParallel { idx ->
+	@Test
+	@Ignore
+	public final void test_10_secondRequests() {
+		def port = 51038
+		def dir = baseDir + "longrun"
+		def args = ["-p", "$port",
+					"-i", dir + "/LongRun.groovy"]
+		def stopFn = new GServRunner().start(args)
+		try {
+			def now = new Date().time
+			log.debug "LongRunningProcess @$now"
+			withPool(3) {
+				[1, 2, 3].collectParallel { idx ->
 
-                    try {
-                        log.debug("LongRunningProcess: Response $idx started.")
-                        Response r = getOf("http://localhost:$port/", withTimeout(11, TimeUnit.SECONDS))
-                        assertThat(r, hasStatusCode(200))
-                        log.debug("LongRunningProcess: Response $idx returned in time.")
-                        return r
-                    } catch (Exception e) {
-                        log.debug("LongRunningProcess: Response $idx did not return in time.")
-                        assertFalse("LongRunningProcess: Response $idx did not return in time.", true)
-                    }
-                }
-            }
-            def after = new Date().time
-            //log.debug("LongRunningProcess: Whole thing took too much time.")
-            assertTrue((after - now) < (11 * 1000))
-        } finally {
-            stopFn()
-        }
-    }
+					try {
+						log.debug("LongRunningProcess: Response $idx started.")
+						Response r = getOf("http://localhost:$port/", withTimeout(11, TimeUnit.SECONDS))
+						assertThat(r, hasStatusCode(200))
+						log.debug("LongRunningProcess: Response $idx returned in time.")
+						return r
+					} catch (Exception e) {
+						log.debug("LongRunningProcess: Response $idx did not return in time.")
+						assertFalse("LongRunningProcess: Response $idx did not return in time.", true)
+					}
+				}
+			}
+			def after = new Date().time
+			//log.debug("LongRunningProcess: Whole thing took too much time.")
+			assertTrue((after - now) < (11 * 1000))
+		} finally {
+			stopFn()
+		}
+	}
 
-    @Test
-    @Ignore
-    public final void test_many_10_secondRequests() {
-        def port = 51039
-        def dir = baseDir + "longrun"
-        def args = ["-p", "$port", "-x", "1000",
-                    "-i", dir + "/LongRun.groovy"]
-        def stopFn = new GServRunner().start(args)
-        try {
-            def now = new Date().time
-            log.debug "LongRunningProcess @$now"
-            withPool(1000) {
-                (1..1000).collectParallel { idx ->
+	@Test
+	@Ignore
+	public final void test_many_10_secondRequests() {
+		def port = 51039
+		def dir = baseDir + "longrun"
+		def args = ["-p", "$port", "-x", "1000",
+					"-i", dir + "/LongRun.groovy"]
+		def stopFn = new GServRunner().start(args)
+		try {
+			def now = new Date().time
+			log.debug "LongRunningProcess @$now"
+			withPool(1000) {
+				(1..1000).collectParallel { idx ->
 
-                    try {
+					try {
 //                        Thread.currentThread().sleep(50)
-                        log.debug("LongRunningProcess: Response $idx started.")
-                        Response r = getOf("http://localhost:$port/", withTimeout(15, TimeUnit.SECONDS))
-                        def tm = (new Date().time - now)
-                        assertThat(r, hasStatusCode(200))
-                        log.debug("LongRunningProcess: Response $idx returned in time : ${tm} msecs.")
-                        return r
-                    } catch (Exception e) {
-                        def tm = (new Date().time - now)
+						log.debug("LongRunningProcess: Response $idx started.")
+						Response r = getOf("http://localhost:$port/", withTimeout(15, TimeUnit.SECONDS))
+						def tm = (new Date().time - now)
+						assertThat(r, hasStatusCode(200))
+						log.debug("LongRunningProcess: Response $idx returned in time : ${tm} msecs.")
+						return r
+					} catch (Exception e) {
+						def tm = (new Date().time - now)
 //                        log.debug("LongRunningProcess: Response $idx did not return in time.")
-                        log.error("LongRunningProcess", e)
-                        assertFalse("LongRunningProcess: Response $idx did not return in time: ${tm} msecs.", true)
-                    }
-                }
-            }
-            def after = new Date().time
-            log.debug("LongRunningProcess: Whole thing took ${(after - now)} msecs.")
-            assertTrue("${(after - now)} msecs.", (after - now) < (50 * 1000))
-        } finally {
-            stopFn()
-        }
-    }
+						log.error("LongRunningProcess", e)
+						assertFalse("LongRunningProcess: Response $idx did not return in time: ${tm} msecs.", true)
+					}
+				}
+			}
+			def after = new Date().time
+			log.debug("LongRunningProcess: Whole thing took ${(after - now)} msecs.")
+			assertTrue("${(after - now)} msecs.", (after - now) < (50 * 1000))
+		} finally {
+			stopFn()
+		}
+	}
 }

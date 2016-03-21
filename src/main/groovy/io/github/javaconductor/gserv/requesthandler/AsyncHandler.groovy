@@ -42,68 +42,68 @@ import io.github.javaconductor.gserv.events.Events
  */
 @Slf4j
 class AsyncHandler {// extends DynamicDispatchActor {//implements TypeUtils {
-    EventManager _evtMgr = EventManager.instance()
-    private def _cfg
-    private def _seq
-    ActionRunner r
-    static long Seq = 0;
+	EventManager _evtMgr = EventManager.instance()
+	private def _cfg
+	private def _seq
+	ActionRunner r
+	static long Seq = 0;
 
-    def AsyncHandler(GServConfig cfg, PGroup pGroup, DataflowQueue handlerQ) {
-        _cfg = cfg
+	def AsyncHandler(GServConfig cfg, PGroup pGroup, DataflowQueue handlerQ) {
+		_cfg = cfg
 
-        r = new ActionRunner(_cfg)
-        _seq = ++Seq
-        Thread.start("AsyncHandler") {
-            while (true) {
-                def val = handlerQ.getVal()
-                log.trace("$this got message: $val : ${new Date().getTime()}")
-                pGroup.execute([
-                        run: {
-                            handler val
-                        }
-                ] as Runnable)
-            }
-        }
-        log.debug("Created $this ")
-    }
+		r = new ActionRunner(_cfg)
+		_seq = ++Seq
+		Thread.start("AsyncHandler") {
+			while (true) {
+				def val = handlerQ.getVal()
+				log.trace("$this got message: $val : ${new Date().getTime()}")
+				pGroup.execute([
+						run: {
+							handler val
+						}
+				] as Runnable)
+			}
+		}
+		log.debug("Created $this ")
+	}
 
-    def handler = { Map request ->
-        onMessage(request)
-    }
+	def handler = { Map request ->
+		onMessage(request)
+	}
 
-    /** This method is called when this Actor receives a message
-     *
-     * @param request
-     * @return void
-     */
-    def onMessage(request) {
-        RequestContext context = request.requestContext
-        def currentReqId = context.id()
-        // log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
-        def action
-        try {
-            action = request.action
-            log.trace "$this  received req #$currentReqId ${context.requestURI.path}"
-            //log.trace "$this received req #$currentReqId bytes from input: ${context.requestBody.bytes.size()} "
-            r.process(context, action)
-        } catch (Throwable e) {
-            _evtMgr.publish(Events.ResourceProcessingError,
-                    [requestId: currentReqId,
-                     path     : action.toString(),
-                     error    : e.message])
-            log.error("$this req #$currentReqId: Error processing request: ${e.message} ", e)
-        }
-        finally {
-            log.trace "$this  processed req #$currentReqId ${context.requestURI.path}"
-        }
-    }
+	/** This method is called when this Actor receives a message
+	 *
+	 * @param request
+	 * @return void
+	 */
+	def onMessage(request) {
+		RequestContext context = request.requestContext
+		def currentReqId = context.id()
+		// log.trace "$this received req #$currentReqId: ${context.requestBody.available()} bytes from input: ${context.requestBody} "
+		def action
+		try {
+			action = request.action
+			log.trace "$this  received req #$currentReqId ${context.requestURI.path}"
+			//log.trace "$this received req #$currentReqId bytes from input: ${context.requestBody.bytes.size()} "
+			r.process(context, action)
+		} catch (Throwable e) {
+			_evtMgr.publish(Events.ResourceProcessingError,
+					[requestId: currentReqId,
+					 path     : action.toString(),
+					 error    : e.message])
+			log.error("$this req #$currentReqId: Error processing request: ${e.message} ", e)
+		}
+		finally {
+			log.trace "$this  processed req #$currentReqId ${context.requestURI.path}"
+		}
+	}
 
-    /**
-     *
-     * @return
-     */
-    @Override
-    String toString() {
-        return "AsyncHandler($_seq)"
-    }
+	/**
+	 *
+	 * @return
+	 */
+	@Override
+	String toString() {
+		return "AsyncHandler($_seq)"
+	}
 }

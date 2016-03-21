@@ -31,28 +31,28 @@ package io.github.javaconductor.gserv.filters
  */
 class FilterByteArrayOutputStream extends ByteArrayOutputStream {
 
-    Closure _closeFn
+	Closure _closeFn
 /**
  * Create OutputStream w/ user supplied close() function.
  *
  * @param closeFn
  */
-    public FilterByteArrayOutputStream(Closure closeFn) {
-        _closeFn = closeFn
-    }
+	public FilterByteArrayOutputStream(Closure closeFn) {
+		_closeFn = closeFn
+	}
 
-    /**
-     * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
-     * this class can be called after the stream has been closed without
-     * generating an <tt>IOException</tt>.
-     * Calls the user supplied close() function.
-     * <p>
-     *
-     */
-    @Override
-    void close() throws IOException {
-        _closeFn(this)
-    }
+	/**
+	 * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
+	 * this class can be called after the stream has been closed without
+	 * generating an <tt>IOException</tt>.
+	 * Calls the user supplied close() function.
+	 * <p>
+	 *
+	 */
+	@Override
+	void close() throws IOException {
+		_closeFn(this)
+	}
 
 
 }

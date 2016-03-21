@@ -28,23 +28,23 @@ import io.github.javaconductor.gserv.actions.ResourceAction
 
 interface IPlugin {
 
-    /**
-     * Initialize the plugin.
-     *
-     * @param options
-     * @return
-     */
-    def name
+	/**
+	 * Initialize the plugin.
+	 *
+	 * @param options
+	 * @return
+	 */
+	def name
 
-    def init(options);
+	def init(options);
 
-    List<ResourceAction> filters();
+	List<ResourceAction> filters();
 
-    List<ResourceAction> actions();
+	List<ResourceAction> actions();
 
-    List<String> staticRoots();
+	List<String> staticRoots();
 
-    MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass)
+	MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass)
 }
 
 

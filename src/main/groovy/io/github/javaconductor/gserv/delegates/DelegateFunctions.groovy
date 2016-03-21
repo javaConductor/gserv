@@ -29,11 +29,11 @@ package io.github.javaconductor.gserv.delegates
  * @author javaConductor
  */
 class DelegateFunctions {
-    Map _properties = [:]
+	Map _properties = [:]
 
-    def value(String key, Object value) { _properties.put(key, value) }
+	def value(String key, Object value) { _properties.put(key, value) }
 
-    def value(String key) { _properties[key] }
+	def value(String key) { _properties[key] }
 
-    def values() { _properties }
+	def values() { _properties }
 }

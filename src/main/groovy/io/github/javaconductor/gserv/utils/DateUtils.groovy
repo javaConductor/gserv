@@ -32,28 +32,28 @@ import java.text.SimpleDateFormat
  */
 class DateUtils {
 
-    private DateFormat m_ISO8601Local =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private DateFormat m_ISO8601Local =
+			new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    public String formatDateTime() {
-        return formatDateTime(new Date());
-    }
+	public String formatDateTime() {
+		return formatDateTime(new Date());
+	}
 
-    public String formatUTC(Date date) {
-        if (date == null) {
-            return formatDateTime(new Date());
-        }
+	public String formatUTC(Date date) {
+		if (date == null) {
+			return formatDateTime(new Date());
+		}
 
-        // format in (almost) ISO8601 format
-        String dateStr = m_ISO8601Local.format(date)
+		// format in (almost) ISO8601 format
+		String dateStr = m_ISO8601Local.format(date)
 
-        // remap the timezone from 0000 to 00:00 (starts at char 22)
-        return dateStr
-    }
+		// remap the timezone from 0000 to 00:00 (starts at char 22)
+		return dateStr
+	}
 
-    public String parseUTC(String utcDate) {
-        // format in (almost) ISO8601 format
-        return m_ISO8601Local.parse(utcDate);
-    }
+	public String parseUTC(String utcDate) {
+		// format in (almost) ISO8601 format
+		return m_ISO8601Local.parse(utcDate);
+	}
 
 }

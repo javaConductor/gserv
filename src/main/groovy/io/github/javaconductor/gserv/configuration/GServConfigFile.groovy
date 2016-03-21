@@ -36,111 +36,111 @@ import io.github.javaconductor.gserv.resourceloader.ResourceLoader
  */
 @Slf4j
 class GServConfigFile {
-    ResourceLoader resourceLoader = new ResourceLoader()
-    GServFactory factory = new GServFactory()
+	ResourceLoader resourceLoader = new ResourceLoader()
+	GServFactory factory = new GServFactory()
 
-    /**
-     *
-     *
-     * @param configFile
-     * @return list of GServConfig
-     */
-    List<GServConfig> parse(File configFile) {
-        def cfg
-        try {
-            cfg = new JsonSlurper().parse(configFile);
-        } catch (Exception e) {
-            def msg = "Could not parse file: ${configFile.absolutePath}: ${e.message}";
-            log.error(msg, e)
-            throw new ConfigException(msg, e)
-        }
+	/**
+	 *
+	 *
+	 * @param configFile
+	 * @return list of GServConfig
+	 */
+	List<GServConfig> parse(File configFile) {
+		def cfg
+		try {
+			cfg = new JsonSlurper().parse(configFile);
+		} catch (Exception e) {
+			def msg = "Could not parse file: ${configFile.absolutePath}: ${e.message}";
+			log.error(msg, e)
+			throw new ConfigException(msg, e)
+		}
 
-        ///// CREATE the initial GServConfig from the file values
-        if (!cfg.apps) {//else
-            System.err.println("Error in gserv config(${configFile.absolutePath}) - No apps specified.  At least one is required.")
-            return [];
-        }
+		///// CREATE the initial GServConfig from the file values
+		if (!cfg.apps) {//else
+			System.err.println("Error in gserv config(${configFile.absolutePath}) - No apps specified.  At least one is required.")
+			return [];
+		}
 
-        GServConfig newCfg;
-        def configs = cfg.apps.collect { app ->
+		GServConfig newCfg;
+		def configs = cfg.apps.collect { app ->
 
-            try {
-                newCfg = appToConfig(app, cfg.classpath)
-                if (app.https && cfg.https) {
-                    newCfg.applyHttpsConfig(cfg.https)
-                }
-            } catch (Exception ex) {
-                log.error("Unable to instantiate configuration", ex)
-                throw ex;
-            }
-            newCfg
-        }//collect
-        configs
-    }//parse
+			try {
+				newCfg = appToConfig(app, cfg.classpath)
+				if (app.https && cfg.https) {
+					newCfg.applyHttpsConfig(cfg.https)
+				}
+			} catch (Exception ex) {
+				log.error("Unable to instantiate configuration", ex)
+				throw ex;
+			}
+			newCfg
+		}//collect
+		configs
+	}//parse
 
-    def addResources(resourceScripts, config) {
-        def resources = []
-        if (resourceScripts) {
-            resources = resourceScripts.collect { scriptFileName ->
-                def f = new File(scriptFileName)
-                if (!f.exists()) {
-                    System.err.println("No resourceScript: ${f.absolutePath}")
-                    return []
-                }
-                return (resourceLoader.loadResources(f) ?: [])
-            }.flatten()
-        }
-        config.addResources(resources)
-        config;
-    }////
+	def addResources(resourceScripts, config) {
+		def resources = []
+		if (resourceScripts) {
+			resources = resourceScripts.collect { scriptFileName ->
+				def f = new File(scriptFileName)
+				if (!f.exists()) {
+					System.err.println("No resourceScript: ${f.absolutePath}")
+					return []
+				}
+				return (resourceLoader.loadResources(f) ?: [])
+			}.flatten()
+		}
+		config.addResources(resources)
+		config;
+	}////
 
-    def appToConfig(app, classpath = []) {
+	def appToConfig(app, classpath = []) {
 
-        def config = factory.createGServConfig()
-        app.with {
-            // declare plugins first so they are available for instance and resources
-            registerPlugins(plugins)
-            if (instanceScript) {
-                File f = new File(instanceScript)
-                if (!f.exists()) {
-                    throw new ConfigException("Instance script: $instanceScript not found.")
-                }
-                config = resourceLoader.loadInstanceConfig(f, classpath)
-            }
+		def config = factory.createGServConfig()
+		app.with {
+			// declare plugins first so they are available for instance and resources
+			registerPlugins(plugins)
+			if (instanceScript) {
+				File f = new File(instanceScript)
+				if (!f.exists()) {
+					throw new ConfigException("Instance script: $instanceScript not found.")
+				}
+				config = resourceLoader.loadInstanceConfig(f, classpath)
+			}
 
-            try {
-                config = addResources(resourceScripts, config);
-            } catch (Exception ex) {
-                log.debug("Could not load resource scripts.", ex)
-                throw ex
-            }
+			try {
+				config = addResources(resourceScripts, config);
+			} catch (Exception ex) {
+				log.debug("Could not load resource scripts.", ex)
+				throw ex
+			}
 
-            if (defaultResource) {
-                config.defaultResource defaultResource
-            }
-            if (port) {
-                config.port(port)
-            }
-            if (maxThreads) {
-                config.maxThreads(maxThreads as int)
-            }
-            if (static_roots) {
-                config.addStaticRoots(static_roots)
-            }
-            if (name) {
-                config.name(name)
-            }
+			if (defaultResource) {
+				config.defaultResource defaultResource
+			}
+			if (port) {
+				config.port(port)
+			}
+			if (maxThreads) {
+				config.maxThreads(maxThreads as int)
+			}
+			if (static_roots) {
+				config.addStaticRoots(static_roots)
+			}
+			if (name) {
+				config.name(name)
+			}
 
-        }
-        config
-    }//appToConfig
+		}
+		config
+	}//appToConfig
 
-    def registerPlugins(plugins) {
-        if (plugins) {
-            def pluginMgr = PluginMgr.instance()
-            plugins.keySet.each { pname ->
-                pluginMgr.register(pname, Class.forName(plugins[pname]))
-            }
-        }
-    }
+	def registerPlugins(plugins) {
+		if (plugins) {
+			def pluginMgr = PluginMgr.instance()
+			plugins.keySet.each { pname ->
+				pluginMgr.register(pname, Class.forName(plugins[pname]))
+			}
+		}
+	}
 }

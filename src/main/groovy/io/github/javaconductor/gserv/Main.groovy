@@ -1,5 +1,3 @@
-
-
 /*
  *  The MIT License (MIT)
  *
@@ -33,8 +31,8 @@ import io.github.javaconductor.gserv.cli.GServRunner
  */
 class Main {
 
-    static void main(String[] args) {
-        new GServRunner().start(args)
-    }
+	static void main(String[] args) {
+		new GServRunner().start(args)
+	}
 
 }

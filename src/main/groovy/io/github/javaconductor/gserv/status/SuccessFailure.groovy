@@ -33,55 +33,55 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class SuccessFailure implements StatRecorder {
 
-    def stats = [
-            SuccessfulRequests: new AtomicLong(0),
-            FailedRequests    : new AtomicLong(0)
-    ]
+	def stats = [
+			SuccessfulRequests: new AtomicLong(0),
+			FailedRequests    : new AtomicLong(0)
+	]
 
-    def runningReqs = [] // RegId
+	def runningReqs = [] // RegId
 
-    @Override
-    def recordEvent(String topic, Map eventData) {
+	@Override
+	def recordEvent(String topic, Map eventData) {
 
-        switch (topic) {
+		switch (topic) {
 
-            case Events.RequestRecieved:
-                /// add to number of requests
+			case Events.RequestRecieved:
+				/// add to number of requests
 
-                /// add to waiting list
-                runningReqs << eventData.requestId
-                break;
+				/// add to waiting list
+				runningReqs << eventData.requestId
+				break;
 
-            case Events.RequestProcessingError:
-                if (runningReqs.contains(eventData.requestId)) {
-                    stats.FailedRequests.incrementAndGet()
-                    runningReqs.remove(eventData.requestId)
-                }
-                break;
+			case Events.RequestProcessingError:
+				if (runningReqs.contains(eventData.requestId)) {
+					stats.FailedRequests.incrementAndGet()
+					runningReqs.remove(eventData.requestId)
+				}
+				break;
 
-            case Events.ResourceProcessed://
-                // find the request in the eventDataByRequestId
-                if (runningReqs.contains(eventData.requestId)) {
-                    stats.SuccessfulRequests.incrementAndGet()
-                    runningReqs.remove(eventData.requestId)
-                }
-                break;
+			case Events.ResourceProcessed://
+				// find the request in the eventDataByRequestId
+				if (runningReqs.contains(eventData.requestId)) {
+					stats.SuccessfulRequests.incrementAndGet()
+					runningReqs.remove(eventData.requestId)
+				}
+				break;
 
-        }
+		}
 
-    }
+	}
 
-    @Override
-    Map reportStat() {
-        [
-                'Successful Requests': stats.SuccessfulRequests.get(),
-                'Failed Requests'    : stats.FailedRequests.get()
-        ]
-    }
+	@Override
+	Map reportStat() {
+		[
+				'Successful Requests': stats.SuccessfulRequests.get(),
+				'Failed Requests'    : stats.FailedRequests.get()
+		]
+	}
 
-    def reset() {
-        stats.SuccessfulRequests.set(0)
-        stats.FailedRequests.set(0)
-    }
+	def reset() {
+		stats.SuccessfulRequests.set(0)
+		stats.FailedRequests.set(0)
+	}
 
 }

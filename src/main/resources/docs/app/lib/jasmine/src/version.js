@@ -1,3 +1,3 @@
-getJasmineRequireObj().version = function() {
-  return "<%= version %>";
+getJasmineRequireObj().version = function () {
+    return "<%= version %>";
 };

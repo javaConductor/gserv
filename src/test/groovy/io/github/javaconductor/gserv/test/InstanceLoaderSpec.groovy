@@ -30,18 +30,18 @@ import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import spock.lang.Specification
 
 public class InstanceLoaderSpec extends Specification {
-    ResourceLoader resourceLoader
-    ClassLoader classLoader = GServ.classLoader
+	ResourceLoader resourceLoader
+	ClassLoader classLoader = GServ.classLoader
 
-    def "Should load gserv instance script"() {
-        URI uri = ClassLoader.getSystemResource("test/instanceLoader/TestInstance.groovy").toURI()
+	def "Should load gserv instance script"() {
+		URI uri = ClassLoader.getSystemResource("test/instanceLoader/TestInstance.groovy").toURI()
 
-        when:
-        resourceLoader = new ResourceLoader()
-        GServConfig cfg = resourceLoader.loadInstanceConfig(new File(uri), [])
+		when:
+		resourceLoader = new ResourceLoader()
+		GServConfig cfg = resourceLoader.loadInstanceConfig(new File(uri), [])
 
-        then:
-        cfg.name() == "AppName"
-        cfg.actions().size() == 1
-    }
+		then:
+		cfg.name() == "AppName"
+		cfg.actions().size() == 1
+	}
 }

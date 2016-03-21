@@ -1,13 +1,13 @@
-getJasmineRequireObj().toBeDefined = function() {
-  function toBeDefined() {
-    return {
-      compare: function(actual) {
+getJasmineRequireObj().toBeDefined = function () {
+    function toBeDefined() {
         return {
-          pass: (void 0 !== actual)
+            compare: function (actual) {
+                return {
+                    pass: (void 0 !== actual)
+                };
+            }
         };
-      }
-    };
-  }
+    }
 
-  return toBeDefined;
+    return toBeDefined;
 };

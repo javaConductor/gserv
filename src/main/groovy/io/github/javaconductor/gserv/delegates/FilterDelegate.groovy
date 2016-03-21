@@ -44,23 +44,23 @@ import io.github.javaconductor.gserv.templating.TemplateManager
  */
 @Slf4j
 class FilterDelegate extends DelegateFunctions implements ResourceHandlerFn, FilterFn, ResourceFn {
-    def $this
-    def requestContext
+	def $this
+	def requestContext
 
-    def FilterDelegate(Filter filter, RequestContext requestContext,
-                       GServConfig serverConfig, String templateEngineName) {
-        assert requestContext
-        value("linkBuilder", serverConfig.linkBuilder());
-        value("staticRoots", serverConfig.staticRoots());
-        value("templateEngineName", serverConfig.templateEngineName());
-        value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
-        value("to", serverConfig.inputStreamTypeConverter.converters);
-        value("serverConfig", serverConfig);
-        value("tmgr", new TemplateManager());
+	def FilterDelegate(Filter filter, RequestContext requestContext,
+					   GServConfig serverConfig, String templateEngineName) {
+		assert requestContext
+		value("linkBuilder", serverConfig.linkBuilder());
+		value("staticRoots", serverConfig.staticRoots());
+		value("templateEngineName", serverConfig.templateEngineName());
+		value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
+		value("to", serverConfig.inputStreamTypeConverter.converters);
+		value("serverConfig", serverConfig);
+		value("tmgr", new TemplateManager());
 
-        value('$this', filter);
+		value('$this', filter);
 
-        this.requestContext = requestContext
-        $this = filter
-    }
+		this.requestContext = requestContext
+		$this = filter
+	}
 }

@@ -1,16 +1,16 @@
-getJasmineRequireObj().toMatch = function() {
+getJasmineRequireObj().toMatch = function () {
 
-  function toMatch() {
-    return {
-      compare: function(actual, expected) {
-        var regexp = new RegExp(expected);
-
+    function toMatch() {
         return {
-          pass: regexp.test(actual)
-        };
-      }
-    };
-  }
+            compare: function (actual, expected) {
+                var regexp = new RegExp(expected);
 
-  return toMatch;
+                return {
+                    pass: regexp.test(actual)
+                };
+            }
+        };
+    }
+
+    return toMatch;
 };

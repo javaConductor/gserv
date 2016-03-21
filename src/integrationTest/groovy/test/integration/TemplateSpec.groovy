@@ -42,57 +42,57 @@ import static org.hamcrest.MatcherAssert.assertThat
  */
 @Slf4j
 class TemplateSpec {
-    def baseDir = "src/integrationTest/resources/test/integration/"
+	def baseDir = "src/integrationTest/resources/test/integration/"
 
-    def instance = new GServ().http([:]) {
-        useResourceDocs(true)
-        delegate.get("/") {
-            template("text/html", "/testTemplate.html", [
-                    title: "Template Test",
-                    page : 3
-            ])
-        }
-        delegate.get("/json") {
-            template("application/json", "/testTemplate.json", [
-                    title: "Template JSON Test",
-                    page : 66
-            ])
-        }
-    }
+	def instance = new GServ().http([:]) {
+		useResourceDocs(true)
+		delegate.get("/") {
+			template("text/html", "/testTemplate.html", [
+					title: "Template Test",
+					page : 3
+			])
+		}
+		delegate.get("/json") {
+			template("application/json", "/testTemplate.json", [
+					title: "Template JSON Test",
+					page : 66
+			])
+		}
+	}
 
-    @Test
-    public final void testTemplateInResourceDocs() {
-        def port = 51000
-        def stopFn = instance.start(port)
-        try {
-            Response r = getOf("http://localhost:$port/",
-                    withTimeout(5, TimeUnit.MINUTES))
+	@Test
+	public final void testTemplateInResourceDocs() {
+		def port = 51000
+		def stopFn = instance.start(port)
+		try {
+			Response r = getOf("http://localhost:$port/",
+					withTimeout(5, TimeUnit.MINUTES))
 
-            assertThat(r, hasStatusCode(200))
-            assertThat("Template should have produced the text",
-                    r.asText().contains("<title>Template Test</title>"))
+			assertThat(r, hasStatusCode(200))
+			assertThat("Template should have produced the text",
+					r.asText().contains("<title>Template Test</title>"))
 
-        } finally {
-            stopFn()
-        }
-    }
+		} finally {
+			stopFn()
+		}
+	}
 
-    @Test
-    public final void testTemplateInResourceDocsJsp() {
-        def port = 51001
-        def stopFn = instance.start(port)
-        try {
-            Response r = getOf("http://localhost:$port/json",
-                    withTimeout(5, TimeUnit.MINUTES))
+	@Test
+	public final void testTemplateInResourceDocsJsp() {
+		def port = 51001
+		def stopFn = instance.start(port)
+		try {
+			Response r = getOf("http://localhost:$port/json",
+					withTimeout(5, TimeUnit.MINUTES))
 
-            assertThat(r, hasStatusCode(200))
-            assertThat(r.asJson().findValue("page").asText(), equalTo("66"))
-            assertThat(r.asJson().findValue("page1").asText(), equalTo("66"))
-            assertThat(r.asJson().findValue("page2").asText(), equalTo("66"))
-            //     assertThat("Template should have produced the text",  r.asText().contains("<title>Template Test</title>"))
+			assertThat(r, hasStatusCode(200))
+			assertThat(r.asJson().findValue("page").asText(), equalTo("66"))
+			assertThat(r.asJson().findValue("page1").asText(), equalTo("66"))
+			assertThat(r.asJson().findValue("page2").asText(), equalTo("66"))
+			//     assertThat("Template should have produced the text",  r.asText().contains("<title>Template Test</title>"))
 
-        } finally {
-            stopFn()
-        }
-    }
+		} finally {
+			stopFn()
+		}
+	}
 }

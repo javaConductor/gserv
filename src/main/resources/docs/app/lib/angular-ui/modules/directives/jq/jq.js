@@ -15,50 +15,50 @@
  */
 angular.module('ui.directives').directive('uiJq', ['ui.config', '$timeout', function uiJqInjectingFunction(uiConfig, $timeout) {
 
-  return {
-    restrict: 'A',
-    compile: function uiJqCompilingFunction(tElm, tAttrs) {
+    return {
+        restrict: 'A',
+        compile: function uiJqCompilingFunction(tElm, tAttrs) {
 
-      if (!angular.isFunction(tElm[tAttrs.uiJq])) {
-        throw new Error('ui-jq: The "' + tAttrs.uiJq + '" function does not exist');
-      }
-      var options = uiConfig.jq && uiConfig.jq[tAttrs.uiJq];
+            if (!angular.isFunction(tElm[tAttrs.uiJq])) {
+                throw new Error('ui-jq: The "' + tAttrs.uiJq + '" function does not exist');
+            }
+            var options = uiConfig.jq && uiConfig.jq[tAttrs.uiJq];
 
-      return function uiJqLinkingFunction(scope, elm, attrs) {
+            return function uiJqLinkingFunction(scope, elm, attrs) {
 
-        var linkOptions = [];
+                var linkOptions = [];
 
-        // If ui-options are passed, merge (or override) them onto global defaults and pass to the jQuery method
-        if (attrs.uiOptions) {
-          linkOptions = scope.$eval('[' + attrs.uiOptions + ']');
-          if (angular.isObject(options) && angular.isObject(linkOptions[0])) {
-            linkOptions[0] = angular.extend({}, options, linkOptions[0]);
-          }
-        } else if (options) {
-          linkOptions = [options];
+                // If ui-options are passed, merge (or override) them onto global defaults and pass to the jQuery method
+                if (attrs.uiOptions) {
+                    linkOptions = scope.$eval('[' + attrs.uiOptions + ']');
+                    if (angular.isObject(options) && angular.isObject(linkOptions[0])) {
+                        linkOptions[0] = angular.extend({}, options, linkOptions[0]);
+                    }
+                } else if (options) {
+                    linkOptions = [options];
+                }
+                // If change compatibility is enabled, the form input's "change" event will trigger an "input" event
+                if (attrs.ngModel && elm.is('select,input,textarea')) {
+                    elm.on('change', function () {
+                        elm.trigger('input');
+                    });
+                }
+
+                // Call jQuery method and pass relevant options
+                function callPlugin() {
+                    $timeout(function () {
+                        elm[attrs.uiJq].apply(elm, linkOptions);
+                    }, 0, false);
+                }
+
+                // If ui-refresh is used, re-fire the the method upon every change
+                if (attrs.uiRefresh) {
+                    scope.$watch(attrs.uiRefresh, function (newVal) {
+                        callPlugin();
+                    });
+                }
+                callPlugin();
+            };
         }
-        // If change compatibility is enabled, the form input's "change" event will trigger an "input" event
-        if (attrs.ngModel && elm.is('select,input,textarea')) {
-          elm.on('change', function() {
-            elm.trigger('input');
-          });
-        }
-
-        // Call jQuery method and pass relevant options
-        function callPlugin() {
-          $timeout(function() {
-            elm[attrs.uiJq].apply(elm, linkOptions);
-          }, 0, false);
-        }
-
-        // If ui-refresh is used, re-fire the the method upon every change
-        if (attrs.uiRefresh) {
-          scope.$watch(attrs.uiRefresh, function(newVal) {
-            callPlugin();
-          });
-        }
-        callPlugin();
-      };
-    }
-  };
+    };
 }]);

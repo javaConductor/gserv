@@ -43,106 +43,106 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
  */
 @Log
 class EventLoggerPlugin extends AbstractPlugin {
-    def eventTopicList = [:]
-    def eventList = []
-    def logSinceUrl = "/log/since/:utc"
-    def logLastUrl = "/log/last/:count"
-    def logUrl = "/log"
-    def logTemplate = "/gserv/views/eventLoggerPlugin/index.html"
-    def logPageUrl = "/logs.html"
-    def logSincePrefix = "/log/since/:utc"
-    def logLastPrefix = "/log/last/:count"
-    def _staticFileHandler = new StaticFileHandler();
+	def eventTopicList = [:]
+	def eventList = []
+	def logSinceUrl = "/log/since/:utc"
+	def logLastUrl = "/log/last/:count"
+	def logUrl = "/log"
+	def logTemplate = "/gserv/views/eventLoggerPlugin/index.html"
+	def logPageUrl = "/logs.html"
+	def logSincePrefix = "/log/since/:utc"
+	def logLastPrefix = "/log/last/:count"
+	def _staticFileHandler = new StaticFileHandler();
 
-    @Override
-    def init(Object options) {
+	@Override
+	def init(Object options) {
 
-        //listen to ALL the messages
-        //TODO def fn = options.logFileName
-        //TODO def f = new File(fn)
+		//listen to ALL the messages
+		//TODO def fn = options.logFileName
+		//TODO def f = new File(fn)
 
-        logUrl = options.url ?: "/log"
-        logSincePrefix = "$logUrl/since"
-        logLastPrefix = "$logUrl/last"
-        logSinceUrl = "$logSincePrefix/:utc"
-        logLastUrl = "$logLastPrefix/:count"
+		logUrl = options.url ?: "/log"
+		logSincePrefix = "$logUrl/since"
+		logLastPrefix = "$logUrl/last"
+		logSinceUrl = "$logSincePrefix/:utc"
+		logLastUrl = "$logLastPrefix/:count"
 
-        EventManager.instance().subscribe('*') { t, d ->
+		EventManager.instance().subscribe('*') { t, d ->
 //            println "$t => " + new JsonBuilder(d).toPrettyString()
-            addEvent(t, d)
-        }
-    }
+			addEvent(t, d)
+		}
+	}
 
-    def addEvent(topic, evtObject) {
-        def o = [data: evtObject]
-        o.topic = topic
-        o.when = evtObject.when
-        evtObject.when = null
-        synchronized (eventList) {
-            eventList << o
-            if (eventList.size() > 1000)
-                eventList = eventList.tail();
-        }
+	def addEvent(topic, evtObject) {
+		def o = [data: evtObject]
+		o.topic = topic
+		o.when = evtObject.when
+		evtObject.when = null
+		synchronized (eventList) {
+			eventList << o
+			if (eventList.size() > 1000)
+				eventList = eventList.tail();
+		}
 
-    }
+	}
 
-    @Override
-    List<ResourceAction> filters() {
-        def f = ResourceActionFactory.createBeforeFilter("EventLogFilter", '*', "/", [:]) { requestContext, args
-            ->
-            if (requestContext.requestURI.path.equals(logUrl)) {
-                def events = lastEvents(1000)
-                events = prepareEvents(events)
-                writeJson(events)
-            }
-            requestContext
-        }
-        [f]
-    }
+	@Override
+	List<ResourceAction> filters() {
+		def f = ResourceActionFactory.createBeforeFilter("EventLogFilter", '*', "/", [:]) { requestContext, args
+			->
+			if (requestContext.requestURI.path.equals(logUrl)) {
+				def events = lastEvents(1000)
+				events = prepareEvents(events)
+				writeJson(events)
+			}
+			requestContext
+		}
+		[f]
+	}
 
-    @Override
-    List<ResourceAction> actions() {
-        def r = ResourceActionFactory.createAction(
-                'GET',
-                "$logPageUrl",
-                [usePathVariables: false],
-                _staticFileHandler.fileFn("text/html", logTemplate))
-        [r]
-    }
+	@Override
+	List<ResourceAction> actions() {
+		def r = ResourceActionFactory.createAction(
+				'GET',
+				"$logPageUrl",
+				[usePathVariables: false],
+				_staticFileHandler.fileFn("text/html", logTemplate))
+		[r]
+	}
 
-    def prepareEvents(evts) {
-        synchronized (evts) {
-            def events = evts
-                    .sort { a, b -> a.when.after(b.when) ? 1 : (b.when.after(a.when) ? -1 : 0) }
-                    .collect { event ->
-                [when : event.when.format("yyyy/MM/dd-hh:mm:ss:S"),
-                 topic: event.topic,
-                 data : event.data
-                ]
-            }
-        }
-    }
+	def prepareEvents(evts) {
+		synchronized (evts) {
+			def events = evts
+					.sort { a, b -> a.when.after(b.when) ? 1 : (b.when.after(a.when) ? -1 : 0) }
+					.collect { event ->
+				[when : event.when.format("yyyy/MM/dd-hh:mm:ss:S"),
+				 topic: event.topic,
+				 data : event.data
+				]
+			}
+		}
+	}
 
-    def eventsSince(events, evtDate) {
-        events.findAll { it.when.after(evtDate) || it.when.equals(evtDate) }
-    }
+	def eventsSince(events, evtDate) {
+		events.findAll { it.when.after(evtDate) || it.when.equals(evtDate) }
+	}
 
-    def lastEvents(evtCount) {
-        synchronized (eventList) {
-            def sz = eventList.size()
-            def elist
-            if (sz <= evtCount)
-                elist = eventList
-            else {
-                def idx = sz - evtCount
-                elist = eventList.subList(idx, sz)
-            }
-            elist.sort { a, b -> a.when.after(b.when) ? 1 : -1 }
-        }
-    }
+	def lastEvents(evtCount) {
+		synchronized (eventList) {
+			def sz = eventList.size()
+			def elist
+			if (sz <= evtCount)
+				elist = eventList
+			else {
+				def idx = sz - evtCount
+				elist = eventList.subList(idx, sz)
+			}
+			elist.sort { a, b -> a.when.after(b.when) ? 1 : -1 }
+		}
+	}
 
-    @Override
-    MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
-        delegateMetaClass
-    }
+	@Override
+	MetaClass decorateDelegate(String delegateType, MetaClass delegateMetaClass) {
+		delegateMetaClass
+	}
 }

@@ -42,81 +42,81 @@ import static org.junit.Assert.assertNotNull
 
 class ConversionSpec {
 
-    GServResource res = GServ.Resource("/app") {
+	GServResource res = GServ.Resource("/app") {
 
-        get('/') {
-            responseHeader("Content-Type", "text/plain")
-            write "Hello"
-        }
+		get('/') {
+			responseHeader("Content-Type", "text/plain")
+			write "Hello"
+		}
 
-        put('/') { instream ->
-            responseHeader("Content-Type", "text/plain")
-            def data = to.type(domainType.class, instream)
-            write "text/plain", """age = ${data.age}, name = ${data.name}"""
-        }
+		put('/') { instream ->
+			responseHeader("Content-Type", "text/plain")
+			def data = to.type(domainType.class, instream)
+			write "text/plain", """age = ${data.age}, name = ${data.name}"""
+		}
 
-        get('/error') {
-            responseHeader("Content-Type", "text/plain")
-            throw new RuntimeException("Testing exceptions handling in tests.")
+		get('/error') {
+			responseHeader("Content-Type", "text/plain")
+			throw new RuntimeException("Testing exceptions handling in tests.")
 //            write "Hello"
-        }
-    }
+		}
+	}
 
-    class domainType {
-        int age
-        String name
+	class domainType {
+		int age
+		String name
 
-        def domainType(int age, String name) {
-            this.age = age
-            this.name = name
-        }
-    }
+		def domainType(int age, String name) {
+			this.age = age
+			this.name = name
+		}
+	}
 
-    GServInstance instance = new GServ().http {
-        conversion(domainType.class) { instream ->
-            def obj = new JsonSlurper().parse(instream)
-            new domainType(obj.age as int, obj.name)
-        }
-        resource res
-    }
+	GServInstance instance = new GServ().http {
+		conversion(domainType.class) { instream ->
+			def obj = new JsonSlurper().parse(instream)
+			new domainType(obj.age as int, obj.name)
+		}
+		resource res
+	}
 
-    @Test
-    void testException() {
+	@Test
+	void testException() {
 
-        def gServFactory = new GServFactory()
+		def gServFactory = new GServFactory()
 
-        InstanceTester t = new InstanceTester(instance.config())
-        t.run("GET", [:], "/app/error", null) { int statusCode, Map responseHeaders, byte[] output ->
-            assert statusCode == 500
-            def outputStr = new String(output)
-            assert outputStr == "Testing exceptions handling in tests."
-        }// run
-    }//TEST
+		InstanceTester t = new InstanceTester(instance.config())
+		t.run("GET", [:], "/app/error", null) { int statusCode, Map responseHeaders, byte[] output ->
+			assert statusCode == 500
+			def outputStr = new String(output)
+			assert outputStr == "Testing exceptions handling in tests."
+		}// run
+	}//TEST
 
-    @Test
-    void testPromiseSample() {
+	@Test
+	void testPromiseSample() {
 
-        GServInstance instance = new GServ().http {
-            conversion(domainType.class) { instream ->
-                def obj = new JsonSlurper().parse(instream)
-                new domainType(obj.age as int, obj.name)
-            }
-            resource res
-        }
+		GServInstance instance = new GServ().http {
+			conversion(domainType.class) { instream ->
+				def obj = new JsonSlurper().parse(instream)
+				new domainType(obj.age as int, obj.name)
+			}
+			resource res
+		}
 
-        def cfg = instance.config()
+		def cfg = instance.config()
 
-        InstanceTester t = new InstanceTester(cfg)
+		InstanceTester t = new InstanceTester(cfg)
 
 //        def run(String method, Map requestHeaders, String path, byte[] data) {
 
-        def data = """{ "age" : 75, "name": "Elder James" }""".bytes
-        Promise p = t.run("PUT", [:], "/app", data)
+		def data = """{ "age" : 75, "name": "Elder James" }""".bytes
+		Promise p = t.run("PUT", [:], "/app", data)
 
-        assertNotNull(p.get())
-        def respData = p.get()
-        assertEquals(200, respData.statusCode)
-        assertEquals(new String(respData.output), "age = 75, name = Elder James")
-    }
+		assertNotNull(p.get())
+		def respData = p.get()
+		assertEquals(200, respData.statusCode)
+		assertEquals(new String(respData.output), "age = 75, name = Elder James")
+	}
 
 }

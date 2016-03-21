@@ -14,23 +14,24 @@
 }
 
 .angular-ui-tree-nodes {
-	display: block;
-	position: relative;
-	margin: 0px;
-	padding: 0px;
-	list-style: none;
+    display: block;
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
 }
 
 .angular-ui-tree-nodes .angular-ui-tree-nodes {
     padding-left: 20px;
 }
+
 .angular-ui-tree-node, .angular-ui-tree-placeholder {
-	display: block;
-	position: relative;
-	margin: 0px;
-	padding: 0px;
-	min-height: 20px;
-	line-height: 20px;
+    display: block;
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    min-height: 20px;
+    line-height: 20px;
 }
 
 .angular-ui-tree-hidden {
@@ -54,10 +55,9 @@
     line-height: 20px;
 }
 
-
 .angular-ui-tree-drag {
     position: absolute;
     pointer-events: none;
     z-index: 999;
-    opacity: .8;    
+    opacity: .8;
 }

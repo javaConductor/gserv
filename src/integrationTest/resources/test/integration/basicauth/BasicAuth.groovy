@@ -34,18 +34,18 @@ gserv.http((Map) [:]) { ->
 /*
     def basicAuthentication(methods, path, realm, challengeFn)
  */
-    basicAuthentication(['GET', "POST", "PUT"], '/*', "testRealm") { user, pswd, requestContext ->
-        def ok = (user == "secret" && pswd == "thing")
-        println "u=$user p=$pswd : ${ok ? "OK" : "FAILED"}";
-        ok
-    }
+	basicAuthentication(['GET', "POST", "PUT"], '/*', "testRealm") { user, pswd, requestContext ->
+		def ok = (user == "secret" && pswd == "thing")
+		println "u=$user p=$pswd : ${ok ? "OK" : "FAILED"}";
+		ok
+	}
 
-    get('/') { ->
-        write("text/plain", "You MUST be authorized!!");
-    }
+	get('/') { ->
+		write("text/plain", "You MUST be authorized!!");
+	}
 
-    get('/hello') { ->
-        write("text/plain", "You SHOULD HAVE BEEN authorized!!");
-    }
+	get('/hello') { ->
+		write("text/plain", "You SHOULD HAVE BEEN authorized!!");
+	}
 
 }

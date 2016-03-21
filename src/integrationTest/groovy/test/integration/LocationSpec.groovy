@@ -41,29 +41,29 @@ import static org.hamcrest.MatcherAssert.assertThat
  */
 
 class LocationSpec {
-    def testResource = GServ.Resource('/test') {
+	def testResource = GServ.Resource('/test') {
 
-        delegate.put("/") { String json ->
-            location("/test/thing")
-            write "text/plain", "done!"
-        }
-        delegate.get('/thing') {
-            write "text/plain", "This is the thing."
-        }
+		delegate.put("/") { String json ->
+			location("/test/thing")
+			write "text/plain", "done!"
+		}
+		delegate.get('/thing') {
+			write "text/plain", "This is the thing."
+		}
 
-    }
+	}
 
-    @Test
-    public final void testLocation() {
-        def port = 51071
-        def stopFn = new GServ().http {
-            resource testResource
-        }.start(port)
-        def data = ""
-        Response r = put("http://localhost:$port/test", withTimeout(5, TimeUnit.MINUTES))
-        assertThat(r, hasStatusCode(200))
-        assertThat(r, hasHeader("Location", "/test/thing"))
-        stopFn()
-    }
+	@Test
+	public final void testLocation() {
+		def port = 51071
+		def stopFn = new GServ().http {
+			resource testResource
+		}.start(port)
+		def data = ""
+		Response r = put("http://localhost:$port/test", withTimeout(5, TimeUnit.MINUTES))
+		assertThat(r, hasStatusCode(200))
+		assertThat(r, hasHeader("Location", "/test/thing"))
+		stopFn()
+	}
 
 }

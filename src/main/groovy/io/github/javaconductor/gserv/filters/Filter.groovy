@@ -32,24 +32,24 @@ import io.github.javaconductor.gserv.actions.ResourceAction
  * for a request filter.
  */
 class Filter extends ResourceAction {
-    def order = 5
-    def filterType = FilterType.Normal
+	def order = 5
+	def filterType = FilterType.Normal
 
-    def Filter(name, method, urlPatterns, qryPattern, opts, beforeClosure) {
-        super(name, method, urlPatterns, qryPattern, opts, beforeClosure);
-    }
+	def Filter(name, method, urlPatterns, qryPattern, opts, beforeClosure) {
+		super(name, method, urlPatterns, qryPattern, opts, beforeClosure);
+	}
 
-    @Override
-    String toString() {
-        name + "->" + super.toString()
-    }
+	@Override
+	String toString() {
+		name + "->" + super.toString()
+	}
 
 }
 /**
  * Supported Filter Types
  */
 enum FilterType {
-    After, Normal, Before
+	After, Normal, Before
 }
 
 /**
@@ -60,5 +60,5 @@ class FilterOptions {
 /**
  *  Boolean:    if true, the filter will only be activated when it matches a route
  */
-    static final String MatchedActionsOnly = 'matchedActionsOnly'
+	static final String MatchedActionsOnly = 'matchedActionsOnly'
 }

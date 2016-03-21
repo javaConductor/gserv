@@ -38,131 +38,131 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
  */
 @Slf4j
 class RequestContextWrapper extends AbstractRequestContext {
-    RequestContext _context
-    int _code
-    InputStream _originalInputStream
-    OutputStream _originalOutputStream, _responseBody
-    def _wasClosed = false
+	RequestContext _context
+	int _code
+	InputStream _originalInputStream
+	OutputStream _originalOutputStream, _responseBody
+	def _wasClosed = false
 
-    def RequestContextWrapper(RequestContext context, OutputStream outputStream = new ByteArrayOutputStream()) {
-        super(context.config())
-        if (!context)
-            throw new IllegalArgumentException("context must NOT be null. Should be valid RequestContext impl.")
+	def RequestContextWrapper(RequestContext context, OutputStream outputStream = new ByteArrayOutputStream()) {
+		super(context.config())
+		if (!context)
+			throw new IllegalArgumentException("context must NOT be null. Should be valid RequestContext impl.")
 
-        if (context instanceof RequestContextWrapper)
-            throw new IllegalArgumentException("context must NOT be Wrapper.")
+		if (context instanceof RequestContextWrapper)
+			throw new IllegalArgumentException("context must NOT be Wrapper.")
 
-        _context = context
-        this.requestURI = _context.requestURI
-        this.principal = _context.principal
-        this.requestHeaders = _context.requestHeaders as Map
-        this.responseHeaders.putAll(_context.responseHeaders)
-        this.requestMethod = _context.requestMethod
-        _originalOutputStream = _context.responseBody
-        _originalInputStream = _context.requestBody
-        this.requestBody = _context.requestBody
-        this.attributes = _context.attributes as Map
-        this.responseCode = _context.responseCode
+		_context = context
+		this.requestURI = _context.requestURI
+		this.principal = _context.principal
+		this.requestHeaders = _context.requestHeaders as Map
+		this.responseHeaders.putAll(_context.responseHeaders)
+		this.requestMethod = _context.requestMethod
+		_originalOutputStream = _context.responseBody
+		_originalInputStream = _context.requestBody
+		this.requestBody = _context.requestBody
+		this.attributes = _context.attributes as Map
+		this.responseCode = _context.responseCode
 
-        this.remoteAddress = _context.remoteAddress
-        this.localAddress = _context.localAddress
-        this.protocol = _context.protocol
-        this.responseBody = _responseBody = outputStream
-        log.trace("RequestContext(#${id()}) -> $_context ")
+		this.remoteAddress = _context.remoteAddress
+		this.localAddress = _context.localAddress
+		this.protocol = _context.protocol
+		this.responseBody = _responseBody = outputStream
+		log.trace("RequestContext(#${id()}) -> $_context ")
 
-        setAttribute(GServ.contextAttributes.isWrapper, true)
-    }
+		setAttribute(GServ.contextAttributes.isWrapper, true)
+	}
 
-    @Override
-    def isClosed() {
-        _wasClosed
-    }
+	@Override
+	def isClosed() {
+		_wasClosed
+	}
 
-    def originalOutputStream() { _originalOutputStream }
+	def originalOutputStream() { _originalOutputStream }
 
-    @Override
-    def close() {
-        def currentReqId = id()
-        if (_wasClosed) {
-            log.warn("RequestContext(#$currentReqId) close() called multiple times.")
-            return
-        }
-        log.trace("RequestContext(#$currentReqId) is closing... ")
-        writeIt(_responseBody.toByteArray())
-        _wasClosed = true
-        log.debug("RequestContext(#$currentReqId) has been closed.")
-    }
+	@Override
+	def close() {
+		def currentReqId = id()
+		if (_wasClosed) {
+			log.warn("RequestContext(#$currentReqId) close() called multiple times.")
+			return
+		}
+		log.trace("RequestContext(#$currentReqId) is closing... ")
+		writeIt(_responseBody.toByteArray())
+		_wasClosed = true
+		log.debug("RequestContext(#$currentReqId) has been closed.")
+	}
 
-    void sendResponseHeaders(int statusCode, long dataLength) throws IOException {
-        /// must NOT send anything YET
-        _code = statusCode
-        //dataLength may change before the data is sent
+	void sendResponseHeaders(int statusCode, long dataLength) throws IOException {
+		/// must NOT send anything YET
+		_code = statusCode
+		//dataLength may change before the data is sent
 //        _context.sendResponseHeaders(statusCode, dataLength)
-    }
+	}
 
-    int getResponseCode() {
-        return _code
-    }
+	int getResponseCode() {
+		return _code
+	}
 
-    String dump() {
-        attributes.toString()
-    }
+	String dump() {
+		attributes.toString()
+	}
 
-    Object nativeObject() {
-        _context.nativeObject()
-    }
+	Object nativeObject() {
+		_context.nativeObject()
+	}
 
-    def setStreams(InputStream is, OutputStream os) {
-        _context.setStreams(is, os)
-    }
+	def setStreams(InputStream is, OutputStream os) {
+		_context.setStreams(is, os)
+	}
 /**
  * Sends the Headers and writes the bytes to the original stream
  * Return code from the intercepted sendResponseHeaders() call or 200 is used as the statusCode in the response
  *
  * @param bytes
  */
-    synchronized def writeIt(byte[] bytes) {
-        def currentReqId = id()
-        log.trace "Wrapper.writeIt(): Writing response($_code) for req #${currentReqId} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
-        if (!_wasClosed) {
-            EventManager.instance().publish(Events.FilterProcessing, [
-                    stream   : this.class.name,
-                    requestId: currentReqId,
-                    message  : "Writing ${bytes.size()} Bytes on stream.close()"])
+	synchronized def writeIt(byte[] bytes) {
+		def currentReqId = id()
+		log.trace "Wrapper.writeIt(): Writing response($_code) for req #${currentReqId} ${requestMethod}( ${requestURI.path} ) size=${bytes.size()}"
+		if (!_wasClosed) {
+			EventManager.instance().publish(Events.FilterProcessing, [
+					stream   : this.class.name,
+					requestId: currentReqId,
+					message  : "Writing ${bytes.size()} Bytes on stream.close()"])
 
-            bytes = new FilterRunner(this.config()).runAfterFilters(this, bytes)
+			bytes = new FilterRunner(this.config()).runAfterFilters(this, bytes)
 
-            def nuHdr = _context.responseHeaders + this.responseHeaders
-            //_context.responseHeaders.putAll this.responseHeaders
-            _context.setResponseHeaders(nuHdr)
-            try {
+			def nuHdr = _context.responseHeaders + this.responseHeaders
+			//_context.responseHeaders.putAll this.responseHeaders
+			_context.setResponseHeaders(nuHdr)
+			try {
 //                log.trace("Read headers wrapper $responseHeaders for req #$currentReqId )")
-                log.trace("Writing headers $nuHdr for req #$currentReqId )")
-                _context.sendResponseHeaders(_code ?: 200, bytes.size())
-                originalOutputStream().write(bytes)
-                log.trace "Wrote response($_code) for req #$currentReqId ) size=${bytes.size()}"
-            } catch (Throwable ex) {
-                log.error "Error writing response($_code) for req #${currentReqId} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}", ex
-                _context.close()
-                _wasClosed = true
-            }
-            // println "Wrote response($_code) for ${requestURI.path} size=${bytes.size()}"
-            originalOutputStream().close()
-            _context.close()
-            _wasClosed = true
-        } else {
-            log.warn "Cannot write: Context already closed for req #$currentReqId ${requestURI.path} size=${bytes.size()}"
+				log.trace("Writing headers $nuHdr for req #$currentReqId )")
+				_context.sendResponseHeaders(_code ?: 200, bytes.size())
+				originalOutputStream().write(bytes)
+				log.trace "Wrote response($_code) for req #$currentReqId ) size=${bytes.size()}"
+			} catch (Throwable ex) {
+				log.error "Error writing response($_code) for req #${currentReqId} ${requestURI.path} size=${bytes.size()} : Exception: ${ex.message}", ex
+				_context.close()
+				_wasClosed = true
+			}
+			// println "Wrote response($_code) for ${requestURI.path} size=${bytes.size()}"
+			originalOutputStream().close()
+			_context.close()
+			_wasClosed = true
+		} else {
+			log.warn "Cannot write: Context already closed for req #$currentReqId ${requestURI.path} size=${bytes.size()}"
 
-            EventManager.instance().publish(Events.FilterProcessing, [
-                    stream   : this.class.name,
-                    requestId: currentReqId,
-                    message  : "Can't Write Bytes - already closed!"])
-        }
-    }// writeIt
+			EventManager.instance().publish(Events.FilterProcessing, [
+					stream   : this.class.name,
+					requestId: currentReqId,
+					message  : "Can't Write Bytes - already closed!"])
+		}
+	}// writeIt
 
-    @Override
-    GServConfig config() {
-        super.config()
-    }
+	@Override
+	GServConfig config() {
+		super.config()
+	}
 
 }//

@@ -29,23 +29,23 @@ import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import spock.lang.Specification
 
 public class ResourceLoaderSpec extends Specification {
-    ResourceLoader resourceLoader
-    ClassLoader classLoader = GServ.classLoader
+	ResourceLoader resourceLoader
+	ClassLoader classLoader = GServ.classLoader
 
-    def "Should load gserv resource list"() {
+	def "Should load gserv resource list"() {
 
-        URI uri = ClassLoader.getSystemResource("test/Resource1.groovy").toURI()
-        def resources
+		URI uri = ClassLoader.getSystemResource("test/Resource1.groovy").toURI()
+		def resources
 
-        when:
-        resourceLoader = new ResourceLoader()
-        resources = resourceLoader.loadResources(new File(uri), [])
+		when:
+		resourceLoader = new ResourceLoader()
+		resources = resourceLoader.loadResources(new File(uri), [])
 
-        then:
-        resources.size() == 1
-        resources[0].basePath == "/hello"
-        resources[0].actions.size() == 2
+		then:
+		resources.size() == 1
+		resources[0].basePath == "/hello"
+		resources[0].actions.size() == 2
 
-    }
+	}
 
 }

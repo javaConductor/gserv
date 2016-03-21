@@ -1,4 +1,3 @@
-
 /*
  *  The MIT License (MIT)
  *
@@ -23,7 +22,7 @@
  *  THE SOFTWARE.
  */
 
-function GServGeneralDocsCtrl($scope){
+function GServGeneralDocsCtrl($scope) {
 
 
 }

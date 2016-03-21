@@ -23,65 +23,66 @@
  */
 
 package io.github.javaconductor.gserv.test
+
 import io.github.javaconductor.gserv.GServ
 import org.junit.Before
 
 public class Stress2Test {
-    def gserv
-    def http
+	def gserv
+	def http
 
-    @Before
-    public final void init() {
-        gserv = new GServ()
-        http = gserv.http {
+	@Before
+	public final void init() {
+		gserv = new GServ()
+		http = gserv.http {
 
-            assert get
-            assert put
-            assert delete
-            assert post
+			assert get
+			assert put
+			assert delete
+			assert post
 
-            get("/:word") { word ->
-                writeJson([word: word, upperCase: word.toUpperCase(), lowerCase: word.toLowerCase()])
-            }
-        }
-        def stopFn
-        Thread.start { stopFn = http.start(10000) }
-        Thread.sleep(200)
-        if (stopFn) stopFn()
-    }
+			get("/:word") { word ->
+				writeJson([word: word, upperCase: word.toUpperCase(), lowerCase: word.toLowerCase()])
+			}
+		}
+		def stopFn
+		Thread.start { stopFn = http.start(10000) }
+		Thread.sleep(200)
+		if (stopFn) stopFn()
+	}
 
 //    @Test
-    public final void testRootPath() {
-        1..1000.times { n ->
+	public final void testRootPath() {
+		1..1000.times { n ->
 
-            http.request(GET, JSON) {
-                uri.port = 10000;
-                uri.path = "/WordsToUpAndLow$n"
-                // uri.query = [ v:'1.0', q: 'Calvin and Hobbes' ]
+			http.request(GET, JSON) {
+				uri.port = 10000;
+				uri.path = "/WordsToUpAndLow$n"
+				// uri.query = [ v:'1.0', q: 'Calvin and Hobbes' ]
 
-                headers.'User-Agent' = 'Mozilla/5.0 Ubuntu/8.10 Firefox/3.0.4'
+				headers.'User-Agent' = 'Mozilla/5.0 Ubuntu/8.10 Firefox/3.0.4'
 
-                // response handler for a success response code:
-                response.success = { resp, json ->
-                    println resp.statusLine
+				// response handler for a success response code:
+				response.success = { resp, json ->
+					println resp.statusLine
 
-                    // parse the JSON response object:
-                    json.responseData.results.each {
-                        println "  ${it.titleNoFormatting} : ${it.visibleUrl}"
-                    }
-                }
+					// parse the JSON response object:
+					json.responseData.results.each {
+						println "  ${it.titleNoFormatting} : ${it.visibleUrl}"
+					}
+				}
 
-                // handler for any failure status code:
-                response.failure = { resp ->
-                    println "Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
-                }
-            }
+				// handler for any failure status code:
+				response.failure = { resp ->
+					println "Unexpected error: ${resp.statusLine.statusCode} : ${resp.statusLine.reasonPhrase}"
+				}
+			}
 
 
-        }
+		}
 
-        assert pat.pathSize() == 1;
-        assert !m.match(pat, new URI("http://acme.com/the_thing/2many"))
-    }
+		assert pat.pathSize() == 1;
+		assert !m.match(pat, new URI("http://acme.com/the_thing/2many"))
+	}
 
 }

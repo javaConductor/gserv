@@ -33,65 +33,65 @@ import io.github.javaconductor.gserv.requesthandler.RequestContext
  */
 class FilterMatcher extends Matcher {
 
-    @Override
-    ResourceAction matchAction(List<ResourceAction> filterList, RequestContext requestContext) {
-        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
-        def ret = filterList.find { p ->
-            def rmethod = p.method()
-            def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
-            def b = (methodOk && match(p, requestContext.requestURI))
-            b
-        }
-        return ret;
-    }
+	@Override
+	ResourceAction matchAction(List<ResourceAction> filterList, RequestContext requestContext) {
+		//loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
+		def ret = filterList.find { p ->
+			def rmethod = p.method()
+			def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
+			def b = (methodOk && match(p, requestContext.requestURI))
+			b
+		}
+		return ret;
+	}
 
-    List<Filter> matchFilters(List<Filter> filterList, RequestContext requestContext) {
-        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
-        def ret = filterList.findAll { p ->
-            def rmethod = p.method()
-            def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
-            def b = (methodOk && match(p, requestContext))
-            b
-        }
-        return ret;
-    }
+	List<Filter> matchFilters(List<Filter> filterList, RequestContext requestContext) {
+		//loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
+		def ret = filterList.findAll { p ->
+			def rmethod = p.method()
+			def methodOk = (rmethod == '*' || rmethod == requestContext.requestMethod)
+			def b = (methodOk && match(p, requestContext))
+			b
+		}
+		return ret;
+	}
 
-    @Override
-    ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method, Map headers) {
+	@Override
+	ResourceAction matchAction(List<ResourceAction> filterList, URI uri, String method, Map headers) {
 
-        //loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
-        def ret = filterList.find { p ->
-            def rmethod = p.method()
-            def methodOk = (rmethod == '*' || rmethod == method)
-            def b = (methodOk && match(p, uri))
-            b
-        }
-        return ret;
-    }
+		//loop thru the actionList calling match(pattern,uri) where the method matches til one returns true then returning that pattern
+		def ret = filterList.find { p ->
+			def rmethod = p.method()
+			def methodOk = (rmethod == '*' || rmethod == method)
+			def b = (methodOk && match(p, uri))
+			b
+		}
+		return ret;
+	}
 
-    /**
-     *
-     * @param filter
-     * @param uri Request URI
-     * @return true if uri matches pattern
-     */
-    @Override
-    boolean match(ResourceAction filter, RequestContext context) {
-        URI uri = context.requestURI
-        def parts = uri.path.split("/")
-        parts = parts.findAll { p -> p }
-        def a = filter.pathSize()
-        // filters w/ empty path matches all
-        if (a == 0)
-            return matchCustomMatcher(context, filter)
-        for (int i = 0; i != filter.pathSize(); ++i) {
-            if (filter.path(i).text() == '**')
-                return matchCustomMatcher(context, filter)
-            def ans = (filter.path(i).text() == '*') || matchActionPathSegment(filter.path(i), parts[i])
-            if (!ans)
-                return false;
-        }
-        return matchCustomMatcher(context, filter)
-    }
+	/**
+	 *
+	 * @param filter
+	 * @param uri Request URI
+	 * @return true if uri matches pattern
+	 */
+	@Override
+	boolean match(ResourceAction filter, RequestContext context) {
+		URI uri = context.requestURI
+		def parts = uri.path.split("/")
+		parts = parts.findAll { p -> p }
+		def a = filter.pathSize()
+		// filters w/ empty path matches all
+		if (a == 0)
+			return matchCustomMatcher(context, filter)
+		for (int i = 0; i != filter.pathSize(); ++i) {
+			if (filter.path(i).text() == '**')
+				return matchCustomMatcher(context, filter)
+			def ans = (filter.path(i).text() == '*') || matchActionPathSegment(filter.path(i), parts[i])
+			if (!ans)
+				return false;
+		}
+		return matchCustomMatcher(context, filter)
+	}
 
 }

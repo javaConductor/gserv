@@ -28,10 +28,10 @@ package io.github.javaconductor.gserv.exceptions
  * Created by lcollins on 5/4/2015.
  */
 class HttpErrorException extends Exception {
-    def httpStatusCode
+	def httpStatusCode
 
-    HttpErrorException(int httpStatusCode, String message) {
-        super(message)
-        this.httpStatusCode = httpStatusCode
-    }
+	HttpErrorException(int httpStatusCode, String message) {
+		super(message)
+		this.httpStatusCode = httpStatusCode
+	}
 }

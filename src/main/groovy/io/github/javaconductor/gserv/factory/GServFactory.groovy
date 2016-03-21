@@ -1,5 +1,3 @@
-
-
 /*
  *  The MIT License (MIT)
  *
@@ -46,250 +44,250 @@ import io.github.javaconductor.gserv.server.gServHttpsInstance
 @Slf4j
 class GServFactory {
 
-    GServConfig createGServConfig() {
-        new GServConfig()
-    }
+	GServConfig createGServConfig() {
+		new GServConfig()
+	}
 
-    GServConfig createGServConfig(actions) {
-        new GServConfig().addActions(actions)
-    }
+	GServConfig createGServConfig(actions) {
+		new GServConfig().addActions(actions)
+	}
 
-    GServConfig createGServConfig(GServConfig orig) {
-        orig.clone()
-    }
+	GServConfig createGServConfig(GServConfig orig) {
+		orig.clone()
+	}
 
-    GServInstance createHttpInstance(GServConfig cfg) {
-        log.debug("$cfg is ${(cfg.https()) ? 'HTTPS' : 'HTTP'}")
-        if (!cfg.httpsConfig() && cfg.https()) {
-            throw new IllegalStateException("HTTPS configuration is required in ServerConfig!")
-        }
-        cfg.https() ? new gServHttpsInstance(cfg)
-                : new GServInstance(cfg)
-    }
+	GServInstance createHttpInstance(GServConfig cfg) {
+		log.debug("$cfg is ${(cfg.https()) ? 'HTTPS' : 'HTTP'}")
+		if (!cfg.httpsConfig() && cfg.https()) {
+			throw new IllegalStateException("HTTPS configuration is required in ServerConfig!")
+		}
+		cfg.https() ? new gServHttpsInstance(cfg)
+				: new GServInstance(cfg)
+	}
 
-    /**
-     * Parses a gserv Config file
-     *
-     * @param cfgFile
-     * @return GServConfig instances that were created from the parsing.
-     */
-    List<GServConfig> createConfigs(File cfgFile) {
-        assert cfgFile
-        try {
-            return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
-        } catch (Exception ex) {
-            log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
-            throw ex;
-        }
-    }//createConfigs
+	/**
+	 * Parses a gserv Config file
+	 *
+	 * @param cfgFile
+	 * @return GServConfig instances that were created from the parsing.
+	 */
+	List<GServConfig> createConfigs(File cfgFile) {
+		assert cfgFile
+		try {
+			return new GServConfigFile().parse(cfgFile);// also assembles the httpsConfig
+		} catch (Exception ex) {
+			log.error("Could not create application from configuration file: ${cfgFile.absolutePath}", ex)
+			throw ex;
+		}
+	}//createConfigs
 
-    /**
-     * Creates a gserv Config
-     *
-     * @param staticRoot
-     * @param port
-     * @param defaultResource
-     * @param instanceScript
-     * @param resourceScripts
-     * @return list of configs (containing one config)
-     */
-    List<GServConfig> createConfigs(String staticRoot, String bindAddress,
-                                    int port, String defaultResource, String instanceScript,
-                                    List<String> resourceScripts,
-                                    int maxThreads,
-                                    boolean statusPage,
-                                    String statusPath,
-                                    String appPropertiesFile,
-                                    List<String> classpath,
-                                    displayName = "gServ Application") {
-        GServConfig cfg
-        def resources = []
-        ResourceLoader resourceLoader = new ResourceLoader()
-        ScriptLoader scriptLoader = new ScriptLoader()
+	/**
+	 * Creates a gserv Config
+	 *
+	 * @param staticRoot
+	 * @param port
+	 * @param defaultResource
+	 * @param instanceScript
+	 * @param resourceScripts
+	 * @return list of configs (containing one config)
+	 */
+	List<GServConfig> createConfigs(String staticRoot, String bindAddress,
+									int port, String defaultResource, String instanceScript,
+									List<String> resourceScripts,
+									int maxThreads,
+									boolean statusPage,
+									String statusPath,
+									String appPropertiesFile,
+									List<String> classpath,
+									displayName = "gServ Application") {
+		GServConfig cfg
+		def resources = []
+		ResourceLoader resourceLoader = new ResourceLoader()
+		ScriptLoader scriptLoader = new ScriptLoader()
 
-        try {
-            /// if there is an instance script then use it to create the config
-            if (instanceScript) {
-                cfg = resourceLoader.loadInstanceConfig(new File(instanceScript), classpath)
-            }
-            // if we didn't get one from the instance then create one
-            cfg = cfg ?: createGServConfig()
-            // if there are resoucrs scripts - load them
-            if (resourceScripts) {
-                resources = scriptLoader.loadResources(resourceScripts, classpath)
-            }
-        } catch (Throwable ex) {
-            log.error("Could not load resource script: ${ex.message}")
-            println ex.message
-            throw ex
-        }
+		try {
+			/// if there is an instance script then use it to create the config
+			if (instanceScript) {
+				cfg = resourceLoader.loadInstanceConfig(new File(instanceScript), classpath)
+			}
+			// if we didn't get one from the instance then create one
+			cfg = cfg ?: createGServConfig()
+			// if there are resoucrs scripts - load them
+			if (resourceScripts) {
+				resources = scriptLoader.loadResources(resourceScripts, classpath)
+			}
+		} catch (Throwable ex) {
+			log.error("Could not load resource script: ${ex.message}")
+			println ex.message
+			throw ex
+		}
 
-        createConfigs(staticRoot, bindAddress, port, defaultResource,
-                cfg, resources, maxThreads, statusPage, statusPath, appPropertiesFile, classpath, displayName)
+		createConfigs(staticRoot, bindAddress, port, defaultResource,
+				cfg, resources, maxThreads, statusPage, statusPath, appPropertiesFile, classpath, displayName)
 
-    }//createConfigs
+	}//createConfigs
 
-    GServInstance createInstance(String staticRoot, String bindAddress,
-                                 int port, String defaultResource, String instanceScript,
-                                 List<String> resourceScripts,
-                                 int maxThreads,
-                                 boolean statusPage,
-                                 String statusPath,
-                                String appPropertiesFilename,
-                                 List<String> classpath,
-                                 displayName = "gServ Application") {
-        GServConfig cfg
-        ResourceLoader resourceLoader = new ResourceLoader()
-        ScriptLoader scriptLoader = new ScriptLoader()
+	GServInstance createInstance(String staticRoot, String bindAddress,
+								 int port, String defaultResource, String instanceScript,
+								 List<String> resourceScripts,
+								 int maxThreads,
+								 boolean statusPage,
+								 String statusPath,
+								 String appPropertiesFilename,
+								 List<String> classpath,
+								 displayName = "gServ Application") {
+		GServConfig cfg
+		ResourceLoader resourceLoader = new ResourceLoader()
+		ScriptLoader scriptLoader = new ScriptLoader()
 
-        try {
-            /// if there is an instance script then use it to create the config
-            File f = new File( instanceScript )
-            GServInstance instance = resourceLoader.loadInstance(f, classpath)
-            log.debug("Loaded instance ${instance.config().name()} from script: ${f.absolutePath}")
-            instance.config().port(port)
-            if ( resourceScripts ) {
-                def resources = scriptLoader.loadResources(resourceScripts, classpath)
-                log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScripts*.toString()}")
-                instance.config().addResources(resources)
-            }
+		try {
+			/// if there is an instance script then use it to create the config
+			File f = new File(instanceScript)
+			GServInstance instance = resourceLoader.loadInstance(f, classpath)
+			log.debug("Loaded instance ${instance.config().name()} from script: ${f.absolutePath}")
+			instance.config().port(port)
+			if (resourceScripts) {
+				def resources = scriptLoader.loadResources(resourceScripts, classpath)
+				log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScripts*.toString()}")
+				instance.config().addResources(resources)
+			}
 
-            if ( staticRoot ) {
-                instance.config().addStaticRoots([staticRoot])
-            }
+			if (staticRoot) {
+				instance.config().addStaticRoots([staticRoot])
+			}
 
-            if (bindAddress) {
-                instance.config().bindAddress(new InetSocketAddress(bindAddress, port))
-            }
+			if (bindAddress) {
+				instance.config().bindAddress(new InetSocketAddress(bindAddress, port))
+			}
 
-            if (maxThreads) {
-                instance.config().maxThreads(maxThreads)
-            }
+			if (maxThreads) {
+				instance.config().maxThreads(maxThreads)
+			}
 
-            if (defaultResource) {
-                instance.config().defaultResource(defaultResource)
-            }
+			if (defaultResource) {
+				instance.config().defaultResource(defaultResource)
+			}
 
-            if (statusPage) {
-                instance.config().statusPage(statusPage)
-                if (statusPath)
-                    instance.config().statusPath(statusPath)
-            }
-            if (displayName) {
-                instance.config().name(displayName)
-            }
+			if (statusPage) {
+				instance.config().statusPage(statusPage)
+				if (statusPath)
+					instance.config().statusPath(statusPath)
+			}
+			if (displayName) {
+				instance.config().name(displayName)
+			}
 
-            if (appPropertiesFilename) {
-                File fProps = new File(appPropertiesFilename);
-                instance.config().appPropertyFile( fProps )
-            }
-            instance
-            // if we didn't get one from the instance then create one
-        } catch (Throwable ex) {
-            log.error("Could not load resource script: ${ex.message}")
-            println ex.message
-            throw ex
-        }
+			if (appPropertiesFilename) {
+				File fProps = new File(appPropertiesFilename);
+				instance.config().appPropertyFile(fProps)
+			}
+			instance
+			// if we didn't get one from the instance then create one
+		} catch (Throwable ex) {
+			log.error("Could not load resource script: ${ex.message}")
+			println ex.message
+			throw ex
+		}
 
-    }//createInstance
+	}//createInstance
 
-    /**
-     * Creates a gserv Config
-     *
-     * @param staticRoot
-     * @param port
-     * @param defaultResource
-     * @param cfg GServConfig
-     * @param resources List<GServResource>
-     * @return list of configs (containing one config)
-     */
-    def createConfigs(String staticRoot, String bindAddress,
-                      int port, String defaultResource,
-                      GServConfig cfg, List<GServResource> resources,
-                      int maxThreads,
-                      boolean statusPage,
-                      String statusPath,
-                      String appPropertiesFilename,
-                      List<String> classpath, displayName = "gServ Application") {
-        cfg = cfg ?: createGServConfig()
-        if (resources) {
-            cfg.addResources(resources)
-        }
-        if (staticRoot) {
-            cfg.addStaticRoots([staticRoot])
-        }
+	/**
+	 * Creates a gserv Config
+	 *
+	 * @param staticRoot
+	 * @param port
+	 * @param defaultResource
+	 * @param cfg GServConfig
+	 * @param resources List<GServResource>
+	 * @return list of configs (containing one config)
+	 */
+	def createConfigs(String staticRoot, String bindAddress,
+					  int port, String defaultResource,
+					  GServConfig cfg, List<GServResource> resources,
+					  int maxThreads,
+					  boolean statusPage,
+					  String statusPath,
+					  String appPropertiesFilename,
+					  List<String> classpath, displayName = "gServ Application") {
+		cfg = cfg ?: createGServConfig()
+		if (resources) {
+			cfg.addResources(resources)
+		}
+		if (staticRoot) {
+			cfg.addStaticRoots([staticRoot])
+		}
 
-        if (defaultResource) {
-            cfg.defaultResource(defaultResource)
-        }
+		if (defaultResource) {
+			cfg.defaultResource(defaultResource)
+		}
 
-        if (bindAddress) {
-            def addr = InetAddress.getByName(bindAddress);
-            def socketAddr = new InetSocketAddress(addr, port);
-            cfg.bindAddress(socketAddr);
-        }
+		if (bindAddress) {
+			def addr = InetAddress.getByName(bindAddress);
+			def socketAddr = new InetSocketAddress(addr, port);
+			cfg.bindAddress(socketAddr);
+		}
 
-        if (displayName) {
-            cfg.name(displayName)
-        }
+		if (displayName) {
+			cfg.name(displayName)
+		}
 
-        if (maxThreads) {
-            cfg.maxThreads(maxThreads)
-        }
+		if (maxThreads) {
+			cfg.maxThreads(maxThreads)
+		}
 
-        if (appPropertiesFilename) {
-            File f = new File(appPropertiesFilename);
-            cfg.appPropertyFile( f )
-        }
+		if (appPropertiesFilename) {
+			File f = new File(appPropertiesFilename);
+			cfg.appPropertyFile(f)
+		}
 
-        cfg.statusPath(statusPath)
-        cfg.statusPage(statusPage)
+		cfg.statusPath(statusPath)
+		cfg.statusPage(statusPage)
 
-        [cfg
-                 .port(port)
-        ];
+		[cfg
+				 .port(port)
+		];
 
-    }//createConfigs
+	}//createConfigs
 
-    RequestContext createRequestContext(GServConfig config, HttpExchange httpExchange) {
-        new Jdk16RequestContext(config, httpExchange);
-    }
+	RequestContext createRequestContext(GServConfig config, HttpExchange httpExchange) {
+		new Jdk16RequestContext(config, httpExchange);
+	}
 
-    @Deprecated
-    RequestContext createRequestContext(String method, URI uri, Map headers) {
-        def context = new AbstractRequestContext(null) {
-            boolean closed = false
+	@Deprecated
+	RequestContext createRequestContext(String method, URI uri, Map headers) {
+		def context = new AbstractRequestContext(null) {
+			boolean closed = false
 
-            @Override
-            void setResponseHeaders(Map<String, List> responseHeaders) {
+			@Override
+			void setResponseHeaders(Map<String, List> responseHeaders) {
 
-            }
+			}
 
-            @Override
-            void sendResponseHeaders(int responseCode, long size) {
+			@Override
+			void sendResponseHeaders(int responseCode, long size) {
 
-            }
+			}
 
-            @Override
-            def close() {
-                closed = true
-                return null
-            }
+			@Override
+			def close() {
+				closed = true
+				return null
+			}
 
-            @Override
-            def isClosed() {
-                return closed
-            }
+			@Override
+			def isClosed() {
+				return closed
+			}
 
-            @Override
-            def setStreams(InputStream is, OutputStream os) {
-                return null
-            }
-        }
-        context.requestHeaders = headers
-        context.requestURI = uri
-        context.requestMethod = method
-        context
-    }
+			@Override
+			def setStreams(InputStream is, OutputStream os) {
+				return null
+			}
+		}
+		context.requestHeaders = headers
+		context.requestURI = uri
+		context.requestMethod = method
+		context
+	}
 
 }

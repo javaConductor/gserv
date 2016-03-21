@@ -2,7 +2,6 @@
 // Button groups
 // --------------------------------------------------
 
-
 // Make the div behave like a button
 .btn-group {
   position: relative;
@@ -36,9 +35,11 @@
   position: relative;
   @include border-radius(0);
 }
+
 .btn-group > .btn + .btn {
   margin-left: -1px;
 }
+
 .btn-group > .btn,
 .btn-group > .dropdown-menu,
 .btn-group > .popover {
@@ -49,9 +50,11 @@
 .btn-group > .btn-mini {
   font-size: $fontSizeMini;
 }
+
 .btn-group > .btn-small {
   font-size: $fontSizeSmall;
 }
+
 .btn-group > .btn-large {
   font-size: $fontSizeLarge;
 }
@@ -62,18 +65,21 @@
   @include border-top-left-radius($baseBorderRadius);
   @include border-bottom-left-radius($baseBorderRadius);
 }
+
 // Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it
 .btn-group > .btn:last-child,
 .btn-group > .dropdown-toggle {
   @include border-top-right-radius($baseBorderRadius);
   @include border-bottom-right-radius($baseBorderRadius);
 }
+
 // Reset corners for large buttons
 .btn-group > .btn.large:first-child {
   margin-left: 0;
   @include border-top-left-radius($borderRadiusLarge);
   @include border-bottom-left-radius($borderRadiusLarge);
 }
+
 .btn-group > .btn.large:last-child,
 .btn-group > .large.dropdown-toggle {
   @include border-top-right-radius($borderRadiusLarge);
@@ -94,8 +100,6 @@
   outline: 0;
 }
 
-
-
 // Split button dropdowns
 // ----------------------
 
@@ -103,20 +107,23 @@
 .btn-group > .btn + .dropdown-toggle {
   padding-left: 8px;
   padding-right: 8px;
-  @include box-shadow(inset 1px 0 0 rgba(255,255,255,.125), inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05));
+  @include box-shadow(inset 1px 0 0 rgba(255, 255, 255, .125), inset 0 1px 0 rgba(255, 255, 255, .2), 0 1px 2px rgba(0, 0, 0, .05));
   *padding-top: 5px;
   *padding-bottom: 5px;
 }
+
 .btn-group > .btn-mini + .dropdown-toggle {
   padding-left: 5px;
   padding-right: 5px;
   *padding-top: 2px;
   *padding-bottom: 2px;
 }
+
 .btn-group > .btn-small + .dropdown-toggle {
   *padding-top: 5px;
   *padding-bottom: 4px;
 }
+
 .btn-group > .btn-large + .dropdown-toggle {
   padding-left: 12px;
   padding-right: 12px;
@@ -130,7 +137,7 @@
   // Remove the gradient and set the same inset shadow as the :active state
   .dropdown-toggle {
     background-image: none;
-    @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
+    @include box-shadow(inset 0 2px 4px rgba(0, 0, 0, .15), 0 1px 2px rgba(0, 0, 0, .05));
   }
 
   // Keep the hover's background when dropdown is open
@@ -157,31 +164,32 @@
   }
 }
 
-
 // Reposition the caret
 .btn .caret {
   margin-top: 8px;
   margin-left: 0;
 }
+
 // Carets in other button sizes
 .btn-large .caret {
   margin-top: 6px;
 }
+
 .btn-large .caret {
-  border-left-width:  5px;
+  border-left-width: 5px;
   border-right-width: 5px;
-  border-top-width:   5px;
+  border-top-width: 5px;
 }
+
 .btn-mini .caret,
 .btn-small .caret {
   margin-top: 8px;
 }
+
 // Upside down carets for .dropup
 .dropup .btn-large .caret {
   border-bottom-width: 5px;
 }
-
-
 
 // Account for other colors
 .btn-primary,
@@ -196,8 +204,6 @@
   }
 }
 
-
-
 // Vertical button groups
 // ----------------------
 
@@ -205,25 +211,31 @@
   display: inline-block; // makes buttons only take up the width they need
   @include ie7-inline-block();
 }
+
 .btn-group-vertical > .btn {
   display: block;
   float: none;
   max-width: 100%;
   @include border-radius(0);
 }
+
 .btn-group-vertical > .btn + .btn {
   margin-left: 0;
   margin-top: -1px;
 }
+
 .btn-group-vertical > .btn:first-child {
   @include border-radius($baseBorderRadius $baseBorderRadius 0 0);
 }
+
 .btn-group-vertical > .btn:last-child {
   @include border-radius(0 0 $baseBorderRadius $baseBorderRadius);
 }
+
 .btn-group-vertical > .btn-large:first-child {
   @include border-radius($borderRadiusLarge $borderRadiusLarge 0 0);
 }
+
 .btn-group-vertical > .btn-large:last-child {
   @include border-radius(0 0 $borderRadiusLarge $borderRadiusLarge);
 }

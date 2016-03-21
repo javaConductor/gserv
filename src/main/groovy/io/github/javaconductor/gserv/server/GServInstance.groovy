@@ -51,301 +51,301 @@ import java.security.KeyStore
  */
 @Slf4j
 class GServInstance {
-    protected def _authenticator
-    protected com.sun.net.httpserver.HttpHandler _handler
-    protected def _executor
-    protected def _filters
-    protected def _templateEngineName;
-    protected GServConfig _cfg;
-    def mbean
-    static def requestId = 1L;
+	protected def _authenticator
+	protected com.sun.net.httpserver.HttpHandler _handler
+	protected def _executor
+	protected def _filters
+	protected def _templateEngineName;
+	protected GServConfig _cfg;
+	def mbean
+	static def requestId = 1L;
 
-    /**
-     *
-     * @param cfg
-     * @return
-     */
-    def GServInstance(cfg) {
-        _cfg = cfg
-        _authenticator = cfg.authenticator();
-        _filters = cfg.filters();
-        _templateEngineName = cfg.templateEngineName();
-    }
+	/**
+	 *
+	 * @param cfg
+	 * @return
+	 */
+	def GServInstance(cfg) {
+		_cfg = cfg
+		_authenticator = cfg.authenticator();
+		_filters = cfg.filters();
+		_templateEngineName = cfg.templateEngineName();
+	}
 
-    /**
-     *
-     * @param actualPort
-     * @param jmxBean
-     * @return
-     */
-    def exportMBean(actualPort, jmxBean) {
+	/**
+	 *
+	 * @param actualPort
+	 * @param jmxBean
+	 * @return
+	 */
+	def exportMBean(actualPort, jmxBean) {
 
-        System.properties.put('com.sun.management.jmxremote.ssl', true);
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
-        JmxBuilder jmx = new JmxBuilder(mbs)
-        def connection = jmx.server(port: 8090)
+		System.properties.put('com.sun.management.jmxremote.ssl', true);
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
+		JmxBuilder jmx = new JmxBuilder(mbs)
+		def connection = jmx.server(port: 8090)
 
-        def beans = jmx.export(policy: "replace") {
-            bean(
-                    target: jmxBean,
-                    name: name
-            )
-        }
+		def beans = jmx.export(policy: "replace") {
+			bean(
+					target: jmxBean,
+					name: name
+			)
+		}
 
-        this.mbean = (GroovyMBean) beans[0]
-        this.mbean
-    }
+		this.mbean = (GroovyMBean) beans[0]
+		this.mbean
+	}
 
-    /**
-     *
-     * @return
-     */
-    def createInitFilter() {
-        def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { requestContext, args ->
-            def requestId = requestContext.id()
-            log.trace("initFilter(#${requestId} context: $requestContext")
-            /// here we should check for a blank file name
-            /// if file name is blank and we have a defaultResource then we use that.
-            URI uri = applyDefaultResourceToURI(config().defaultResource(),
-                    requestContext.requestURI);
+	/**
+	 *
+	 * @return
+	 */
+	def createInitFilter() {
+		def initFilter = ResourceActionFactory.createBeforeFilter("gServInit", "*", "/*", [:], -1) { requestContext, args ->
+			def requestId = requestContext.id()
+			log.trace("initFilter(#${requestId} context: $requestContext")
+			/// here we should check for a blank file name
+			/// if file name is blank and we have a defaultResource then we use that.
+			URI uri = applyDefaultResourceToURI(config().defaultResource(),
+					requestContext.requestURI);
 
-            // wrap the Context
-            RequestContext rc = new RequestContextWrapper(requestContext)
-            rc.requestURI = uri
-            rc.setAttribute(GServ.contextAttributes.postProcessList, [])
-            rc.setStreams(rc.requestBody, new ByteArrayOutputStream())
-            rc
-        }
-        initFilter
-    }
+			// wrap the Context
+			RequestContext rc = new RequestContextWrapper(requestContext)
+			rc.requestURI = uri
+			rc.setAttribute(GServ.contextAttributes.postProcessList, [])
+			rc.setStreams(rc.requestBody, new ByteArrayOutputStream())
+			rc
+		}
+		initFilter
+	}
 
-    /**
-     *
-     * @return The Status Filter
-     */
-    Filter createStatusFilter() {
-        new StatisticsMgr().createStatusFilter(_cfg)
-    }
+	/**
+	 *
+	 * @return The Status Filter
+	 */
+	Filter createStatusFilter() {
+		new StatisticsMgr().createStatusFilter(_cfg)
+	}
 
-    /**
-     *
-     * @return The AppProperties Filter
-     */
-    Filter createAppPropertiesFilter( String path, File propFile ) {
-        def filter = ResourceActionFactory.createBeforeFilter("appPropertiesDoc", "GET", path, [:], -1) { requestContext, args ->
-            def requestId = requestContext.id()
-            log.debug("createAppPropertiesFilter(#${requestId} context: $requestContext")
-            sendFile( propFile )
-            //writeJson( [propFile : "xyz"] )
-            done()
-        }
-        return filter
-    }
+	/**
+	 *
+	 * @return The AppProperties Filter
+	 */
+	Filter createAppPropertiesFilter(String path, File propFile) {
+		def filter = ResourceActionFactory.createBeforeFilter("appPropertiesDoc", "GET", path, [:], -1) { requestContext, args ->
+			def requestId = requestContext.id()
+			log.debug("createAppPropertiesFilter(#${requestId} context: $requestContext")
+			sendFile(propFile)
+			//writeJson( [propFile : "xyz"] )
+			done()
+		}
+		return filter
+	}
 
-    /**
-     * This method will start the server on 'port'.
-     *
-     * @param port
-     * @return Function to close the server
-     */
-    def start(port = null) {
-        def actualPort = (port ?: _cfg.port())
-        def handler = new GServHandler(_cfg);
+	/**
+	 * This method will start the server on 'port'.
+	 *
+	 * @param port
+	 * @return Function to close the server
+	 */
+	def start(port = null) {
+		def actualPort = (port ?: _cfg.port())
+		def handler = new GServHandler(_cfg);
 
-        exportMBean(actualPort,
-                new GServJMX()
-        );
+		exportMBean(actualPort,
+				new GServJMX()
+		);
 
-        ///// Underlying Server Impl -
-        HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
-        HttpContext context = server.createContext("/", handler);
+		///// Underlying Server Impl -
+		HttpServer server = HttpServer.create((_cfg.bindAddress() ?: new InetSocketAddress(actualPort as Integer)), actualPort as Integer);
+		HttpContext context = server.createContext("/", handler);
 
-        ////////////////////////////////
-        /// create and add the InitFilter
-        ////////////////////////////////
-        def initFilter = createInitFilter()
-        _filters = _filters ?: []
-        _filters.add(initFilter);
+		////////////////////////////////
+		/// create and add the InitFilter
+		////////////////////////////////
+		def initFilter = createInitFilter()
+		_filters = _filters ?: []
+		_filters.add(initFilter);
 
-        ////////////////////////////////
-        /// create and add the StatusFilter
-        ////////////////////////////////
-        if (_cfg.statusPage()) {
-            _filters.add(createStatusFilter())
-        }
+		////////////////////////////////
+		/// create and add the StatusFilter
+		////////////////////////////////
+		if (_cfg.statusPage()) {
+			_filters.add(createStatusFilter())
+		}
 
-        ////////////////////////////////
-        /// create and add propertiesFileFilter
-        ////////////////////////////////
-        if (_cfg.appPropertyFile()) {
-            _filters.add(createAppPropertiesFilter(
-                    _cfg.appPropertyPath(),
-                    _cfg.appPropertyFile()))
-        }
+		////////////////////////////////
+		/// create and add propertiesFileFilter
+		////////////////////////////////
+		if (_cfg.appPropertyFile()) {
+			_filters.add(createAppPropertiesFilter(
+					_cfg.appPropertyPath(),
+					_cfg.appPropertyFile()))
+		}
 
-        _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
-        context.authenticator = _authenticator;
-        server.executor = _executor;
-        def appName = _cfg.name() ?: "gserv"
+		_cfg._filters = _filters.sort({ a, b -> a.order - b.order })
+		context.authenticator = _authenticator;
+		server.executor = _executor;
+		def appName = _cfg.name() ?: "gserv"
 
-        def bindStr = bindAddrString(_cfg.bindAddress())
-        if (bindStr)
-            println "$appName starting HTTP ${bindStr}"
-        else
-            println "$appName starting HTTP on port ${server.address.port}"
+		def bindStr = bindAddrString(_cfg.bindAddress())
+		if (bindStr)
+			println "$appName starting HTTP ${bindStr}"
+		else
+			println "$appName starting HTTP on port ${server.address.port}"
 
-        EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
-        Thread.start {
-            server.start();
-        }
-        return ({ ->
-            server.stop(0);
-        });
-    };
+		EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
+		Thread.start {
+			server.start();
+		}
+		return ({ ->
+			server.stop(0);
+		});
+	};
 
-    /**
-     *
-     * @param bindAddress
-     * @return
-     */
-    def bindAddrString(bindAddress) {
-        (bindAddress && !bindAddress.toString().contains("0:0:0:0")) ? "bound to ${bindAddress.toString().substring(1)} " : ""
-    }
+	/**
+	 *
+	 * @param bindAddress
+	 * @return
+	 */
+	def bindAddrString(bindAddress) {
+		(bindAddress && !bindAddress.toString().contains("0:0:0:0")) ? "bound to ${bindAddress.toString().substring(1)} " : ""
+	}
 
-    /**
-     *
-     * @return
-     */
-    GServConfig config() {
-        return _cfg;
-    }
+	/**
+	 *
+	 * @return
+	 */
+	GServConfig config() {
+		return _cfg;
+	}
 
-    /**
-     * Takes a URI pointing to the  root and returns a URI pointing to the defaultResource
-     *
-     * @param defaultResource
-     * @param uri
-     * @return
-     */
-    URI applyDefaultResourceToURI(defaultResource, uri) {
-        if (!defaultResource || (!(uri.path == '/')))
-            return uri;
+	/**
+	 * Takes a URI pointing to the  root and returns a URI pointing to the defaultResource
+	 *
+	 * @param defaultResource
+	 * @param uri
+	 * @return
+	 */
+	URI applyDefaultResourceToURI(defaultResource, uri) {
+		if (!defaultResource || (!(uri.path == '/')))
+			return uri;
 
-        new URI(
-                uri.scheme, uri.userInfo, uri.host,
-                uri.port, config().defaultResource(),
-                uri.query, uri.fragment);
-    }
+		new URI(
+				uri.scheme, uri.userInfo, uri.host,
+				uri.port, config().defaultResource(),
+				uri.query, uri.fragment);
+	}
 
 }
 
 @Slf4j
 class gServHttpsInstance extends GServInstance {
 
-    gServHttpsInstance(cfg) {
-        super(cfg)
-        if (!cfg.https())
-            throw new IllegalArgumentException("HTTPS must be configured for this Instance.")
-    }
+	gServHttpsInstance(cfg) {
+		super(cfg)
+		if (!cfg.https())
+			throw new IllegalArgumentException("HTTPS must be configured for this Instance.")
+	}
 
-    /**
-     * This method will start the server on 'port'.
-     *
-     * @param port
-     */
-    def start(port = null) {
-        def actualPort = (port ?: _cfg.port())
-        def handler = new GServHandler(_cfg);
+	/**
+	 * This method will start the server on 'port'.
+	 *
+	 * @param port
+	 */
+	def start(port = null) {
+		def actualPort = (port ?: _cfg.port())
+		def handler = new GServHandler(_cfg);
 
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
-        GServJMX mbean = new GServJMX();
-        mbs.registerMBean(mbean, name);
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		ObjectName name = new ObjectName("com.gserv.$actualPort:type=GServJMX");
+		GServJMX mbean = new GServJMX();
+		mbs.registerMBean(mbean, name);
 
-        def httpsConfig = this._cfg.httpsConfig()
-        assert (httpsConfig.password)
-        def keyManagerAlgorithm = httpsConfig.keyManagerAlgorithm ?: "SunX509"
-        def trustManagerAlgorithm = httpsConfig.trustManagerAlgorithm ?: "SunX509"
-        def keyStoreFilePath = httpsConfig.keyStoreFilePath ?: (System.getProperty("user.home") + "/gserv.keystore")
-        def keyStoreImplementation = httpsConfig.keyStoreImplementation ?: "JKS"
-        def sslProtocol = httpsConfig.sslProtocol ?: "TLS"
-        def httpsPassword = httpsConfig.password
-        def server = HttpsServer.create(new InetSocketAddress(actualPort as Integer), 0);
-        SSLContext sslContext = SSLContext.getInstance(sslProtocol);
+		def httpsConfig = this._cfg.httpsConfig()
+		assert (httpsConfig.password)
+		def keyManagerAlgorithm = httpsConfig.keyManagerAlgorithm ?: "SunX509"
+		def trustManagerAlgorithm = httpsConfig.trustManagerAlgorithm ?: "SunX509"
+		def keyStoreFilePath = httpsConfig.keyStoreFilePath ?: (System.getProperty("user.home") + "/gserv.keystore")
+		def keyStoreImplementation = httpsConfig.keyStoreImplementation ?: "JKS"
+		def sslProtocol = httpsConfig.sslProtocol ?: "TLS"
+		def httpsPassword = httpsConfig.password
+		def server = HttpsServer.create(new InetSocketAddress(actualPort as Integer), 0);
+		SSLContext sslContext = SSLContext.getInstance(sslProtocol);
 
-        // initialise the keystore
-        char[] password = httpsPassword.toCharArray();
-        KeyStore ks = KeyStore.getInstance(keyStoreImplementation);
-        FileInputStream fis = new FileInputStream(keyStoreFilePath);
-        ks.load(fis, password);
+		// initialise the keystore
+		char[] password = httpsPassword.toCharArray();
+		KeyStore ks = KeyStore.getInstance(keyStoreImplementation);
+		FileInputStream fis = new FileInputStream(keyStoreFilePath);
+		ks.load(fis, password);
 
-        // setup the key manager factory
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManagerAlgorithm);
-        kmf.init(ks, password);
+		// setup the key manager factory
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManagerAlgorithm);
+		kmf.init(ks, password);
 
-        // setup the trust manager factory
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(trustManagerAlgorithm);
-        tmf.init(ks);
+		// setup the trust manager factory
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance(trustManagerAlgorithm);
+		tmf.init(ks);
 
-        // setup the HTTPS context and parameters
-        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		// setup the HTTPS context and parameters
+		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-        server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext) {
+		server.setHttpsConfigurator(new com.sun.net.httpserver.HttpsConfigurator(sslContext) {
 
-            @Override
-            void configure(com.sun.net.httpserver.HttpsParameters params) {
-                log.info("HTTPSConfigurator.onConfigure($params) - handling");
-                try {
-                    // initialise the SSL context
-                    SSLContext c = sslContext;//.getDefault();
-                    SSLEngine engine = c.createSSLEngine();
-                    params.setNeedClientAuth(false);
-                    params.setCipherSuites(engine.getEnabledCipherSuites());
-                    params.setProtocols(engine.getEnabledProtocols());
+			@Override
+			void configure(com.sun.net.httpserver.HttpsParameters params) {
+				log.info("HTTPSConfigurator.onConfigure($params) - handling");
+				try {
+					// initialise the SSL context
+					SSLContext c = sslContext;//.getDefault();
+					SSLEngine engine = c.createSSLEngine();
+					params.setNeedClientAuth(false);
+					params.setCipherSuites(engine.getEnabledCipherSuites());
+					params.setProtocols(engine.getEnabledProtocols());
 
-                    // get the default parameters
-                    SSLParameters defaultSSLParameters = c.getDefaultSSLParameters();
-                    params.setSSLParameters(defaultSSLParameters);
-                    super.configure(params)
-                }
-                catch (Exception ex) {
-                    log.error("Failed to create HTTPS port: ", ex);
-                } finally {
-                    log.info("HTTPSConfigurator.onConfigure($params) - handled!");
-                }
-            }
-        });
-        def context = server.createContext("/", handler);
+					// get the default parameters
+					SSLParameters defaultSSLParameters = c.getDefaultSSLParameters();
+					params.setSSLParameters(defaultSSLParameters);
+					super.configure(params)
+				}
+				catch (Exception ex) {
+					log.error("Failed to create HTTPS port: ", ex);
+				} finally {
+					log.info("HTTPSConfigurator.onConfigure($params) - handled!");
+				}
+			}
+		});
+		def context = server.createContext("/", handler);
 
-        ////////////////////////////////
-        /// create and add the InitFilter
-        ////////////////////////////////
-        def initFilter = createInitFilter()
+		////////////////////////////////
+		/// create and add the InitFilter
+		////////////////////////////////
+		def initFilter = createInitFilter()
 
-        _filters = _filters ?: []
-        _filters.add(initFilter);
-        //TODO ADD Status Filter
-        /// If  (_cfg .statusPage)  then create/add StatusFilter
-        // _filters.add ( createStatusFilter( cfg, statusPath) )
+		_filters = _filters ?: []
+		_filters.add(initFilter);
+		//TODO ADD Status Filter
+		/// If  (_cfg .statusPage)  then create/add StatusFilter
+		// _filters.add ( createStatusFilter( cfg, statusPath) )
 
-        _cfg._filters = _filters.sort({ a, b -> a.order - b.order })
-        context.authenticator = _authenticator;
-        server.executor = _executor;
-        def appName = _cfg.name() ?: "gserv"
-        def bindStr = bindAddrString(_cfg.bindAddress())
-        if (bindStr)
-            println "$appName starting HTTPS ${bindStr}"
-        else
-            println "$appName starting HTTPS on port ${server.address.port}"
+		_cfg._filters = _filters.sort({ a, b -> a.order - b.order })
+		context.authenticator = _authenticator;
+		server.executor = _executor;
+		def appName = _cfg.name() ?: "gserv"
+		def bindStr = bindAddrString(_cfg.bindAddress())
+		if (bindStr)
+			println "$appName starting HTTPS ${bindStr}"
+		else
+			println "$appName starting HTTPS on port ${server.address.port}"
 
-        EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
-        Thread.start {
-            server.start();
-        }
-        return ({ ->
-            server.stop(0);
-        });
-    }
+		EventManager.instance().publish(Events.ServerStarted, [port: actualPort])
+		Thread.start {
+			server.start();
+		}
+		return ({ ->
+			server.stop(0);
+		});
+	}
 
 }

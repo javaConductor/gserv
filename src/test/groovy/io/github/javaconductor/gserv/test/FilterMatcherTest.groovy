@@ -34,89 +34,89 @@ import org.junit.Test
 
 public class FilterMatcherTest {
 
-    Matcher m;
+	Matcher m;
 
-    @Before
-    public final void setup() {
-        m = new FilterMatcher();
-    }
+	@Before
+	public final void setup() {
+		m = new FilterMatcher();
+	}
 
-    @Test
-    public void "testPathWildCardMatch"() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/*",
-                { ->
+	@Test
+	public void "testPathWildCardMatch"() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/*",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/anything_goes"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/anything_goes"), [:]))
+	}
 
 
-    @Test
-    public final void testWildcardMatchesRoot() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/*",
-                { ->
+	@Test
+	public final void testWildcardMatchesRoot() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/*",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
+	}
 
-    @Test
-    public final void testEmptyPathMatchesAll() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/**",
-                { ->
+	@Test
+	public final void testEmptyPathMatchesAll() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/**",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
+	}
 
-    @Test
-    public final void testSlashMatchesSlash() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/",
-                { ->
+	@Test
+	public final void testSlashMatchesSlash() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/"), [:]))
+	}
 
-    @Test
-    public final void testSlashMatches() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/yippy/**",
-                { ->
+	@Test
+	public final void testSlashMatches() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/yippy/**",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
+	}
 
-    @Test
-    public final void testSlashMatches3() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/yippy/**",
-                { ->
+	@Test
+	public final void testSlashMatches3() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/yippy/**",
+				{ ->
 
-                })
-        assert !m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yiippy/yappy/yahooey"), [:]))
-    }
+				})
+		assert !m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yiippy/yappy/yahooey"), [:]))
+	}
 
-    @Test
-    public final void testSlashMatches2() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/yippy/*/yahooey",
-                { ->
+	@Test
+	public final void testSlashMatches2() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/yippy/*/yahooey",
+				{ ->
 
-                })
-        assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
-    }
+				})
+		assert m.match(pat, new GServFactory().createRequestContext("GET", new URI("/yippy/yappy/yahooey"), [:]))
+	}
 
 }

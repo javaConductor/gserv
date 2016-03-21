@@ -28,18 +28,18 @@ package io.github.javaconductor.gserv.resourceloader
  * Created by javaConductor on 10/13/2014.
  */
 class ResourceScriptException extends Exception {
-    ResourceScriptException() {
-    }
+	ResourceScriptException() {
+	}
 
-    ResourceScriptException(String s) {
-        super(s)
-    }
+	ResourceScriptException(String s) {
+		super(s)
+	}
 
-    ResourceScriptException(String s, Throwable throwable) {
-        super(s, throwable)
-    }
+	ResourceScriptException(String s, Throwable throwable) {
+		super(s, throwable)
+	}
 
-    ResourceScriptException(Throwable throwable) {
-        super(throwable)
-    }
+	ResourceScriptException(Throwable throwable) {
+		super(throwable)
+	}
 }

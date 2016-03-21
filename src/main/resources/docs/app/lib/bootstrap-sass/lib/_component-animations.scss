@@ -2,7 +2,6 @@
 // Component animations
 // --------------------------------------------------
 
-
 .fade {
   opacity: 0;
   @include transition(opacity .15s linear);

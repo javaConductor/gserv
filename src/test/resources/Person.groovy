@@ -25,14 +25,14 @@
 import io.github.javaconductor.gserv.GServ
 
 [
-        GServ.Resource('member') {
-            get('/') {
-                writeJson("{ }")
-            }
-        },
-        GServ.Resource('accounts') {
-            get('/') {
-                writeJson("{ }")
-            }
-        }
+		GServ.Resource('member') {
+			get('/') {
+				writeJson("{ }")
+			}
+		},
+		GServ.Resource('accounts') {
+			get('/') {
+				writeJson("{ }")
+			}
+		}
 ]

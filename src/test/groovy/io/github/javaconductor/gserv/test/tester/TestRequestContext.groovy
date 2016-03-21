@@ -35,54 +35,55 @@ import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
  */
 @Slf4j
 class TestRequestContext extends AbstractRequestContext {
-    OutputStream _responseBody
-    def _wasClosed = false
-    Closure _callBack
+	OutputStream _responseBody
+	def _wasClosed = false
+	Closure _callBack
 
-    def TestRequestContext(String method, Map headers, String path, byte[] data, Promise promise) {
-        this(method, headers, path, data, promise, null)
-    }
+	def TestRequestContext(String method, Map headers, String path, byte[] data, Promise promise) {
+		this(method, headers, path, data, promise, null)
+	}
 
-    def TestRequestContext(String method, Map headers, String path, byte[] data, Promise promise, Closure callBack) {
-        super(new GServFactory().createGServConfig())
-        this._callBack = ({ code, hdrs, bytesData ->
-            promise << [statusCode: code, responseHeaders: hdrs, output: bytesData]
-            if (callBack)
-                callBack(code, hdrs, bytesData)
-        });
-        this.requestBody = new ByteArrayInputStream(data ?: new byte[0])
-        this.responseBody = _responseBody = new ByteArrayOutputStream()
-        setAttribute(GServ.contextAttributes.isWrapper, true)
-        this.requestURI = new URI(path)
-        this.requestMethod = method
-        this.requestHeaders = headers as Map
-    }
+	def TestRequestContext(String method, Map headers, String path, byte[] data, Promise promise, Closure callBack) {
+		super(new GServFactory().createGServConfig())
+		this._callBack = ({ code, hdrs, bytesData ->
+			promise << [statusCode: code, responseHeaders: hdrs, output: bytesData]
+			if (callBack)
+				callBack(code, hdrs, bytesData)
+		});
+		this.requestBody = new ByteArrayInputStream(data ?: new byte[0])
+		this.responseBody = _responseBody = new ByteArrayOutputStream()
+		setAttribute(GServ.contextAttributes.isWrapper, true)
+		this.requestURI = new URI(path)
+		this.requestMethod = method
+		this.requestHeaders = headers as Map
+	}
 
-    @Override
-    def close() {
-        if (_wasClosed) {
-            log.warn("RequestContext.close() called multiple times.")
-            return
-        }
-        _wasClosed = true
-        _callBack(responseCode, responseHeaders, _responseBody.toByteArray())
-    }
+	@Override
+	def close() {
+		if (_wasClosed) {
+			log.warn("RequestContext.close() called multiple times.")
+			return
+		}
+		_wasClosed = true
+		_callBack(responseCode, responseHeaders, _responseBody.toByteArray())
+	}
 
-    @Override
-    def setStreams(InputStream is, OutputStream os) {
-        this.requestBody = is
-        this.responseBody = os
-    }
-    @Override
-    void sendResponseHeaders(int responseCode, long size) {
-        this.responseCode = responseCode
-        /// really can't use the size - yet
-    }
+	@Override
+	def setStreams(InputStream is, OutputStream os) {
+		this.requestBody = is
+		this.responseBody = os
+	}
 
-    @Override
-    Object isClosed() {
-        _wasClosed
-    }
+	@Override
+	void sendResponseHeaders(int responseCode, long size) {
+		this.responseCode = responseCode
+		/// really can't use the size - yet
+	}
+
+	@Override
+	Object isClosed() {
+		_wasClosed
+	}
 
 
 }

@@ -1,33 +1,45 @@
 {
-    "https":{
-        "keyManagerAlgorithm": "SunX509",
-        "trustManagerAlgorithm": "SunX509",
-        "keystoreFilePath": "/Users/lcollins/gserv.keystore",
-        "keyStoreImplementation": "JKS",
-        "password": "remoteip",
-        "sslProtocol" : "TLS"
+  "https": {
+    "keyManagerAlgorithm": "SunX509",
+    "trustManagerAlgorithm": "SunX509",
+    "keystoreFilePath": "/Users/lcollins/gserv.keystore",
+    "keyStoreImplementation": "JKS",
+    "password": "remoteip",
+    "sslProtocol": "TLS"
+  },
+  "plugins": {
+    "cors": "io.github.javaconductor.gserv.plugins.cors.CorsPlugin",
+    "compression": "io.github.javaconductor.gserv.plugins.compression.CompressionPlugin.class",
+    "caching": "io.github.javaconductor.gserv.plugins.caching.CachingPlugin.class"
+  },
+  "apps": [
+    {
+      "https": false,
+      "name": "singlePageMath",
+      "resourceScripts": [
+        "resources/Resource1.groovy",
+        "resources/Resource2.groovy"
+      ],
+      "port": 11111,
+      "bindAddress": "127.0.0.1",
+      "static_roots": [
+        "/Users/lcollins/src/main/resources/docs"
+      ]
     },
-    "plugins": {
-        "cors":             "io.github.javaconductor.gserv.plugins.cors.CorsPlugin",
-        "compression":"io.github.javaconductor.gserv.plugins.compression.CompressionPlugin.class",
-        "caching":        "io.github.javaconductor.gserv.plugins.caching.CachingPlugin.class"
-        },
-    "apps" : [{
-            "https": false,
-            "name" : "singlePageMath",
-            "resourceScripts" : ["resources/Resource1.groovy","resources/Resource2.groovy"],
-            "port" : 11111,
+    {
+      "https": true,
+      "name": "singlePageMath2",
+      "resourceScripts": [
+        "resources/Resource2.groovy"
+      ],
+      "port": 11112,
       "bindAddress": "127.0.0.1",
-            "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
-        },{
-              "https": true,
-              "name" : "singlePageMath2",
-              "resourceScripts" : ["resources/Resource2.groovy"],
-              "port" : 11112,
-      "bindAddress": "127.0.0.1",
-              "static_roots" : [ "/Users/lcollins/src/main/resources/docs" ]
-          }],
-
-    "classpath" : ["/apps/lib/*"]
-
+      "static_roots": [
+        "/Users/lcollins/src/main/resources/docs"
+      ]
+    }
+  ],
+  "classpath": [
+    "/apps/lib/*"
+  ]
 }

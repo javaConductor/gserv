@@ -30,28 +30,28 @@ package io.github.javaconductor.gserv.utils
  * doesn't.
  */
 class Filename {
-    private String fullPath;
-    private String pathSeparator, extensionSeparator;
+	private String fullPath;
+	private String pathSeparator, extensionSeparator;
 
-    def Filename(String str, String sep = File.separator, String ext = '.') {
-        fullPath = str;
-        pathSeparator = sep;
-        extensionSeparator = ext;
-    }
+	def Filename(String str, String sep = File.separator, String ext = '.') {
+		fullPath = str;
+		pathSeparator = sep;
+		extensionSeparator = ext;
+	}
 
-    String extension() {
-        int dot = fullPath.lastIndexOf(extensionSeparator);
-        return fullPath.substring(dot + 1);
-    }
+	String extension() {
+		int dot = fullPath.lastIndexOf(extensionSeparator);
+		return fullPath.substring(dot + 1);
+	}
 
-    String filename() { // gets filename without extension
-        int dot = fullPath.lastIndexOf(extensionSeparator);
-        int sep = fullPath.lastIndexOf(pathSeparator);
-        return fullPath.substring(sep + 1, dot);
-    }
+	String filename() { // gets filename without extension
+		int dot = fullPath.lastIndexOf(extensionSeparator);
+		int sep = fullPath.lastIndexOf(pathSeparator);
+		return fullPath.substring(sep + 1, dot);
+	}
 
-    String path() {
-        int sep = fullPath.lastIndexOf(pathSeparator);
-        return fullPath.substring(0, sep);
-    }
+	String path() {
+		int sep = fullPath.lastIndexOf(pathSeparator);
+		return fullPath.substring(0, sep);
+	}
 }

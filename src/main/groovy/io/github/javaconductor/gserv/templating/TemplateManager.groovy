@@ -33,11 +33,11 @@ import io.github.javaconductor.gserv.exceptions.TemplateException
  *
  */
 class TemplateManager {
-    def getTemplateEngine(name) {
-        if (name == "default") {
-            return new GStringTemplateEngine();
-        }
+	def getTemplateEngine(name) {
+		if (name == "default") {
+			return new GStringTemplateEngine();
+		}
 
-        throw new TemplateException(null, null, "Template engine [$name] is not supported.")
-    }
+		throw new TemplateException(null, null, "Template engine [$name] is not supported.")
+	}
 }

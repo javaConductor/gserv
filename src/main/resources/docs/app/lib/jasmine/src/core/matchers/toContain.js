@@ -1,16 +1,16 @@
-getJasmineRequireObj().toContain = function() {
-  function toContain(util, customEqualityTesters) {
-    customEqualityTesters = customEqualityTesters || [];
-
-    return {
-      compare: function(actual, expected) {
+getJasmineRequireObj().toContain = function () {
+    function toContain(util, customEqualityTesters) {
+        customEqualityTesters = customEqualityTesters || [];
 
         return {
-          pass: util.contains(actual, expected, customEqualityTesters)
-        };
-      }
-    };
-  }
+            compare: function (actual, expected) {
 
-  return toContain;
+                return {
+                    pass: util.contains(actual, expected, customEqualityTesters)
+                };
+            }
+        };
+    }
+
+    return toContain;
 };

@@ -1,13 +1,13 @@
 // This methods allows the killing of built-in functions,
 // so the shim can take over with that implementation
-var HLP = (function() {
+var HLP = (function () {
     "use strict";
     var kill;
 
-    kill = function(_class, methods) {
+    kill = function (_class, methods) {
         /*if(!Array.isArray(methods))
-            return;*/
-        if(!_class.originals)
+         return;*/
+        if (!_class.originals)
             _class.originals = {};
 
         for (var i = 0, len = methods.length; i < len; i++) {
@@ -24,7 +24,7 @@ var HLP = (function() {
             }
         }
     };
-    return { kill: kill };
+    return {kill: kill};
 }());
 
 HLP.kill(Function.prototype, [

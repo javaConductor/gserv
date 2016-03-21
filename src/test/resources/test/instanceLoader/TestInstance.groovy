@@ -23,15 +23,16 @@
  */
 
 package test.integration.instanceloader
+
 import io.github.javaconductor.gserv.GServ
 
 
 new GServ().http {
-    name("AppName")
-    get("/math/add/:num1/:num2") { num1, num2 ->
-        def ans = service.calc("add", num1, num2)
-        def msg = "Adding $num1 to $num2 == $ans"
-        write(msg.bytes)
-    }
+	name("AppName")
+	get("/math/add/:num1/:num2") { num1, num2 ->
+		def ans = service.calc("add", num1, num2)
+		def msg = "Adding $num1 to $num2 == $ans"
+		write(msg.bytes)
+	}
 
 }

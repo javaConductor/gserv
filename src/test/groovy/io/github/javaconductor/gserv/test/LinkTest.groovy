@@ -32,78 +32,78 @@ import org.junit.Test
 
 public class LinkTest {
 
-    LinkBuilder l
+	LinkBuilder l
 
-    @Before
-    public final void init() {
-        l = new LinkBuilder();
-    }
+	@Before
+	public final void init() {
+		l = new LinkBuilder();
+	}
 
-    @Test
-    public final void testLinkBuilder() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/books/:id",
-                { ->
+	@Test
+	public final void testLinkBuilder() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/books/:id",
+				{ ->
 
-                }
-        )
-        l.add("test1", pat)
-        assert "/books/555" == l.link("test1", [id: 555])
-    }
+				}
+		)
+		l.add("test1", pat)
+		assert "/books/555" == l.link("test1", [id: 555])
+	}
 
-    @Test
-    public final void testLinkBuilder2() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/books/:year/:rank",
-                { yr, rnk ->
+	@Test
+	public final void testLinkBuilder2() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/books/:year/:rank",
+				{ yr, rnk ->
 
-                }
-        )
-        l.add("test2", pat)
-        assert "/books/1970/10" == l.link("test2", [year: 1970, rank: 10])
-    }
+				}
+		)
+		l.add("test2", pat)
+		assert "/books/1970/10" == l.link("test2", [year: 1970, rank: 10])
+	}
 
-    @Test
-    public final void testLinkBuilder3() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/books/:year/:rank/all",
-                { yr, rnk ->
+	@Test
+	public final void testLinkBuilder3() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/books/:year/:rank/all",
+				{ yr, rnk ->
 
-                }
-        )
-        l.addLink("test2", pat)
-        assert "/books/1970/10/all" == l.link("test2", [year: 1970, rank: 10])
-    }
+				}
+		)
+		l.addLink("test2", pat)
+		assert "/books/1970/10/all" == l.link("test2", [year: 1970, rank: 10])
+	}
 
-    @Test
-    public final void testLinkBuilderWithQuery() {
-        ResourceAction pat = ResourceActionFactory.createAction(
-                "GET",
-                "/books/:year/:rank/all?foo=:foo",
-                { yr, rnk, foo ->
+	@Test
+	public final void testLinkBuilderWithQuery() {
+		ResourceAction pat = ResourceActionFactory.createAction(
+				"GET",
+				"/books/:year/:rank/all?foo=:foo",
+				{ yr, rnk, foo ->
 
-                }
-        )
-        l.addLink("test2", pat)
-        assert "/books/1970/10/all?foo=theQueryParam" == l.link("test2", [year: 1970, rank: 10, foo: "theQueryParam"])
-    }
+				}
+		)
+		l.addLink("test2", pat)
+		assert "/books/1970/10/all?foo=theQueryParam" == l.link("test2", [year: 1970, rank: 10, foo: "theQueryParam"])
+	}
 
-    @Test
-    public final void testLinkBuilderFixHrefs() {
-        def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21")
-        assert nuHref.startsWith("http")
-        assert nuHref.startsWith("http://me.com:8080")
-    }
+	@Test
+	public final void testLinkBuilderFixHrefs() {
+		def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21")
+		assert nuHref.startsWith("http")
+		assert nuHref.startsWith("http://me.com:8080")
+	}
 
-    @Test
-    public final void testLinkBuilderFixHrefsWithQry() {
-        def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21?page=5")
-        assert nuHref.startsWith("http")
-        assert nuHref.startsWith("http://me.com:8080")
-        assert nuHref.contains("page=5")
-    }
+	@Test
+	public final void testLinkBuilderFixHrefsWithQry() {
+		def nuHref = LinkBuilder.expandLinkIfNeeded("http", "me.com", 8080, "/thing/21?page=5")
+		assert nuHref.startsWith("http")
+		assert nuHref.startsWith("http://me.com:8080")
+		assert nuHref.contains("page=5")
+	}
 
 }

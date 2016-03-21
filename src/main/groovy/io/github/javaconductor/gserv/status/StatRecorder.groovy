@@ -29,9 +29,9 @@ package io.github.javaconductor.gserv.status
  */
 interface StatRecorder {
 
-    def recordEvent(String topic, Map eventData)
+	def recordEvent(String topic, Map eventData)
 
-    Map reportStat() // Map [statDisplayName] : value
+	Map reportStat() // Map [statDisplayName] : value
 
-    def reset()
+	def reset()
 }

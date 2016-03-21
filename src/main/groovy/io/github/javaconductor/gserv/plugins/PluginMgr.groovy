@@ -37,42 +37,42 @@ import io.github.javaconductor.gserv.plugins.cors.CorsPlugin
 @Slf4j
 class PluginMgr {
 
-    private static final INSTANCE = new PluginMgr()
+	private static final INSTANCE = new PluginMgr()
 
-    static PluginMgr instance() { INSTANCE }
+	static PluginMgr instance() { INSTANCE }
 
-    private def PluginMgr() {
-        initDefaultPlugins()
-    }
+	private def PluginMgr() {
+		initDefaultPlugins()
+	}
 
-    def initDefaultPlugins() {
-        // register('ldap', LdapPlugin.class)
-        register('cors', CorsPlugin.class)
-        register('caching', CachingPlugin.class)
-        register('compression', CompressionPlugin.class)
-    }
+	def initDefaultPlugins() {
+		// register('ldap', LdapPlugin.class)
+		register('cors', CorsPlugin.class)
+		register('caching', CachingPlugin.class)
+		register('compression', CompressionPlugin.class)
+	}
 
-    def plugins = [:]
+	def plugins = [:]
 
-    def register(name, Class pluginClass) {
+	def register(name, Class pluginClass) {
 
-        if (plugins[name]) {
-            log.warn("Plugin name: $name is being overridden with class: ${pluginClass.canonicalName}")
-        }
+		if (plugins[name]) {
+			log.warn("Plugin name: $name is being overridden with class: ${pluginClass.canonicalName}")
+		}
 
-        plugins[name] = pluginClass
-        EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
-        this
-    }
+		plugins[name] = pluginClass
+		EventManager.instance().publish(Events.PluginRegistered, [name: name, pluginClass: pluginClass.toString()])
+		this
+	}
 
-    IPlugin plugin(name, options) {
-        def clazz = plugins[name]
-        def ret
-        if (clazz) {
-            ret = clazz.newInstance()
-            ret.init(options)
-        }
-        EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
-        ret
-    }
+	IPlugin plugin(name, options) {
+		def clazz = plugins[name]
+		def ret
+		if (clazz) {
+			ret = clazz.newInstance()
+			ret.init(options)
+		}
+		EventManager.instance().publish(Events.PluginLoaded, [name: name, options: options])
+		ret
+	}
 }

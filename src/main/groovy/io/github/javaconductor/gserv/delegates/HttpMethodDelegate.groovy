@@ -36,29 +36,30 @@ import io.github.javaconductor.gserv.utils.StaticFileHandler
  * This is the delegate for any HTTP Method handler closure
  */
 @Mixin(StaticFileHandler)
-class HttpMethodDelegate extends DelegateFunctions implements ResourceHandlerFn {
-    RequestContext requestContext
-    def serverConfig
-    ResourceAction $this
-    def eventManager = EventManager.instance()
+class HttpMethodDelegate extends DelegateFunctions
+		implements ResourceHandlerFn {
+	RequestContext requestContext
+	def serverConfig
+	ResourceAction $this
+	def eventManager = EventManager.instance()
 
-    def HttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
-        value("tmgr", new TemplateManager());
-        value("linkBuilder", serverConfig.linkBuilder());
-        value("staticRoots", serverConfig.staticRoots());
-        value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
-        value('to', serverConfig.inputStreamTypeConverter.converters);
-        value("templateEngineName", serverConfig.templateEngineName());
-        // $this inside the closure will be the currently processing action
-        to = value('to')
-        $this = action
-        log.trace("Created httpMethodDelegate : $requestContext  ${this.hashCode()}")
-        this.requestContext = requestContext
-        this.serverConfig = serverConfig
-    }
+	def HttpMethodDelegate(RequestContext requestContext, ResourceAction action, GServConfig serverConfig) {
+		value("tmgr", new TemplateManager());
+		value("linkBuilder", serverConfig.linkBuilder());
+		value("staticRoots", serverConfig.staticRoots());
+		value('inputStreamTypeConverter', serverConfig.inputStreamTypeConverter);
+		value('to', serverConfig.inputStreamTypeConverter.converters);
+		value("templateEngineName", serverConfig.templateEngineName());
+		// $this inside the closure will be the currently processing action
+		to = value('to')
+		$this = action
+		log.trace("Created httpMethodDelegate : $requestContext  ${this.hashCode()}")
+		this.requestContext = requestContext
+		this.serverConfig = serverConfig
+	}
 
-    def actions() {
-        value("actions")
-    }
+	def actions() {
+		value("actions")
+	}
 
 }

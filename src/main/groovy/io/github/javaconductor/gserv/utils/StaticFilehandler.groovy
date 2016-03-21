@@ -33,48 +33,48 @@ import org.apache.commons.io.IOUtils
  */
 @Slf4j
 class StaticFileHandler {
-    def fileFn(contentType, filePath) {
-        file(contentType, filePath)
-    }
+	def fileFn(contentType, filePath) {
+		file(contentType, filePath)
+	}
 
-    /**
-     * Creates a function that, when called, writes the content of file 'filename'
-     * to the outputStream and sets the contentType to 'mimeType'
-     *
-     * @param mimeType
-     * @param filename
-     * @return Closure
-     */
-    def file(mimeType, filename) {
+	/**
+	 * Creates a function that, when called, writes the content of file 'filename'
+	 * to the outputStream and sets the contentType to 'mimeType'
+	 *
+	 * @param mimeType
+	 * @param filename
+	 * @return Closure
+	 */
+	def file(mimeType, filename) {
 
-        if (!mimeType) {
-            mimeType = URLConnection.guessContentTypeFromName(filename)
-            log.trace("File: $filename said to have type $mimeType")
-        }
+		if (!mimeType) {
+			mimeType = URLConnection.guessContentTypeFromName(filename)
+			log.trace("File: $filename said to have type $mimeType")
+		}
 
-        { ->
+		{ ->
 //            EventManager.instance().publish(Events.ResourceProcessing, [
 //                    requestId: exchange.getAttribute(GServ.contextAttributes.requestId),
 //                    mimeType : mimeType,
 //                    msg      : "Sending static file.",
 //                    path     : "$filename"])
-            /// search the staticRoots
-            InputStream is = getFile(_staticRoots, filename)
-            if (is) {
-                def sz = is.available();
-                requestContext.responseHeaders.put("Content-Type", [mimeType])
-                requestContext.sendResponseHeaders(200, sz)
-                IOUtils.copy(is, requestContext.responseBody)
-            } else {
-                def msg = "No such file: $filename"
-                def ab = msg.getBytes()
-                requestContext.sendResponseHeaders(404, ab.size())
-                requestContext.responseBody.write(ab);
-            }
-            requestContext.responseBody.close()
-            requestContext.close()
-        }//fn
-    }
+			/// search the staticRoots
+			InputStream is = getFile(_staticRoots, filename)
+			if (is) {
+				def sz = is.available();
+				requestContext.responseHeaders.put("Content-Type", [mimeType])
+				requestContext.sendResponseHeaders(200, sz)
+				IOUtils.copy(is, requestContext.responseBody)
+			} else {
+				def msg = "No such file: $filename"
+				def ab = msg.getBytes()
+				requestContext.sendResponseHeaders(404, ab.size())
+				requestContext.responseBody.write(ab);
+			}
+			requestContext.responseBody.close()
+			requestContext.close()
+		}//fn
+	}
 
 /**
  *  Returns an inputStream to a file with path 'filePath'. Path is evaluated against
@@ -86,53 +86,53 @@ class StaticFileHandler {
  * @param useResourceDocs
  * @return InputStream
  */
-    InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean useResourceDocs) {
-        /// if useResourceDocs then look in the resources
-        (useResourceDocs) ? getFile(staticRoots, filePath) : getContentFile(staticRoots, filePath)
-    }
+	InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean useResourceDocs) {
+		/// if useResourceDocs then look in the resources
+		(useResourceDocs) ? getFile(staticRoots, filePath) : getContentFile(staticRoots, filePath)
+	}
 
-    /**
-     * Get file from either src/main/resources/docs or from fileSystem
-     *
-     * @param staticRoots
-     * @param filePath
-     * @return inputStream to File
-     */
-    def getFile(List<String> staticRoots, String filePath) {
-        (getDoc(filePath)) ?: getContentFile(staticRoots, filePath)
-    }
+	/**
+	 * Get file from either src/main/resources/docs or from fileSystem
+	 *
+	 * @param staticRoots
+	 * @param filePath
+	 * @return inputStream to File
+	 */
+	def getFile(List<String> staticRoots, String filePath) {
+		(getDoc(filePath)) ?: getContentFile(staticRoots, filePath)
+	}
 
-    /**
-     * Get documents relative to the /src/main/resources/docs folder
-     *
-     * @param filePath
-     * @return inputStream to File
-     */
-    def getDoc(String filePath) {
+	/**
+	 * Get documents relative to the /src/main/resources/docs folder
+	 *
+	 * @param filePath
+	 * @return inputStream to File
+	 */
+	def getDoc(String filePath) {
 
-        if (filePath.startsWith("/")) filePath = filePath.substring(1)
-        //// check the default first (may change)
-        URL u = Class.getResource("/docs/$filePath")
-        u?.openStream()//content
-    }
+		if (filePath.startsWith("/")) filePath = filePath.substring(1)
+		//// check the default first (may change)
+		URL u = Class.getResource("/docs/$filePath")
+		u?.openStream()//content
+	}
 
-    /**
-     * Get file from the FileSystem
-     *
-     * @param staticRoots directories to search
-     * @param filePath String - The file to find
-     * @return inputStream to File
-     */
-    InputStream getContentFile(List<String> staticRoots, String filePath) {
+	/**
+	 * Get file from the FileSystem
+	 *
+	 * @param staticRoots directories to search
+	 * @param filePath String - The file to find
+	 * @return inputStream to File
+	 */
+	InputStream getContentFile(List<String> staticRoots, String filePath) {
 
-        if (filePath.startsWith("/")) filePath = filePath.substring(1)
-        //// Maybe its in one of the other static roots (if any)
+		if (filePath.startsWith("/")) filePath = filePath.substring(1)
+		//// Maybe its in one of the other static roots (if any)
 
-        def dir = staticRoots.find { sroot ->
-            File f = new File("$sroot/$filePath")
-            f.exists() && f.isFile()
-        }
-        (dir) ? new FileInputStream(new File("$dir/$filePath")) : null
-    }
+		def dir = staticRoots.find { sroot ->
+			File f = new File("$sroot/$filePath")
+			f.exists() && f.isFile()
+		}
+		(dir) ? new FileInputStream(new File("$dir/$filePath")) : null
+	}
 
 }

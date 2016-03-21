@@ -23,10 +23,11 @@
  */
 
 package test.integration.configtest
+
 [
-        Resource("/upper") {
-            get("/:word") { word ->
-                write(word.toUpperCase().bytes)
-            }
-        }
+		Resource("/upper") {
+			get("/:word") { word ->
+				write(word.toUpperCase().bytes)
+			}
+		}
 ]

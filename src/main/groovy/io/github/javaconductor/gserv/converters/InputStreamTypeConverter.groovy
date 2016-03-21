@@ -37,108 +37,108 @@ import org.apache.commons.io.IOUtils
  * Time: 4:10 AM
  */
 class InputStreamTypeConverter {
-    def converters
-    def typeConverters
+	def converters
+	def typeConverters
 
-    def InputStreamTypeConverter() {
-        to = converters = ["text"    : readText,
-                           "json"    : readJson,
-                           "xml"     : readXml,
-                           "type"    : typeConverter,
-                           "formData": formDataConverter]
-        typeConverters = [:]
-    }
+	def InputStreamTypeConverter() {
+		to = converters = ["text"    : readText,
+						   "json"    : readJson,
+						   "xml"     : readXml,
+						   "type"    : typeConverter,
+						   "formData": formDataConverter]
+		typeConverters = [:]
+	}
 
-    def formDataConverter = { InputStream inputStream, RequestContext context ->
-        String contentType = context.getRequestHeader("Content-Type")
+	def formDataConverter = { InputStream inputStream, RequestContext context ->
+		String contentType = context.getRequestHeader("Content-Type")
 
-        //check the contentType - should be "multipart/form-data"
-        if (!contentType.toLowerCase().startsWith("multipart/form-data") && !contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")) {
-            throw new ConversionException("No form data found : $contentType found instead.")
-        }
+		//check the contentType - should be "multipart/form-data"
+		if (!contentType.toLowerCase().startsWith("multipart/form-data") && !contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")) {
+			throw new ConversionException("No form data found : $contentType found instead.")
+		}
 
-        boolean isMultipart = contentType.toLowerCase().startsWith("multipart/form-data")
-        boolean urlEncoded = contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")
+		boolean isMultipart = contentType.toLowerCase().startsWith("multipart/form-data")
+		boolean urlEncoded = contentType.toLowerCase().startsWith("application/x-www-form-urlencoded")
 
 
-        new FormDataUtils().getFormData(inputStream.bytes, contentType)
-    }
+		new FormDataUtils().getFormData(inputStream.bytes, contentType)
+	}
 
-    /**
-     * @param c Target class of conversion
-     * @param inputStream
-     * @return stream data as class 'c'
-     */
-    def typeConverter = { Class c, InputStream inputStream ->
-        def convertFn = typeConverters[c.name]
-        if (!convertFn) {
-            throw new ConversionException("No converter for class: ${c.name}.")
-        }
-        convertFn(inputStream)
-    }
+	/**
+	 * @param c Target class of conversion
+	 * @param inputStream
+	 * @return stream data as class 'c'
+	 */
+	def typeConverter = { Class c, InputStream inputStream ->
+		def convertFn = typeConverters[c.name]
+		if (!convertFn) {
+			throw new ConversionException("No converter for class: ${c.name}.")
+		}
+		convertFn(inputStream)
+	}
 
-    /**
-     *  Add a converter function 'fn' to be referenced by 'name'
-     *
-     * @param name
-     * @param fn
-     * @return
-     */
-    def add(String name, fn) {
-        converters[name] = fn
-    }
+	/**
+	 *  Add a converter function 'fn' to be referenced by 'name'
+	 *
+	 * @param name
+	 * @param fn
+	 * @return
+	 */
+	def add(String name, fn) {
+		converters[name] = fn
+	}
 
-    /**
-     *  Add a class converter function 'fn' to be referenced by 'name'
-     *
-     * @param aClass
-     * @param fn
-     * @return
-     */
-    def add(Class aClass, Closure fn) {
-        typeConverters[aClass.name] = fn
-    }
+	/**
+	 *  Add a class converter function 'fn' to be referenced by 'name'
+	 *
+	 * @param aClass
+	 * @param fn
+	 * @return
+	 */
+	def add(Class aClass, Closure fn) {
+		typeConverters[aClass.name] = fn
+	}
 
-    /**
-     *  Builtin converter for JSON
-     *
-     * @param istream The inputStream
-     *
-     * @return converted text (Map)
-     */
-    def readJson = { istream ->
-        def js = new JsonSlurper()
-        def ret = js.parse(new InputStreamReader(istream))
-        return ret;
-    }
+	/**
+	 *  Builtin converter for JSON
+	 *
+	 * @param istream The inputStream
+	 *
+	 * @return converted text (Map)
+	 */
+	def readJson = { istream ->
+		def js = new JsonSlurper()
+		def ret = js.parse(new InputStreamReader(istream))
+		return ret;
+	}
 
-    /**
-     *  Builtin converter for XML
-     *
-     * @param istream The inputStream
-     *
-     * @return converted text (GPathResult)
-     */
-    def readXml = { istream ->
-        def xs = new XmlSlurper()
-        xs.parse(istream)
-    }
+	/**
+	 *  Builtin converter for XML
+	 *
+	 * @param istream The inputStream
+	 *
+	 * @return converted text (GPathResult)
+	 */
+	def readXml = { istream ->
+		def xs = new XmlSlurper()
+		xs.parse(istream)
+	}
 
-    /**
-     *  Builtin converter for String as byte stream
-     *
-     * @param istream The inputStream
-     *
-     * @return converted text
-     */
-    def readText = { istream ->
-        IOUtils.toString(istream);
-    }
+	/**
+	 *  Builtin converter for String as byte stream
+	 *
+	 * @param istream The inputStream
+	 *
+	 * @return converted text
+	 */
+	def readText = { istream ->
+		IOUtils.toString(istream);
+	}
 
-    /**
-     *  Invokes converter 'name' on input stream 'istream'
-     */
+	/**
+	 *  Invokes converter 'name' on input stream 'istream'
+	 */
 //    def to = { name, istream -> converters[name](istream) }
-    def to
+	def to
 
 }

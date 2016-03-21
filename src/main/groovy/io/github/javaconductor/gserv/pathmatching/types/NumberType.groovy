@@ -31,15 +31,15 @@ import static io.github.javaconductor.gserv.utils.TextUtils.isNumber
  */
 class NumberType extends PathElementType {
 
-    NumberType() {
-        name = "Number"
-    }
+	NumberType() {
+		name = "Number"
+	}
 
-    boolean validate(String s) {
-        isNumber(s)
-    }
+	boolean validate(String s) {
+		isNumber(s)
+	}
 
-    Object toType(String s) {
-        Double.parseDouble(s)
-    }
+	Object toType(String s) {
+		Double.parseDouble(s)
+	}
 }
