@@ -24,6 +24,7 @@
 
 package io.github.javaconductor.gserv.pathmatching.custom
 
+import groovy.transform.CompileStatic
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
@@ -37,6 +38,7 @@ class ContentTypeMatcher implements CustomActionMatcher {
         _mimeTypes = mimeTypes as List
     }
 
+    @CompileStatic
     boolean matches(RequestContext context, ResourceAction action) {
         def types = context.requestHeaders["Content-Type"]
         if (!types)

@@ -88,7 +88,7 @@ class StaticFileHandler {
  */
     InputStream resolveStaticResource(String filePath, List<String> staticRoots, boolean useResourceDocs) {
         /// if useResourceDocs then look in the resources
-        (useResourceDocs) ? getFile(staticRoots, filePath) : getFsFile(staticRoots, filePath)
+        (useResourceDocs) ? getFile(staticRoots, filePath) : getContentFile(staticRoots, filePath)
     }
 
     /**
@@ -99,7 +99,7 @@ class StaticFileHandler {
      * @return inputStream to File
      */
     def getFile(List<String> staticRoots, String filePath) {
-        (getDoc(filePath)) ?: getFsFile(staticRoots, filePath)
+        (getDoc(filePath)) ?: getContentFile(staticRoots, filePath)
     }
 
     /**
@@ -123,7 +123,7 @@ class StaticFileHandler {
      * @param filePath String - The file to find
      * @return inputStream to File
      */
-    def getFsFile(List<String> staticRoots, String filePath) {
+    InputStream getContentFile(List<String> staticRoots, String filePath) {
 
         if (filePath.startsWith("/")) filePath = filePath.substring(1)
         //// Maybe its in one of the other static roots (if any)

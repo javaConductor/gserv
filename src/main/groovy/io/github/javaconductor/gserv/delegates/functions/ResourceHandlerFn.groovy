@@ -27,6 +27,8 @@ package io.github.javaconductor.gserv.delegates.functions
 import groovy.text.Template
 import groovy.text.TemplateEngine
 import io.github.javaconductor.gserv.actions.ResourceAction
+import io.github.javaconductor.gserv.events.EventManager
+import io.github.javaconductor.gserv.events.Events
 import io.github.javaconductor.gserv.exceptions.TemplateException
 import io.github.javaconductor.gserv.utils.LinkBuilder
 import io.github.javaconductor.gserv.utils.StaticFileHandler
@@ -49,7 +51,6 @@ trait ResourceHandlerFn {
      * @param data
      * @return String
      */
-
     def link(name, data) {
         linkBuilder.link(name, data)
     }
@@ -173,9 +174,6 @@ trait ResourceHandlerFn {
      */
     void writeFrom(InputStream is) {
         if (!requestContext.isClosed()) {
-            //     log.trace("write(): Writing data, headers: ${requestContext.responseHeaders} for req $requestContext ")
-//            int size = is.available();
-
             int size = IOUtils.copy(is, requestContext.getResponseBody())
             requestContext.sendResponseHeaders(200, size)
             requestContext.getResponseBody().close()
@@ -191,6 +189,40 @@ trait ResourceHandlerFn {
      */
     void write(String contentTyp, String data) {
         write(contentTyp, data.bytes)
+    }
+
+	void sendFile( File file ) {
+		sendFile(file, null)
+	}
+		/**
+     * Sets the contentType header, writes the content of file to OutputStream, and closes the output stream
+     *
+     * @param contentType
+     * @param file
+     */
+    void sendFile( File file,  String contentTyp ) {
+		if (requestContext.isClosed()) {
+			return
+		}
+		if ( !contentTyp ) {
+            contentTyp = URLConnection.guessContentTypeFromName(file.name)
+        }
+
+        EventManager.instance().publish(Events.ResourceProcessing, [
+                requestId: requestContext.id(),
+                mimeType : contentTyp,
+                msg      : "Sending static file.",
+                path     : "${file.absolutePath}"])
+        /// search the staticRoots
+        if (!file.exists()){
+            def msg = "No such file: ${file.absolutePath}"
+			error(404, msg)
+        } else {
+            InputStream is = new FileInputStream(file);
+			writeFrom(is)
+        }
+        requestContext.close()
+        requestContext
     }
 
     /**
@@ -385,6 +417,5 @@ trait ResourceHandlerFn {
     }
 
     def to = (value("to")) //serverConfig.inputStreamTypeConverter.converters
-
 }
 

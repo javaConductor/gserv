@@ -94,7 +94,7 @@ class GServRunner {
         def maxThreads
         def statusPage
         def statusPath
-        def appPropertiesFilename
+        String appPropertiesFilename
         def configs
         def configFile
         def configFilename = options.c;
@@ -116,7 +116,7 @@ class GServRunner {
                 maxThreads = options.x;
                 statusPath = options.t
                 statusPage = !options.g
-                appPropertiesFilename = options.appProperties
+                appPropertiesFilename = options.appProperties  ?: null
 
                 if (instanceScript) {
                     nuInstance = factory.createInstance(
@@ -149,14 +149,17 @@ class GServRunner {
                 }
             } else {   // use ONLY the config file and ignore everything else on the cmdLine Except: appProperties
 
-                //TODO we need to use the appProperties file as the values for config file vars eg: $properties.timeServiceHost
-                //TODO $properties is Map of values from properties file ???? LAC
-
                 configFile = new File(configFilename);
                 if (!configFile.exists()) {
                     throw new IllegalArgumentException("ConfigFile $configFilename not found!");
                 }
                 configs = factory.createConfigs(configFile)
+                if(appPropertiesFilename) {
+                    File f = new File(appPropertiesFilename);
+                    configs.each { cfg ->
+                        cfg.appPropertyFile( f )
+                    }
+                }
             }
         } catch (Throwable ex) {
             log.trace("Could not start app.", ex)

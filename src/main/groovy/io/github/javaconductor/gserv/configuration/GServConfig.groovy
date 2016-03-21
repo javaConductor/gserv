@@ -1,6 +1,3 @@
-
-
-
 /*
  *  The MIT License (MIT)
  *
@@ -369,5 +366,14 @@ class GServConfig {
         _appPropertyFile = f
         this
     }
+
+    String appPropertyPath(){
+        _appPropertyPath
+    }
+    GServConfig appPropertyPath( String p){
+        _appPropertyPath = p
+        this
+    }
+
 
 }

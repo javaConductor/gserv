@@ -247,6 +247,7 @@ trait ServerConfigFn {
 
     /**
      * Creates a closure that writes file 'filename' to the outputStream
+     * The filename is applied to the static roots
      *
      * @param mimeType Optional contentType
      * @param filename
@@ -278,6 +279,45 @@ trait ServerConfigFn {
                 requestContext.sendResponseHeaders(404, ab.size())
                 requestContext.responseBody.write(ab);
             }
+            requestContext.responseBody.close();
+            requestContext.close()
+            requestContext
+        }
+    }
+
+    /**
+     * Creates a closure that writes file 'filename' to the outputStream
+     *
+     * @param mimeType Optional contentType
+     * @param filename  fully qualified file name
+     *
+     * @return Closure that will return the file
+     *
+     */
+    def systemFile(mimeType, File file) {
+        if (!mimeType) {
+            mimeType = URLConnection.guessContentTypeFromName(file.name)
+        }
+
+        { ->
+            EventManager.instance().publish(Events.ResourceProcessing, [
+                    requestId: requestContext.id(),
+                    mimeType : mimeType,
+                    msg      : "Sending static file.",
+                    path     : "${file.absolutePath}"])
+            /// search the staticRoots
+            if (!file.exists()){
+                def msg = "No such file: ${file.absolutePath}"
+                def ab = msg.getBytes()
+                requestContext.sendResponseHeaders(404, ab.size())
+                requestContext.responseBody.write(ab);
+            }
+            InputStream is = new FileInputStream(file);
+            def sz = is.available();
+            requestContext.responseHeaders.put("Content-Type", [mimeType])
+            requestContext.sendResponseHeaders(200, sz)
+            IOUtils.copy(is, requestContext.responseBody)
+
             requestContext.responseBody.close();
             requestContext.close()
             requestContext

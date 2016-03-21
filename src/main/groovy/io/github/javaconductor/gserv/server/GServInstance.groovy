@@ -129,6 +129,21 @@ class GServInstance {
     }
 
     /**
+     *
+     * @return The AppProperties Filter
+     */
+    Filter createAppPropertiesFilter( String path, File propFile ) {
+        def filter = ResourceActionFactory.createBeforeFilter("appPropertiesDoc", "GET", path, [:], -1) { requestContext, args ->
+            def requestId = requestContext.id()
+            log.debug("createAppPropertiesFilter(#${requestId} context: $requestContext")
+            sendFile( propFile )
+            //writeJson( [propFile : "xyz"] )
+            done()
+        }
+        return filter
+    }
+
+    /**
      * This method will start the server on 'port'.
      *
      * @param port
@@ -158,6 +173,15 @@ class GServInstance {
         ////////////////////////////////
         if (_cfg.statusPage()) {
             _filters.add(createStatusFilter())
+        }
+
+        ////////////////////////////////
+        /// create and add propertiesFileFilter
+        ////////////////////////////////
+        if (_cfg.appPropertyFile()) {
+            _filters.add(createAppPropertiesFilter(
+                    _cfg.appPropertyPath(),
+                    _cfg.appPropertyFile()))
         }
 
         _cfg._filters = _filters.sort({ a, b -> a.order - b.order })

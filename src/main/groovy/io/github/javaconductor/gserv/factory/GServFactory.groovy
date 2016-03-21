@@ -144,17 +144,17 @@ class GServFactory {
 
         try {
             /// if there is an instance script then use it to create the config
-            File f = new File(instanceScript)
+            File f = new File( instanceScript )
             GServInstance instance = resourceLoader.loadInstance(f, classpath)
             log.debug("Loaded instance ${instance.config().name()} from script: ${f.absolutePath}")
             instance.config().port(port)
-            if (resourceScripts) {
+            if ( resourceScripts ) {
                 def resources = scriptLoader.loadResources(resourceScripts, classpath)
                 log.debug("Loaded ${resources.size()} resources from scripts: ${resourceScripts*.toString()}")
                 instance.config().addResources(resources)
             }
 
-            if (staticRoot) {
+            if ( staticRoot ) {
                 instance.config().addStaticRoots([staticRoot])
             }
 

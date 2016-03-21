@@ -24,6 +24,7 @@
 
 package io.github.javaconductor.gserv.pathmatching.custom
 
+import groovy.transform.CompileStatic
 import io.github.javaconductor.gserv.actions.ResourceAction
 import io.github.javaconductor.gserv.requesthandler.RequestContext
 
@@ -39,6 +40,7 @@ class HeaderMatcher implements CustomActionMatcher {
         _values = values as List
     }
 
+    @CompileStatic
     boolean matches(RequestContext context, ResourceAction action) {
         def requestHdrValues = context.requestHeaders[_header]
         if (!requestHdrValues)
