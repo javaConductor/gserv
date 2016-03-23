@@ -80,7 +80,7 @@ class GServRunner {
 	 * @param cliArgs
 	 * @return NONE - call never returns
 	 */
-	@TailRecursive
+//	@TailRecursive
 	def start(cliArgs) {
 		def options = cli.parse(cliArgs)
 		if (options?.v) {
@@ -101,10 +101,11 @@ class GServRunner {
 		def configFilename = options.c;
 		def nuInstance
 		def autoReload
-		def autoReloader
+		Reloader autoReloader
+		def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
+
 		try {
 			if (!configFilename) {
-				def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
 				if (!options.p)
 					throw new ConfigException("Port not specified.")
 
@@ -170,24 +171,32 @@ class GServRunner {
 		}
 
 		/// Start the instance !!
-		autoReload = option.l
-		if(autoReload){
-			autoReloader = new Reloader( cliArgs ).listen { cliArgs ->
-
+		autoReload = options.l
+		if (autoReload) {
+			autoReloader = Reloader.createReloader(configFilename,instanceScript,resourceScripts)
+			autoReloader.listen { File f ->
+				//add restart logic here
+				return start(cliArgs);
 			}
+			autoReloader.start()
 		}
 
 		def stopFns
 		if (nuInstance) {
 			stopFns = [nuInstance.start(nuInstance.config().port())]
-			if(autoReloader)
-				autoReloader.setStopFns( stopFns))
+
 		} else {
 			stopFns = configs.collect { cfg ->
 				log.debug("Creating HTTP Instance")
 				def inst = factory.createHttpInstance(cfg);
 				inst.start(cfg.port())
 			}
+		}
+
+		if (autoReloader) {
+			//add function to stop reloader to list of things to stop
+			stopFns << ({ -> autoReloader.stop()  })
+			autoReloader.setStopFns(stopFns)
 		}
 		Thread.sleep(300)
 		return ({ ->

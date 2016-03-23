@@ -137,7 +137,6 @@ class GServInstance {
 			def requestId = requestContext.id()
 			log.debug("createAppPropertiesFilter(#${requestId} context: $requestContext")
 			sendFile(propFile)
-			//writeJson( [propFile : "xyz"] )
 			done()
 		}
 		return filter
@@ -200,7 +199,7 @@ class GServInstance {
 			server.start();
 		}
 		return ({ ->
-			server.stop(0);
+			server.stop(2);
 		});
 	};
 
