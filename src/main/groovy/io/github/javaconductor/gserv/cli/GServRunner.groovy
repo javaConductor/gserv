@@ -166,8 +166,9 @@ class GServRunner {
 				}
 			}
 		} catch (Throwable ex) {
+			println("Could not start app. ${ex.message}")
 			log.trace("Could not start app.", ex)
-			throw ex;
+			//throw ex;
 		}
 
 		/// Start the instance !!

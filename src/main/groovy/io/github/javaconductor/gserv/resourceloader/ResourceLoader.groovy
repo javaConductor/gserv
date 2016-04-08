@@ -78,10 +78,12 @@ class ResourceLoader {
 	 * @return GServConfig
 	 */
 	GServInstance loadInstance(File instanceScriptFile, classpath) {
+		log.debug("Loading instance @ ${instanceScriptFile.absolutePath} . . . ")
 		if (!(instanceScriptFile?.exists()))
 			return null;
 		GroovyShell groovyShell = createGroovyShell(classpath ?: [])
 		GServInstance instance = groovyShell.evaluate(instanceScriptFile)
+		log.debug("Instance @ ${instanceScriptFile.absolutePath} loaded.")
 		instance
 	}
 

@@ -32,6 +32,7 @@ import io.github.javaconductor.gserv.configuration.scriptloader.ScriptLoader
 import io.github.javaconductor.gserv.requesthandler.AbstractRequestContext
 import io.github.javaconductor.gserv.requesthandler.Jdk16RequestContext
 import io.github.javaconductor.gserv.requesthandler.RequestContext
+import io.github.javaconductor.gserv.resourceloader.InstanceScriptException
 import io.github.javaconductor.gserv.resourceloader.ResourceLoader
 import io.github.javaconductor.gserv.resources.GServResource
 import io.github.javaconductor.gserv.server.GServInstance
@@ -144,6 +145,9 @@ class GServFactory {
 			/// if there is an instance script then use it to create the config
 			File f = new File(instanceScript)
 			GServInstance instance = resourceLoader.loadInstance(f, classpath)
+			if (!instance){
+				throw  new InstanceScriptException("Error loading script file: ${f.absolutePath}")
+			}
 			log.debug("Loaded instance ${instance.config().name()} from script: ${f.absolutePath}")
 			instance.config().port(port)
 			if (resourceScripts) {
@@ -186,7 +190,8 @@ class GServFactory {
 		} catch (Throwable ex) {
 			log.error("Could not load resource script: ${ex.message}")
 			println ex.message
-			throw ex
+			return null;
+//			throw ex
 		}
 
 	}//createInstance

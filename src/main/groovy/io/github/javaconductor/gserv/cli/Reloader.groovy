@@ -56,6 +56,7 @@ class Reloader {
 			ctxt.resourceScripts = resourceScripts.collect { new File(it) }
 		}
 		Reloader autoReloader = new Reloader( ctxt)
+		print "Created autoReloader ($configFilename, $instanceScript, $resourceScripts)"
 		autoReloader
 	}
 
@@ -67,7 +68,6 @@ class Reloader {
 		}
 	}
 
-
 	def onFileChange(File f) {
 		println '*' * (f.absolutePath.length() + 16)
 		println "* Reloading ${f.absolutePath} . . ."
@@ -78,8 +78,7 @@ class Reloader {
 
 	def checkTimestamps() {
 		def changedFile = currentTimestamps.keySet().find { f ->
-			def lastModified = currentTimestamps[f]
-			f.lastModified() > lastModified
+			f.lastModified() > currentTimestamps[f]
 		}
 		if (changedFile) {
 			initTimestamps();
