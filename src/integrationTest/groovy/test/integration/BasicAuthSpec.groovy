@@ -70,7 +70,7 @@ class BasicAuthSpec {
 					assert "Failed!", false
 				}
 			}
-		} finally {
+		} catch (Throwable e) {
 			--testCnt
 			if (testCnt == 0)
 				stopFn()
@@ -97,6 +97,8 @@ class BasicAuthSpec {
 			}
 		}
 		catch (Throwable e) {
+			if (testCnt == 0)
+				stopFn()
 			assert "${e.message}", false
 		}
 	}

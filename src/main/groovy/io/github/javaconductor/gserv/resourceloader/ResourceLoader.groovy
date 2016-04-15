@@ -62,7 +62,7 @@ class ResourceLoader {
 		} catch (MultipleCompilationErrorsException ex) {
 			//TODO report the line number of the syntax error
 			//log.trace("Error compiling resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-			//log.warn("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+			log.warn("Error compiling resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
 			throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
 		} catch (Throwable ex) {
 			log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)

@@ -100,7 +100,7 @@ class GServRunner {
 		def configFile
 		def configFilename = options.c;
 		def nuInstance
-		def autoReload
+		def autoReload = options.l
 		Reloader autoReloader
 		def staticRoot, bindAddress, port, classpath, defaultResource, resourceScripts, instanceScript;
 
@@ -168,11 +168,11 @@ class GServRunner {
 		} catch (Throwable ex) {
 			println("Could not start app. ${ex.message}")
 			log.trace("Could not start app.", ex)
-			//throw ex;
+			if ( !autoReload )
+			throw ex;
 		}
 
 		/// Start the instance !!
-		autoReload = options.l
 		if (autoReload) {
 			autoReloader = Reloader.createReloader(configFilename,instanceScript,resourceScripts)
 			autoReloader.listen { File f ->

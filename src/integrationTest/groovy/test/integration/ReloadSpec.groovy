@@ -74,7 +74,7 @@ class ReloadSpec {
 		assert (newText.contains("MathInstance2"))
 	}
 
-	@Test
+
 	public final void testInstanceReload2() {
 		def port = "11018"
 		def dir = baseDir + "reloadTest"
