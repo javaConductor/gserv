@@ -66,7 +66,7 @@ class ResourceLoader {
 			throw new ResourceScriptException("Compilation error in resource script at ${resourceScriptFile.absolutePath}: ${ex.message}")
 		} catch (Throwable ex) {
 			log.trace("Error evaluating resource script file: ${resourceScriptFile.absolutePath} - rethrowing...", ex)
-			log.warn("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
+//			log.warn("Error evaluating resource script file: ${resourceScriptFile.absolutePath} " + ex.message)
 			throw new ResourceScriptException("Error loading resource at ${resourceScriptFile.absolutePath}: ${ex.message}")
 		}
 		resources
@@ -91,7 +91,7 @@ class ResourceLoader {
 		loadInstance(instanceScriptFile, classpath)?.config()
 	}
 
-	def createGroovyShell(classpath) {
+	private def createGroovyShell(classpath) {
 		// Add imports for script.
 		def importCustomizer = new ImportCustomizer()
 		importCustomizer.addStaticStars 'io.github.javaconductor.gserv.GServ'
@@ -104,4 +104,5 @@ class ResourceLoader {
 		// Create shell.
 		new GroovyShell(configuration)
 	}
+
 }

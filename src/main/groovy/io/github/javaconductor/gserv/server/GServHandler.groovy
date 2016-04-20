@@ -175,16 +175,14 @@ class GServHandler implements HttpHandler {
 	private void _handle(RequestContext context) {
 		log.trace("GServHandler._handle(${context})")
 		//TODO be ready to stop/start the actor when it returns with IllegalState (actor cannot recv messages)
-		def success = false
+		def success
 		try {
 			dispatchQ << [requestContext: context]
 			success = true
+			log.trace("GServHandler._handle(${context}) Sent to dispatcher.")
 		} catch (IllegalStateException e) {
 			log.warn("GServHandler._handle(${context})", e)
 			throw e
 		}
-		if (success)
-			log.trace("GServHandler._handle(${context}) Sent to dispatcher.")
-
 	}
 }

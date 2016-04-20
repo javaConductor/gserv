@@ -154,8 +154,16 @@ class FilterRunner {
 	 * @return
 	 */
 	RequestContext process(Filter theFilter, RequestContext context) {
-		Closure cl = theFilter.requestHandler()//_handler
-		FilterDelegate dgt = prepareDelegate(theFilter, context)
+		Closure cl = theFilter.requestHandler()
+
+		//TODO Should be a cleaner way to do this
+		cl.delegate = prepareDelegate(theFilter, context)
+		cl.resolveStrategy = Closure.DELEGATE_FIRST
+		/// Pass the route variables to the behavior if option is set
+		/// Else there will be no args
+		List args = prepareArguments(context, theFilter)
+
+		/// Execute the behavior for this filter
 		def errorHandlingWrapper = { clozure, List argList ->
 			try {
 				return clozure(context, argList)
@@ -166,15 +174,6 @@ class FilterRunner {
 				context
 			}
 		}
-
-		//TODO Should be a cleaner way to do this
-		cl.delegate = dgt
-		cl.resolveStrategy = Closure.DELEGATE_FIRST
-		/// Pass the route variables to the behavior if option is set
-		/// Else there will be no args
-		List args = prepareArguments(context, theFilter)
-
-		/// Execute the behavior for this filter
 		def ret = errorHandlingWrapper(cl, args)
 		ret
 	}

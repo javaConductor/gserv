@@ -169,10 +169,9 @@ class GServ {
 
 		/// get the delegate
 		if (https) {
-			instanceDefinition.delegate = cfg.delegateMgr.createHttpsDelegate();
-
+			instanceDefinition.delegate = cfg.delegateMgr.createHttpsDelegate()
 		} else {
-			instanceDefinition.delegate = cfg.delegateMgr.createHttpDelegate();
+			instanceDefinition.delegate = cfg.delegateMgr.createHttpDelegate()
 		}
 
 		instanceDefinition.resolveStrategy = Closure.DELEGATE_FIRST
@@ -213,7 +212,6 @@ class GServ {
 				.linkBuilder(lBuilder)
 				.converter(inputStreamTypeConverter)
 				.defaultResource(defaultRes)
-		//}
 		factory.createHttpInstance(cfg)
 	}
 
