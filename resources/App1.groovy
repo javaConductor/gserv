@@ -24,8 +24,6 @@
 
 @Grab('com.gmongo:gmongo:1.0')
 import com.gmongo.GMongo
-@Grab('com.gmongo:gmongo:1.0')
-import com.gmongo.GMongo
 import io.github.javaconductor.gserv.GServ
 import io.github.javaconductor.gserv.plugins.PluginMgr
 import io.github.javaconductor.gserv.plugins.caching.CachingPlugin
